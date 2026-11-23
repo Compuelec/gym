@@ -69,7 +69,7 @@ Si usas otro dominio, cambia `BETTER_AUTH_URL` en `secret/gym-secrets` y reinici
 ## 2. Nueva versión
 
 ```bash
-V=0.2.0
+V=0.3.0
 docker buildx build --platform linux/amd64 -f infra/docker/api.Dockerfile \
   -t $REGISTRY/$REGISTRY_OWNER/gym-api:$V --push .
 docker buildx build --platform linux/amd64 -f infra/docker/web.Dockerfile \
@@ -95,6 +95,10 @@ $K 'kubectl -n gym rollout status deploy/gym-api deploy/gym-web deploy/gym-worke
 $K 'kubectl -n gym exec deploy/gym-api -- node dist/admin.mjs invite --days 14'   # imprime el enlace
 $K 'kubectl -n gym exec deploy/gym-api -- node dist/admin.mjs promote <correo>'   # tras registrarse
 ```
+
+El servidor de correo y las invitaciones también se manejan desde la app (Perfil →
+Administración → Correo / Invitaciones / Usuarios). La regla de red sólo deja salir correo por los
+puertos 465 y 587.
 
 ## 4. Comprobar después de publicar
 

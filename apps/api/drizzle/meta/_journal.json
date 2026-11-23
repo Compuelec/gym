@@ -64,6 +64,13 @@
       "when": 1795440000000,
       "tag": "0008_equipment_other_cleanup",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1795450476175,
+      "tag": "0009_admin_mail_users",
+      "breakpoints": true
     }
   ]
 }
