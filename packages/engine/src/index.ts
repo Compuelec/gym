@@ -1,2 +1,3 @@
-// Pure, deterministic smart-training engine (no runtime dependencies).
+// Pure, deterministic smart-training engine.
 export const ENGINE_VERSION = 1 as const;
+export * from './substitutes';

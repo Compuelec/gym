@@ -167,23 +167,23 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T077 [P] [US3] Unit tests for SetEntry validation by `measure`, kg storage with lb display conversion, superset grouping in `packages/shared/src/workout.test.ts`
-- [ ] T078 [P] [US3] Unit tests for substitutes (same primary muscle, equipment available, ranked by similarity, every result has a non-empty Spanish `reason`) in `packages/engine/src/substitutes.test.ts`
-- [ ] T079 [P] [US3] Unit tests for rest timer (absolute end time, survives reload, overtime display) in `apps/web/src/features/session/rest-timer.test.ts`
-- [ ] T080 [P] [US3] Integration tests for workout entities sync (references session→exercise→set validated within batch or same owner; setEntry never conflicts) in `apps/api/tests/workout-sync.test.ts`
-- [ ] T081 [P] [US3] E2E offline: create routine, full session, reload mid-session keeps sets, finish, reconnect, second context sees session once within 60 s of reconnecting (SC-002); logging a set takes ≤ 2 taps from the session screen (SC-001); routine edited in two offline contexts keeps latest in `e2e/us3-offline-session.spec.ts`
-- [ ] T082 [P] [US3] Integration tests for push rest-timer scheduling and cancel in `apps/api/tests/push.test.ts`
+- [X] T077 [P] [US3] Unit tests for SetEntry validation by `measure`, kg storage with lb display conversion, superset grouping in `packages/shared/src/workout.test.ts`
+- [X] T078 [P] [US3] Unit tests for substitutes (same primary muscle, equipment available, ranked by similarity, every result has a non-empty Spanish `reason`) in `packages/engine/src/substitutes.test.ts`
+- [X] T079 [P] [US3] Unit tests for rest timer (absolute end time, survives reload, overtime display) in `apps/web/src/features/session/rest-timer.test.ts`
+- [X] T080 [P] [US3] Integration tests for workout entities sync (references session→exercise→set validated within batch or same owner; setEntry never conflicts) in `apps/api/tests/workout-sync.test.ts`
+- [X] T081 [P] [US3] E2E offline: create routine, full session, reload mid-session keeps sets, finish, reconnect, second context sees session once within 60 s of reconnecting (SC-002); logging a set takes ≤ 2 taps from the session screen (SC-001); routine edited in two offline contexts keeps latest in `e2e/us3-offline-session.spec.ts`
+- [X] T082 [P] [US3] Integration tests for push rest-timer scheduling and cancel in `apps/api/tests/push.test.ts`
 
 ### Implementation for User Story 3
 
-- [ ] T083 [P] [US3] Define Zod schemas Program, Routine (items: `position`, `exerciseId`, `supersetGroup?`, `targetSets`, `repMin?`, `repMax?`, `targetSeconds?`, `targetRir?`, `restSeconds`, `notes?`), WorkoutSession (`status` in_progress|completed|discarded), SessionExercise, SetEntry (`type` warmup|normal|failure|drop, `weightKg?`, `reps?`, `seconds?`, `meters?`, `rir?`, `rpe?`, `suggested?`) in `packages/shared/src/workout.ts`
-- [ ] T084 [P] [US3] Create tables `programs`, `routines` (items jsonb), `workout_sessions`, `session_exercises`, `set_entries` in `apps/api/src/db/schema/workout.ts`; register all in sync registry
-- [ ] T085 [P] [US3] Implement substitutes returning `{exerciseId, score, reason}` with a Spanish explanation (e.g. «Trabaja pecho y tríceps con mancuernas, que tienes en Casa») in `packages/engine/src/substitutes.ts`
-- [ ] T086 [US3] Build routines list/editor (add exercises from catalog, reorder, supersets, targets, rest, duplicate, delete) in `apps/web/src/routes/routines/`
-- [ ] T087 [US3] Build active session screen (start from routine or empty, log set in ≤ 2 taps with prefilled last values, set type, RIR/RPE, notes, swap exercise, finish/discard, summary) in `apps/web/src/routes/session/$id.tsx` and `apps/web/src/features/session/`
-- [ ] T088 [US3] Implement rest timer with absolute end time, Screen Wake Lock during session, sound + vibration in `apps/web/src/features/session/rest-timer.ts`
-- [ ] T089 [US3] Implement Web Push: VAPID routes, subscriptions, `ScheduledPush` table and pg-boss job firing rest-end notifications, cancel on next set in `apps/api/src/routes/push.ts`, `apps/api/src/db/schema/push.ts`, `apps/api/src/jobs/rest-push.ts`; service worker `push` handler in `apps/web/src/sw/sw.ts`
-- [ ] T090 [US3] Offer to close sessions `in_progress` > 6 h on app open in `apps/web/src/features/session/stale-session.ts`
+- [X] T083 [P] [US3] Define Zod schemas Program, Routine (items: `position`, `exerciseId`, `supersetGroup?`, `targetSets`, `repMin?`, `repMax?`, `targetSeconds?`, `targetRir?`, `restSeconds`, `notes?`), WorkoutSession (`status` in_progress|completed|discarded), SessionExercise, SetEntry (`type` warmup|normal|failure|drop, `weightKg?`, `reps?`, `seconds?`, `meters?`, `rir?`, `rpe?`, `suggested?`) in `packages/shared/src/workout.ts`
+- [X] T084 [P] [US3] Create tables `programs`, `routines` (items jsonb), `workout_sessions`, `session_exercises`, `set_entries` in `apps/api/src/db/schema/workout.ts`; register all in sync registry
+- [X] T085 [P] [US3] Implement substitutes returning `{exerciseId, score, reason}` with a Spanish explanation (e.g. «Trabaja pecho y tríceps con mancuernas, que tienes en Casa») in `packages/engine/src/substitutes.ts`
+- [X] T086 [US3] Build routines list/editor (add exercises from catalog, reorder, supersets, targets, rest, duplicate, delete) in `apps/web/src/routes/routines/`
+- [X] T087 [US3] Build active session screen (start from routine or empty, log set in ≤ 2 taps with prefilled last values, set type, RIR/RPE, notes, swap exercise, finish/discard, summary) in `apps/web/src/routes/session/$id.tsx` and `apps/web/src/features/session/`
+- [X] T088 [US3] Implement rest timer with absolute end time, Screen Wake Lock during session, sound + vibration in `apps/web/src/features/session/rest-timer.ts`
+- [X] T089 [US3] Implement Web Push: VAPID routes, subscriptions, `ScheduledPush` table and a polling worker (every 2 s, `FOR UPDATE SKIP LOCKED`, no queue service) firing rest-end notifications, cancel on next set in `apps/api/src/routes/push.ts`, `apps/api/src/db/schema/push.ts`, `apps/api/src/jobs/rest-push.ts`; service worker `push` handler in `apps/web/src/sw/sw.ts`
+- [X] T090 [US3] Offer to close sessions `in_progress` > 6 h on app open in `apps/web/src/features/session/stale-session.ts`
 - [ ] T091 [US3] Live check US3 in a real gym-like airplane-mode run (Android + iPhone installed), including locked-screen push with network, record in `specs/001-gym-pwa-mvp/checklists/us3-live.md`
 
 **Checkpoint**: MVP mínimo útil (US1+US2+US3) — se puede usar a diario.

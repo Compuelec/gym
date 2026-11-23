@@ -55,8 +55,9 @@ Fecha: 2026-11-22. Cada decisión: **Decisión / Razón / Alternativas**.
 
 ## R6. Servidor y base de datos
 - **Decisión**: Hono sobre Node.js (`@hono/node-server`), PostgreSQL 17, Drizzle ORM +
-  drizzle-kit para migraciones, Zod para validación, pg-boss para trabajos en segundo plano
-  (coach, push programados, limpieza).
+  drizzle-kit para migraciones, Zod para validación y un *worker* que consulta la base cada 2 s
+  (`FOR UPDATE SKIP LOCKED`) para trabajos en segundo plano (push programados; coach después).
+  Se descartó pg-boss al implementar la US3: una tabla consultada alcanza y no suma dependencias.
 - **Razón**: liviano, tipado de punta a punta (cliente RPC de Hono), sin Redis (principio VI).
 - **Alternativas**: NestJS (más estructura y ceremonia de la necesaria), Fastify (equivalente;
   Hono tiene mejor cliente tipado), Prisma (más pesado; Drizzle es más cercano a SQL).

@@ -7,3 +7,4 @@ export * from './vocabulary';
 export * from './profile';
 export * from './exercise';
 export * from './catalog-filter';
+export * from './workout';

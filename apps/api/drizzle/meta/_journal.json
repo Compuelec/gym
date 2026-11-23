@@ -22,6 +22,13 @@
       "when": 1795404822670,
       "tag": "0002_us2_catalog",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795405784637,
+      "tag": "0003_us3_training",
+      "breakpoints": true
     }
   ]
 }

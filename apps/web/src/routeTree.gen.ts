@@ -17,12 +17,15 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
-import { Route as RoutinesRouteImport } from './routes/routines'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ExercisesIndexRouteImport } from './routes/exercises/index'
 import { Route as ExercisesNewRouteImport } from './routes/exercises/new'
+import { Route as RoutinesIndexRouteImport } from './routes/routines/index'
+import { Route as RoutinesNewRouteImport } from './routes/routines/new'
+import { Route as SessionIdRouteImport } from './routes/session/$id'
 import { Route as ExercisesIdIndexRouteImport } from './routes/exercises/$id/index'
 import { Route as ExercisesIdEditRouteImport } from './routes/exercises/$id/edit'
+import { Route as RoutinesIdEditRouteImport } from './routes/routines/$id/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -64,11 +67,6 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
-const RoutinesRoute = RoutinesRouteImport.update({
-  id: '/routines',
-  path: '/routines',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
@@ -84,6 +82,21 @@ const ExercisesNewRoute = ExercisesNewRouteImport.update({
   path: '/exercises/new',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RoutinesIndexRoute = RoutinesIndexRouteImport.update({
+  id: '/routines/',
+  path: '/routines/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoutinesNewRoute = RoutinesNewRouteImport.update({
+  id: '/routines/new',
+  path: '/routines/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessionIdRoute = SessionIdRouteImport.update({
+  id: '/session/$id',
+  path: '/session/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExercisesIdIndexRoute = ExercisesIdIndexRouteImport.update({
   id: '/exercises/$id/',
   path: '/exercises/$id/',
@@ -92,6 +105,11 @@ const ExercisesIdIndexRoute = ExercisesIdIndexRouteImport.update({
 const ExercisesIdEditRoute = ExercisesIdEditRouteImport.update({
   id: '/exercises/$id/edit',
   path: '/exercises/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RoutinesIdEditRoute = RoutinesIdEditRouteImport.update({
+  id: '/routines/$id/edit',
+  path: '/routines/$id/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -104,11 +122,14 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/routines': typeof RoutinesRoute
   '/signup': typeof SignupRoute
   '/exercises/new': typeof ExercisesNewRoute
+  '/routines/new': typeof RoutinesNewRoute
+  '/session/$id': typeof SessionIdRoute
   '/exercises/': typeof ExercisesIndexRoute
+  '/routines/': typeof RoutinesIndexRoute
   '/exercises/$id/edit': typeof ExercisesIdEditRoute
+  '/routines/$id/edit': typeof RoutinesIdEditRoute
   '/exercises/$id/': typeof ExercisesIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -120,11 +141,14 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/routines': typeof RoutinesRoute
   '/signup': typeof SignupRoute
   '/exercises/new': typeof ExercisesNewRoute
+  '/routines/new': typeof RoutinesNewRoute
+  '/session/$id': typeof SessionIdRoute
   '/exercises': typeof ExercisesIndexRoute
+  '/routines': typeof RoutinesIndexRoute
   '/exercises/$id/edit': typeof ExercisesIdEditRoute
+  '/routines/$id/edit': typeof RoutinesIdEditRoute
   '/exercises/$id': typeof ExercisesIdIndexRoute
 }
 export interface FileRoutesById {
@@ -137,11 +161,14 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/routines': typeof RoutinesRoute
   '/signup': typeof SignupRoute
   '/exercises/new': typeof ExercisesNewRoute
+  '/routines/new': typeof RoutinesNewRoute
+  '/session/$id': typeof SessionIdRoute
   '/exercises/': typeof ExercisesIndexRoute
+  '/routines/': typeof RoutinesIndexRoute
   '/exercises/$id/edit': typeof ExercisesIdEditRoute
+  '/routines/$id/edit': typeof RoutinesIdEditRoute
   '/exercises/$id/': typeof ExercisesIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -155,11 +182,14 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/reset-password'
-    | '/routines'
     | '/signup'
     | '/exercises/new'
+    | '/routines/new'
+    | '/session/$id'
     | '/exercises/'
+    | '/routines/'
     | '/exercises/$id/edit'
+    | '/routines/$id/edit'
     | '/exercises/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -171,11 +201,14 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/reset-password'
-    | '/routines'
     | '/signup'
     | '/exercises/new'
+    | '/routines/new'
+    | '/session/$id'
     | '/exercises'
+    | '/routines'
     | '/exercises/$id/edit'
+    | '/routines/$id/edit'
     | '/exercises/$id'
   id:
     | '__root__'
@@ -187,11 +220,14 @@ export interface FileRouteTypes {
     | '/profile'
     | '/progress'
     | '/reset-password'
-    | '/routines'
     | '/signup'
     | '/exercises/new'
+    | '/routines/new'
+    | '/session/$id'
     | '/exercises/'
+    | '/routines/'
     | '/exercises/$id/edit'
+    | '/routines/$id/edit'
     | '/exercises/$id/'
   fileRoutesById: FileRoutesById
 }
@@ -204,11 +240,14 @@ export interface RootRouteChildren {
   ProfileRoute: typeof ProfileRoute
   ProgressRoute: typeof ProgressRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
-  RoutinesRoute: typeof RoutinesRoute
   SignupRoute: typeof SignupRoute
   ExercisesNewRoute: typeof ExercisesNewRoute
+  RoutinesNewRoute: typeof RoutinesNewRoute
+  SessionIdRoute: typeof SessionIdRoute
   ExercisesIndexRoute: typeof ExercisesIndexRoute
+  RoutinesIndexRoute: typeof RoutinesIndexRoute
   ExercisesIdEditRoute: typeof ExercisesIdEditRoute
+  RoutinesIdEditRoute: typeof RoutinesIdEditRoute
   ExercisesIdIndexRoute: typeof ExercisesIdIndexRoute
 }
 
@@ -270,13 +309,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/routines': {
-      id: '/routines'
-      path: '/routines'
-      fullPath: '/routines'
-      preLoaderRoute: typeof RoutinesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -298,6 +330,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExercisesNewRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/routines/': {
+      id: '/routines/'
+      path: '/routines'
+      fullPath: '/routines/'
+      preLoaderRoute: typeof RoutinesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/routines/new': {
+      id: '/routines/new'
+      path: '/routines/new'
+      fullPath: '/routines/new'
+      preLoaderRoute: typeof RoutinesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/session/$id': {
+      id: '/session/$id'
+      path: '/session/$id'
+      fullPath: '/session/$id'
+      preLoaderRoute: typeof SessionIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/exercises/$id/': {
       id: '/exercises/$id/'
       path: '/exercises/$id'
@@ -312,6 +365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ExercisesIdEditRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/routines/$id/edit': {
+      id: '/routines/$id/edit'
+      path: '/routines/$id/edit'
+      fullPath: '/routines/$id/edit'
+      preLoaderRoute: typeof RoutinesIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -324,11 +384,14 @@ const rootRouteChildren: RootRouteChildren = {
   ProfileRoute: ProfileRoute,
   ProgressRoute: ProgressRoute,
   ResetPasswordRoute: ResetPasswordRoute,
-  RoutinesRoute: RoutinesRoute,
   SignupRoute: SignupRoute,
   ExercisesNewRoute: ExercisesNewRoute,
+  RoutinesNewRoute: RoutinesNewRoute,
+  SessionIdRoute: SessionIdRoute,
   ExercisesIndexRoute: ExercisesIndexRoute,
+  RoutinesIndexRoute: RoutinesIndexRoute,
   ExercisesIdEditRoute: ExercisesIdEditRoute,
+  RoutinesIdEditRoute: RoutinesIdEditRoute,
   ExercisesIdIndexRoute: ExercisesIdIndexRoute,
 }
 export const routeTree = rootRouteImport

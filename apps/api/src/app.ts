@@ -9,6 +9,7 @@ import { SyncRegistry } from './lib/sync-registry';
 import { logger } from './logger';
 import { configRoutes } from './routes/config';
 import { invitationRoutes } from './routes/invitations';
+import { pushRoutes } from './routes/push';
 import { syncRoutes } from './routes/sync';
 
 export interface AppDeps {
@@ -53,6 +54,8 @@ export function createApp({ db, config, registry = new SyncRegistry(), auth = cr
 
   app.use('/sync/*', requireSession(auth));
   app.route('/sync', syncRoutes(db, registry));
+  app.use('/push/*', requireSession(auth));
+  app.route('/push', pushRoutes(db, config));
 
   return app;
 }

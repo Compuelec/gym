@@ -4,6 +4,7 @@ import { AppShell } from '@/components/AppShell';
 import { FullPageSpinner } from '@/components/Spinner';
 import { t } from '@/i18n';
 import { getDB } from '@/db/database';
+import { registerUpdateBlocker } from '@/lib/update-guard';
 import { requestPersistentStorage } from '@/db/persistence';
 import { ensureCatalog, scheduleImagePrecache } from '@/features/catalog/catalog-loader';
 import { UserContext } from '@/lib/auth-context';
@@ -56,7 +57,12 @@ function SignedIn({ user, path }: { user: SessionUser; path: string }) {
     // Base catalog: download when new; the installed app also warms every image when idle.
     const db = getDB(user.id);
     void ensureCatalog(db).then(() => scheduleImagePrecache(db));
-    return () => engine.stop();
+    // Never apply a new app version in the middle of a workout.
+    const unblock = registerUpdateBlocker(async () => (await db.entityTable('workoutSession').where('status').equals('in_progress').count()) > 0);
+    return () => {
+      engine.stop();
+      unblock();
+    };
   }, [user.id]);
 
   // Wait for the first sync (or for being offline) before deciding the user is new.

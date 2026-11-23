@@ -30,3 +30,34 @@ self.addEventListener('activate', (event) => event.waitUntil(self.clients.claim(
 self.addEventListener('message', (event) => {
   if (event.data?.type === 'SKIP_WAITING') void self.skipWaiting();
 });
+
+// Rest-timer push from the server (arrives with the screen locked).
+self.addEventListener('push', (event) => {
+  const data = (event.data?.json() ?? {}) as { title?: string; body?: string; tag?: string; url?: string };
+  event.waitUntil(
+    self.registration.showNotification(data.title ?? 'Gym', {
+      body: data.body,
+      tag: data.tag ?? 'gym',
+      icon: '/pwa-192x192.png',
+      badge: '/pwa-64x64.png',
+      data: { url: data.url ?? '/' },
+    }),
+  );
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const url = (event.notification.data as { url?: string } | undefined)?.url ?? '/';
+  event.waitUntil(
+    (async () => {
+      const windows = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+      const open = windows.find((w) => new URL(w.url).pathname === url) ?? windows[0];
+      if (open) {
+        await open.focus();
+        if (new URL(open.url).pathname !== url) await open.navigate(url);
+      } else {
+        await self.clients.openWindow(url);
+      }
+    })(),
+  );
+});

@@ -4,3 +4,5 @@ export * from './sync';
 export * from './invitations';
 export * from './profiles';
 export * from './exercises';
+export * from './workout';
+export * from './push';

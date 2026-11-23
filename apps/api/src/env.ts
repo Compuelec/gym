@@ -15,6 +15,10 @@ const EnvSchema = z.object({
   // smtp://user:pass@host:587 — without it, emails are logged (development) and not sent.
   SMTP_URL: z.string().optional(),
   MAIL_FROM: z.string().default('Gym <no-reply@example.com>'),
+  // Web Push (rest timer). Without keys, push is disabled and the in-app timer still works.
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().default('mailto:admin@example.com'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

@@ -35,6 +35,12 @@ export const ENTITY_STORES: Record<string, string> = {
   // US2
   exercise: 'id, serverVersion',
   favorite: 'id, exerciseId',
+  // US3
+  program: 'id',
+  routine: 'id',
+  workoutSession: 'id, status, startedAt',
+  sessionExercise: 'id, sessionId, exerciseId',
+  setEntry: 'id, sessionExerciseId',
 };
 
 /** Local-only stores (not synced): the base exercise catalog. */
