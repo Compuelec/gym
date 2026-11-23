@@ -1,3 +1,4 @@
+import { BrandMark } from '@/components/BrandMark';
 import { useState, type FormEvent } from 'react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -30,7 +31,8 @@ function ForgotPasswordPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">{t('auth.forgot.title')}</h1>
+        <BrandMark />
+        <h1 className="text-3xl font-bold">{t('auth.forgot.title')}</h1>
         <p className="text-muted-foreground">{t('auth.forgot.intro')}</p>
       </header>
       {sent ? (

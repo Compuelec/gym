@@ -40,5 +40,7 @@ describe('rest timer', () => {
   it('formats as m:ss', () => {
     expect(formatClock(0)).toBe('0:00');
     expect(formatClock(95)).toBe('1:35');
+    expect(formatClock(3909)).toBe('1:05:09');
+    expect(formatClock(19219)).toBe('5:20:19');
   });
 });

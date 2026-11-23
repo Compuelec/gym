@@ -1,3 +1,4 @@
+import { BrandMark } from '@/components/BrandMark';
 import { useState, type FormEvent } from 'react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
@@ -33,7 +34,8 @@ function ResetPasswordPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">{t('auth.reset.title')}</h1>
+      <BrandMark />
+      <h1 className="text-3xl font-bold">{t('auth.reset.title')}</h1>
       {done ? (
         <p role="status" className="rounded-lg bg-muted px-3 py-2">
           {t('auth.reset.done')}

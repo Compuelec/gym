@@ -23,7 +23,7 @@ function RoutinesPage() {
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t('routines.title')}</h1>
+        <h1 className="text-3xl font-bold">{t('routines.title')}</h1>
         <Link to="/routines/new" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
           <Plus className="size-4" aria-hidden />
           {t('routines.new')}
@@ -32,7 +32,7 @@ function RoutinesPage() {
       {routines.length === 0 && <p className="text-muted-foreground">{t('routines.empty')}</p>}
       <ul className="flex flex-col gap-3">
         {routines.map((r) => (
-          <li key={r.id} className="flex flex-col gap-2 rounded-lg border border-border p-4">
+          <li key={r.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 shadow-card">
             <div>
               <h2 className="font-semibold">{r.name}</h2>
               <p className="text-sm text-muted-foreground">

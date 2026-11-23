@@ -2,7 +2,8 @@
   "app": {
     "name": "Gym",
     "tagline": "Entrena en casa o en el gimnasio.",
-    "greeting": "Hola, {name}"
+    "greeting": "Hola, {name}",
+    "brand": "GYM"
   },
   "nav": {
     "train": "Entrenar",
@@ -133,7 +134,8 @@
     "saved": "Guardado.",
     "deleteLocationConfirm": "¿Eliminar este lugar?",
     "pendingChanges": "Tienes {count} cambios sin sincronizar. Conéctate antes de cerrar sesión para no perderlos.",
-    "credits": "Créditos de ejercicios e imágenes"
+    "credits": "Créditos de ejercicios e imágenes",
+    "more": "Más opciones"
   },
   "install": {
     "title": "Instala la app",
@@ -652,5 +654,22 @@
     "rights": "© {year} · Todos los derechos reservados",
     "version": "v{version}",
     "name": "Compuelec Soporte"
+  },
+  "home": {
+    "week": "Semana",
+    "weekDone": "{done} de {goal} entrenamientos",
+    "streak": "Racha",
+    "streakWeeks": "{count} semanas seguidas",
+    "streakWeeksOne": "1 semana seguida",
+    "todayTitle": "Tu entrenamiento de hoy",
+    "todayHint": "Según tu recuperación, tu tiempo y el equipo que tienes.",
+    "todayCta": "Ver y empezar"
+  },
+  "theme": {
+    "title": "Apariencia",
+    "auto": "Automático",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "hint": "Automático sigue el modo de tu teléfono."
   }
 }

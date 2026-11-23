@@ -65,7 +65,7 @@ export function RoutineEditor({
           const ex = exercises.get(item.exerciseId);
           const timed = ex?.measure === 'time';
           return (
-            <li key={`${item.exerciseId}-${i}`} className="flex flex-col gap-3 rounded-lg border border-border p-3">
+            <li key={`${item.exerciseId}-${i}`} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 shadow-card">
               <div className="flex items-center justify-between gap-2">
                 <span className="font-medium">
                   {i + 1}. {ex?.nameEs ?? item.exerciseId}

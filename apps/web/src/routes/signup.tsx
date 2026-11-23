@@ -1,3 +1,4 @@
+import { BrandMark } from '@/components/BrandMark';
 import { useState, type FormEvent } from 'react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
@@ -49,7 +50,8 @@ function SignupPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">{t('auth.signup.title')}</h1>
+      <BrandMark />
+      <h1 className="text-3xl font-bold">{t('auth.signup.title')}</h1>
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
         <TextField
           label={t('auth.signup.inviteCode')}

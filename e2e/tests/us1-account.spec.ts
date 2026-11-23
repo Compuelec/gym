@@ -22,8 +22,8 @@ test.describe('US1 · cuenta e instalación', () => {
     await page.getByRole('button', { name: 'Siguiente' }).click();
 
     // Casa is preselected with dumbbells, band and mat; add a pull-up bar. Also enable Gimnasio.
-    const home = page.locator('div.rounded-lg', { has: page.getByText('Casa', { exact: true }) }).first();
-    await home.getByText('Barra de dominadas').click();
+    // Casa's equipment comes first (Gimnasio's chips only show once it is checked).
+    await page.getByText('Barra de dominadas').first().click();
     await page.getByLabel('Gimnasio').check();
     await page.getByRole('button', { name: 'Siguiente' }).click();
 

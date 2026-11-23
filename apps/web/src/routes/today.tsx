@@ -115,7 +115,7 @@ function TodayPage() {
 
   return (
     <div className={`flex flex-col gap-4 ${items ? 'pb-32' : ''}`}>
-      <h1 className="text-2xl font-semibold">{t('smart.todayTitle')}</h1>
+      <h1 className="text-3xl font-bold">{t('smart.todayTitle')}</h1>
       <div className="grid grid-cols-2 gap-3">
         <SelectField label={t('smart.minutes')} value={chosenMinutes} onChange={(e) => setMinutes(Number(e.target.value))}>
           {[...new Set([...MINUTES, profile.sessionMinutes])].sort((a, b) => a - b).map((m) => (
@@ -132,7 +132,7 @@ function TodayPage() {
           ))}
         </SelectField>
       </div>
-      <Button variant={items ? 'outline' : 'default'} onClick={propose}>
+      <Button variant={items ? 'outline' : 'brand'} size={items ? 'default' : 'lg'} onClick={propose}>
         <Sparkles className="size-4" aria-hidden />
         {items ? t('smart.regenerate') : t('smart.generate')}
       </Button>
@@ -140,9 +140,9 @@ function TodayPage() {
       {items && items.length === 0 && <p>{t('smart.noExercises')}</p>}
       {items && items.length > 0 && (
         <section className="flex flex-col gap-3">
-          {reason && <p className="rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-900">{reason}</p>}
-          <div className="flex items-center justify-between gap-2 rounded-lg border border-border px-3 py-2">
-            <p role="status" className={`text-sm ${off > 0 || off < -5 ? 'font-medium text-amber-800' : 'text-muted-foreground'}`}>
+          {reason && <p className="rounded-lg bg-info-soft px-3 py-2 text-sm text-info">{reason}</p>}
+          <div className="flex items-center justify-between gap-2 rounded-2xl border border-border bg-card px-3 py-2 shadow-card">
+            <p role="status" className={`text-sm ${off > 0 || off < -5 ? 'font-medium text-warning' : 'text-muted-foreground'}`}>
               {t('smart.estimatedOf', { minutes: estimated, total: chosenMinutes })}
             </p>
             {(off > 0 || off < -5) && (
@@ -171,7 +171,7 @@ function TodayPage() {
             {t('session.addExercise')}
           </Button>
           {saved && (
-            <p role="status" className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-900">
+            <p role="status" className="rounded-lg bg-success-soft px-3 py-2 text-sm text-success">
               {t('smart.savedAsRoutine')}
             </p>
           )}
@@ -179,13 +179,13 @@ function TodayPage() {
       )}
 
       {items && items.length > 0 && (
-        <div className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-40 border-t border-border bg-background">
-          <div className="mx-auto grid max-w-md grid-cols-[auto_1fr] gap-2 px-4 py-2">
+        <div className="fixed inset-x-0 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-40 px-3">
+          <div className="mx-auto grid max-w-md grid-cols-[auto_1fr] gap-2 rounded-2xl border border-border bg-card p-2 shadow-card">
             <Button variant="outline" size="lg" className="px-4" aria-label={t('smart.saveAsRoutine')} disabled={saved} onClick={() => void saveAsRoutine()}>
               <Save className="size-5" aria-hidden />
               {saved ? t('smart.saved') : t('common.save')}
             </Button>
-            <Button size="lg" onClick={() => void start()}>
+            <Button size="lg" variant="brand" onClick={() => void start()}>
               {t('smart.start')}
             </Button>
           </div>
@@ -262,7 +262,7 @@ function PlanCard({
   const restOptions = REST_PRESETS.includes(item.restSeconds) ? REST_PRESETS : [...REST_PRESETS, item.restSeconds].sort((a, b) => a - b);
   const num = (v: string, min: number, max: number) => Math.min(max, Math.max(min, Math.round(Number(v) || min)));
   return (
-    <li aria-label={name} className="flex flex-col gap-3 rounded-xl border border-border p-3">
+    <li aria-label={name} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-3 shadow-card">
       <div className="flex items-start gap-3">
         <AnimatedThumbnail media={exercise?.media ?? []} />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -299,7 +299,7 @@ function PlanCard({
             ) : (
               <label className="flex flex-col gap-1 text-xs">
                 {t('session.restBetween')}
-                <select className="h-12 rounded-lg border border-border bg-background px-2 text-base" value={item.restSeconds} onChange={(e) => onChange({ restSeconds: Number(e.target.value) })}>
+                <select className="h-12 rounded-xl border border-border bg-card px-2 text-base" value={item.restSeconds} onChange={(e) => onChange({ restSeconds: Number(e.target.value) })}>
                   {restOptions.map((r) => (
                     <option key={r} value={r}>
                       {r === 0 ? t('session.noRest') : formatClock(r)}

@@ -1,3 +1,5 @@
+import { ChevronRight, Download, Info, Shield } from 'lucide-react';
+import { ThemePicker } from '@/components/ThemePicker';
 import { Credits } from '@/components/Credits';
 import { useState } from 'react';
 import { PageSpinner } from '@/components/Spinner';
@@ -53,12 +55,17 @@ function ProfilePage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-semibold">{t('profile.title')}</h1>
+      <h1 className="text-3xl font-bold">{t('profile.title')}</h1>
 
-      <section className="flex flex-col gap-2">
-        <h2 className="text-lg font-semibold">{t('profile.account')}</h2>
-        <p>{user.name}</p>
-        <p className="text-muted-foreground">{user.email}</p>
+      <section aria-label={t('profile.account')} className="bg-brand flex items-center gap-4 rounded-3xl p-4 shadow-card">
+        <span aria-hidden className="grid size-14 shrink-0 place-items-center rounded-full bg-black/25 font-display text-xl font-bold">
+          {initials(user.name)}
+        </span>
+        <span className="flex min-w-0 flex-col">
+          <span className="truncate text-lg font-bold">{user.name}</span>
+          <span className="truncate text-sm opacity-90">{user.email}</span>
+        </span>
+        {user.role === 'admin' && <span className="ml-auto rounded-full bg-white px-2 py-0.5 text-[11px] font-bold text-[#3a2bb8]">{t('admin.users.admin')}</span>}
       </section>
 
       <section className="flex flex-col gap-4">
@@ -90,7 +97,7 @@ function ProfilePage() {
               }}
             />
           ) : (
-            <article key={loc.id} className="flex flex-col gap-2 rounded-lg border border-border p-4">
+            <article key={loc.id} className="flex flex-col gap-2 rounded-2xl border border-border bg-card p-4 shadow-card">
               <div className="flex items-center gap-2">
                 <h3 className="font-medium">{loc.name}</h3>
                 {loc.isDefault && <span className="rounded-full bg-muted px-2 py-0.5 text-xs">{t('profile.default')}</span>}
@@ -134,19 +141,13 @@ function ProfilePage() {
 
       <InstallPrompt />
 
-      <div className="flex flex-col gap-2 text-sm">
-        {user.role === 'admin' && (
-          <Link to="/admin" className="font-medium underline">
-            {t('admin.link')}
-          </Link>
-        )}
-        <Link to="/data" className="underline">
-          {t('progress.dataLink')}
-        </Link>
-        <Link to="/credits" className="underline">
-          {t('profile.credits')}
-        </Link>
-      </div>
+      <ThemePicker />
+
+      <nav aria-label={t('profile.more')} className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+        {user.role === 'admin' && <MenuLink to="/admin" icon={Shield} tone="accent" label={t('admin.link')} />}
+        <MenuLink to="/data" icon={Download} tone="info" label={t('progress.dataLink')} />
+        <MenuLink to="/credits" icon={Info} tone="info" label={t('profile.credits')} />
+      </nav>
 
       <section className="flex flex-col gap-2">
         <FormError message={error} />
@@ -159,5 +160,26 @@ function ProfilePage() {
       </section>
       <Credits />
     </div>
+  );
+}
+
+function initials(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]!.toUpperCase())
+    .join('');
+}
+
+function MenuLink({ to, icon: Icon, tone, label }: { to: '/admin' | '/data' | '/credits'; icon: typeof Info; tone: 'info' | 'accent'; label: string }) {
+  return (
+    <Link to={to} className="flex items-center gap-3 border-b border-border px-4 py-3.5 text-sm font-medium last:border-b-0 hover:bg-muted">
+      <span className={`grid size-8 place-items-center rounded-lg ${tone === 'accent' ? 'bg-accent-soft text-accent' : 'bg-info-soft text-info'}`}>
+        <Icon className="size-4" aria-hidden />
+      </span>
+      <span className="flex-1">{label}</span>
+      <ChevronRight className="size-4 text-muted-foreground" aria-hidden />
+    </Link>
   );
 }
