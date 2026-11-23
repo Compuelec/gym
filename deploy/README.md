@@ -69,7 +69,7 @@ Si usas otro dominio, cambia `BETTER_AUTH_URL` en `secret/gym-secrets` y reinici
 ## 2. Nueva versión
 
 ```bash
-V=0.1.1
+V=0.2.0
 docker buildx build --platform linux/amd64 -f infra/docker/api.Dockerfile \
   -t $REGISTRY/$REGISTRY_OWNER/gym-api:$V --push .
 docker buildx build --platform linux/amd64 -f infra/docker/web.Dockerfile \

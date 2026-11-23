@@ -36,7 +36,7 @@ spec:
       containers:
         - name: web
           # Pin version@sha256 after each push (see deploy/README.md).
-          image: registry.example.com/owner/gym-web:0.1.1@sha256:13d36b2275da06fd06d375ab8a6d34e6e02dcb9b4f9a431a64e0a51fd1824eb6
+          image: registry.example.com/owner/gym-web:0.2.0
           ports: [{ containerPort: 8080 }]
           env:
             - { name: API_UPSTREAM, value: "gym-api:3000" }
@@ -75,7 +75,7 @@ spec:
         - name: gym-registry
       containers:
         - name: api
-          image: registry.example.com/owner/gym-api:0.1.1@sha256:0cb51f90c3807738626ffafc3848d5977075486bc5023cd331fe9faf63f73cc0
+          image: registry.example.com/owner/gym-api:0.2.0
           ports: [{ containerPort: 3000 }]
           envFrom: [{ secretRef: { name: gym-secrets } }]
           env:
@@ -122,7 +122,7 @@ spec:
         - name: gym-registry
       containers:
         - name: worker
-          image: registry.example.com/owner/gym-api:0.1.1@sha256:0cb51f90c3807738626ffafc3848d5977075486bc5023cd331fe9faf63f73cc0
+          image: registry.example.com/owner/gym-api:0.2.0
           command: ["node", "dist/worker.mjs"]
           envFrom: [{ secretRef: { name: gym-secrets } }]
           resources:
