@@ -646,5 +646,11 @@
     "open": "Ver rutina",
     "keepBrowsing": "Seguir viendo",
     "full": "Llena (30)"
+  },
+  "credits": {
+    "by": "Creado y diseñado por",
+    "rights": "© {year} · Todos los derechos reservados",
+    "version": "v{version}",
+    "name": "Compuelec Soporte"
   }
 }
