@@ -2,7 +2,7 @@ import { Minus, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { t } from '@/i18n';
 
-const inputCls = 'h-12 w-full min-w-0 rounded-lg border border-border bg-background px-1 text-center text-lg tabular-nums';
+const inputCls = 'h-12 w-full min-w-0 rounded-xl border border-border bg-card px-1 text-center text-lg tabular-nums';
 
 /** Number box with large − / + buttons, easy to use with sweaty hands. */
 export function Stepper({ label, value, onChange, step, min = 0, decimal = false }: { label: string; value: string; onChange: (v: string) => void; step: number; min?: number; decimal?: boolean }) {

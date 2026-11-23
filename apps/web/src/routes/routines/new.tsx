@@ -43,7 +43,7 @@ function NewRoutinePage() {
   const withDefault = { ...initial, items, locationId: locations.find((l) => l.isDefault)?.id ?? null };
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{t('routines.newTitle')}</h1>
+      <h1 className="text-3xl font-bold">{t('routines.newTitle')}</h1>
       <RoutineEditor
         userId={user.id}
         initial={withDefault}

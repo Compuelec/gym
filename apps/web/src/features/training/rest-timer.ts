@@ -30,8 +30,11 @@ export function addRest(state: RestState, seconds: number, now = Date.now()): Re
 }
 
 export function formatClock(totalSeconds: number): string {
-  const m = Math.floor(totalSeconds / 60);
+  // An hour or more: h:mm:ss («1:05:09»), never «65:09».
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
   const s = totalSeconds % 60;
+  if (h > 0) return `${h}:${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 

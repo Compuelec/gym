@@ -58,7 +58,7 @@ function OnboardingPage() {
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
         <p className="text-sm text-muted-foreground">{t('onboarding.step', { current: step, total: TOTAL_STEPS })}</p>
-        <h1 className="text-2xl font-semibold">{t('onboarding.title')}</h1>
+        <h1 className="text-3xl font-bold">{t('onboarding.title')}</h1>
       </header>
 
       {step === 1 && <TrainingFields value={training} onChange={setTraining} />}
@@ -70,7 +70,7 @@ function OnboardingPage() {
             <p className="text-sm text-muted-foreground">{t('onboarding.locationsHint')}</p>
           </div>
           {places.map((place, i) => (
-            <div key={i} className="flex flex-col gap-3 rounded-lg border border-border p-4">
+            <div key={i} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-card">
               <Choice
                 type="checkbox"
                 checked={place.enabled}

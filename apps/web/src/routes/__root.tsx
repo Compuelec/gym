@@ -18,7 +18,7 @@ export const Route = createRootRoute({ component: Root, notFoundComponent: NotFo
 function NotFound() {
   return (
     <section className="flex flex-col gap-3">
-      <h1 className="text-2xl font-semibold">{t('common.notFoundTitle')}</h1>
+      <h1 className="text-3xl font-bold">{t('common.notFoundTitle')}</h1>
       <Link to="/" className="underline">
         {t('common.notFoundBack')}
       </Link>

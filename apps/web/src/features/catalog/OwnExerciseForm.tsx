@@ -114,7 +114,7 @@ export function OwnExerciseForm({ initial, onSave }: { initial: LocalOwnExercise
           rows={5}
           value={steps}
           onChange={(e) => setSteps(e.target.value)}
-          className="rounded-lg border border-border bg-background p-3 text-base font-normal"
+          className="rounded-xl border border-border bg-card p-3 text-base font-normal"
         />
       </label>
       <FormError message={error} />

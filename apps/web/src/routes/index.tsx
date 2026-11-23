@@ -2,7 +2,10 @@ import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
 import { useState } from 'react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Activity, MessageSquare, Play, Sparkles } from 'lucide-react';
+import { Activity, Flame, MessageSquare, Play, Sparkles } from 'lucide-react';
+import { weeklyFrequency, weeklyStreak } from '@gym/engine';
+import { useCompletedSessions } from '@/features/progress/data';
+import { useProfile } from '@/lib/repos';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { SelectField } from '@/components/ui/field';
@@ -16,7 +19,7 @@ import {
   useActiveSession,
   useRoutines,
 } from '@/features/training/repo';
-import { t } from '@/i18n';
+import { t, tn } from '@/i18n';
 import { useUser } from '@/lib/auth-context';
 import { useLocations } from '@/lib/repos';
 import { useNow } from '@/lib/use-now';
@@ -38,6 +41,13 @@ function TrainPage() {
   const [locationId, setLocationId] = useState('');
   const now = useNow(1000);
   const where = locationId || locations.find((l) => l.isDefault)?.id || null;
+  const profile = useProfile(user.id);
+  const sessions = useCompletedSessions(user.id) ?? [];
+  const dates = sessions.map((x) => x.startedAt);
+  const thisWeek = weeklyFrequency(dates, now, 1)[0]?.sessions ?? 0;
+  const goal = profile?.daysPerWeek ?? 3;
+  const weekPct = Math.min(100, Math.round((thisWeek / goal) * 100));
+  const streak = weeklyStreak(dates, now);
 
   async function start(routineId: string | null) {
     const routine = routines.find((r) => r.id === routineId) ?? null;
@@ -52,14 +62,41 @@ function TrainPage() {
   return (
     <section className="flex flex-col gap-5">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">
+        <p className="text-sm text-muted-foreground">{t('app.tagline')}</p>
+        <h1 className="text-[2rem] leading-none font-bold">
           {t('app.greeting', { name: user.name.split(' ')[0] ?? user.name })}
         </h1>
-        <p className="text-muted-foreground">{t('app.tagline')}</p>
       </header>
 
+      <div className="grid grid-cols-2 gap-3">
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-card">
+          <div
+            aria-hidden
+            className="grid size-12 shrink-0 place-items-center rounded-full"
+            style={{ background: `conic-gradient(var(--primary) 0 ${weekPct}%, var(--muted) ${weekPct}% 100%)` }}
+          >
+            <span className="grid size-9 place-items-center rounded-full bg-card font-display text-sm font-bold">
+              {thisWeek}/{goal}
+            </span>
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold">{t('home.week')}</p>
+            <p className="text-xs text-muted-foreground">{t('home.weekDone', { done: thisWeek, goal })}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-card">
+          <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-accent-soft text-accent">
+            <Flame className="size-6" aria-hidden />
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-semibold">{t('home.streak')}</p>
+            <p className="text-xs text-muted-foreground">{tn('home.streakWeeks', streak)}</p>
+          </div>
+        </div>
+      </div>
+
       {active && (
-        <article className="flex flex-col gap-3 rounded-lg border border-primary p-4">
+        <article className="flex flex-col gap-3 rounded-3xl border-2 border-primary bg-card p-4 shadow-card">
           <div>
             <h2 className="font-semibold">{t('train.inProgress')}</h2>
             <p className="text-sm text-muted-foreground">
@@ -70,7 +107,7 @@ function TrainPage() {
             </p>
           </div>
           {isStale(active, now) && (
-            <div className="flex flex-col gap-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-900">
+            <div className="flex flex-col gap-2 rounded-lg bg-warning-soft p-3 text-sm text-warning">
               <p>{t('train.stale')}</p>
               <div className="flex gap-2">
                 <Button size="sm" onClick={() => void finishSession(user.id, active)}>
@@ -98,6 +135,18 @@ function TrainPage() {
 
       {!active && (
         <>
+          <Link to="/today" className="bg-brand flex flex-col gap-3 rounded-3xl p-5 shadow-card">
+            <span className="flex items-center gap-2 text-xs font-bold tracking-[0.14em] uppercase opacity-90">
+              <Sparkles className="size-4" aria-hidden />
+              {t('smart.todayLink')}
+            </span>
+            <span className="font-display text-2xl leading-tight font-bold uppercase">{t('home.todayTitle')}</span>
+            <span className="text-sm opacity-90">{t('home.todayHint')}</span>
+            <span className="mt-1 flex h-12 items-center justify-center gap-2 rounded-2xl bg-white font-display text-base font-bold tracking-wider text-[#0a0e1f] uppercase">
+              <Play className="size-4 fill-[#2f6bff] text-[#2f6bff]" aria-hidden />
+              {t('home.todayCta')}
+            </span>
+          </Link>
           {locations.length > 1 && (
             <SelectField
               label={t('train.where')}
@@ -114,20 +163,20 @@ function TrainPage() {
           <ul className="flex flex-col gap-2">
             {routines.map((r) => (
               <li key={r.id}>
-                <Button
-                  className="w-full justify-start"
-                  size="lg"
-                  variant="outline"
-                  onClick={() => void start(r.id)}
-                >
-                  <Play className="size-4" aria-hidden />
-                  {t('train.startRoutine', { name: r.name })}
+                <Button className="h-auto w-full justify-start rounded-2xl py-3 shadow-card" size="lg" variant="outline" onClick={() => void start(r.id)}>
+                  <span className="grid size-10 place-items-center rounded-xl bg-info-soft text-info">
+                    <Play className="size-4 fill-current" aria-hidden />
+                  </span>
+                  <span className="flex flex-col items-start">
+                    <span>{t('train.startRoutine', { name: r.name })}</span>
+                    <span className="text-xs font-normal text-muted-foreground">{t('routines.exercises', { count: r.items.length })}</span>
+                  </span>
                 </Button>
               </li>
             ))}
           </ul>
           {routines.length === 0 && (
-            <div className="flex flex-col gap-2 rounded-lg bg-muted/60 p-3 text-sm">
+            <div className="flex flex-col gap-2 rounded-2xl border border-dashed border-border bg-card p-4 text-sm">
               <p>{t('train.noRoutines')}</p>
               <div className="flex flex-wrap gap-2">
                 <Link to="/routines/new" className={buttonVariants({ size: 'sm' })}>
@@ -139,14 +188,7 @@ function TrainPage() {
               </div>
             </div>
           )}
-          <Link
-            to="/today"
-            className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'w-full')}
-          >
-            <Sparkles className="size-4" aria-hidden />
-            {t('smart.todayLink')}
-          </Link>
-          <Button size="lg" onClick={() => void start(null)}>
+          <Button size="lg" variant="outline" onClick={() => void start(null)}>
             <Play className="size-4" aria-hidden />
             {t('train.free')}
           </Button>
@@ -155,13 +197,17 @@ function TrainPage() {
 
       {/* Only when the administrator has the AI turned on: otherwise the link leads nowhere. */}
       {coachStatus.data?.available && (
-        <Link to="/coach" className="flex items-center gap-2 text-sm underline">
-          <MessageSquare className="size-4" aria-hidden />
+        <Link to="/coach" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 text-sm font-medium shadow-card">
+          <span className="grid size-9 place-items-center rounded-xl bg-accent-soft text-accent">
+            <MessageSquare className="size-4" aria-hidden />
+          </span>
           {t('coach.link')}
         </Link>
       )}
-      <Link to="/recovery" className="flex items-center gap-2 text-sm underline">
-        <Activity className="size-4" aria-hidden />
+      <Link to="/recovery" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 text-sm font-medium shadow-card">
+        <span className="grid size-9 place-items-center rounded-xl bg-info-soft text-info">
+          <Activity className="size-4" aria-hidden />
+        </span>
         {t('smart.recoveryLink')}
       </Link>
 

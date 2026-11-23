@@ -10,11 +10,11 @@ function CreditsPage() {
   const credits = useCredits(user.id) ?? [];
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{t('exercises.creditsTitle')}</h1>
+      <h1 className="text-3xl font-bold">{t('exercises.creditsTitle')}</h1>
       <p className="text-muted-foreground">{t('exercises.creditsIntro')}</p>
       <ul className="flex flex-col gap-3">
         {credits.map((c) => (
-          <li key={c.source} className="flex flex-col gap-1 rounded-lg border border-border p-4 text-sm">
+          <li key={c.source} className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-4 shadow-card text-sm">
             <a href={c.url} target="_blank" rel="noreferrer" className="font-medium underline">
               {c.source}
             </a>

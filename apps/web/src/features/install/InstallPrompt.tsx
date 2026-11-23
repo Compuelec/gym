@@ -56,7 +56,7 @@ export function InstallPrompt() {
   }
 
   return (
-    <aside aria-label={t('install.title')} className="flex flex-col gap-3 rounded-lg border border-border p-4">
+    <aside aria-label={t('install.title')} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-card">
       <div className="flex items-center gap-2 font-medium">
         <Download className="size-4" aria-hidden />
         {t('install.title')}

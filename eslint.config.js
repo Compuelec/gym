@@ -14,6 +14,8 @@ export default tseslint.config(
       '**/coverage/**',
       '**/*.min.js',
       '**/playwright-report/**',
+      // Plain browser script loaded before the app (no module, no bundler).
+      'apps/web/public/theme-init.js',
       '**/test-results/**',
       '**/routeTree.gen.ts',
       'packages/catalog/.cache/**',

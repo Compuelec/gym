@@ -47,7 +47,7 @@ function MeasurementsPage() {
   return (
     <div className="flex flex-col gap-5">
       <header>
-        <h1 className="text-2xl font-semibold">{t('measurements.title')}</h1>
+        <h1 className="text-3xl font-bold">{t('measurements.title')}</h1>
         <p className="text-sm text-muted-foreground">{t('measurements.privacy')}</p>
       </header>
 
@@ -62,7 +62,7 @@ function MeasurementsPage() {
         </section>
       )}
 
-      <section className="flex flex-col gap-3 rounded-lg border border-border p-4">
+      <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-card">
         <h2 className="text-lg font-semibold">{t('measurements.add')}</h2>
         <TextField label={t('measurements.date')} type="date" value={form.date} max={today()} onChange={set('date')} />
         <div className="grid grid-cols-2 gap-3">

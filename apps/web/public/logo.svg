@@ -1,10 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="96" fill="#0f172a"/>
-  <g fill="#f8fafc">
-    <rect x="96" y="176" width="48" height="160" rx="12"/>
-    <rect x="368" y="176" width="48" height="160" rx="12"/>
-    <rect x="152" y="208" width="40" height="96" rx="10"/>
-    <rect x="320" y="208" width="40" height="96" rx="10"/>
-    <rect x="192" y="240" width="128" height="32" rx="8"/>
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2f6bff"/>
+      <stop offset="0.55" stop-color="#5b3be8"/>
+      <stop offset="1" stop-color="#e0329e"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#g)"/>
+  <g fill="#ffffff">
+    <rect x="84" y="196" width="44" height="120" rx="12"/>
+    <rect x="384" y="196" width="44" height="120" rx="12"/>
+    <rect x="136" y="222" width="34" height="68" rx="9"/>
+    <rect x="342" y="222" width="34" height="68" rx="9"/>
   </g>
+  <path d="M282 112 196 268h58l-24 132 98-170h-60z" fill="#ffffff" stroke="#0a0e1f" stroke-width="10" stroke-linejoin="round"/>
 </svg>

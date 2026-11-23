@@ -35,7 +35,7 @@ export function AddToRoutineSheet({
 
         {done ? (
           <div role="status" className="flex flex-col gap-3">
-            <p className="flex items-center gap-2 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-900">
+            <p className="flex items-center gap-2 rounded-lg bg-success-soft px-3 py-2 text-sm text-success">
               <Check className="size-4" aria-hidden />
               {done.added > 0 ? tn('addToRoutine.added', done.added, { name: done.name }) : t('addToRoutine.already', { name: done.name })}
             </p>

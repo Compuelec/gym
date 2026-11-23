@@ -52,7 +52,7 @@ function AdminPage() {
   if (user.role !== 'admin') return <p>{t('admin.forbidden')}</p>;
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">{t('admin.title')}</h1>
+      <h1 className="text-3xl font-bold">{t('admin.title')}</h1>
       <nav aria-label={t('admin.sections')} className="-mx-1 flex gap-1 overflow-x-auto pb-1">
         {TABS.map((k) => (
           <button
@@ -177,7 +177,7 @@ function MailSection() {
         <TextField label={t('admin.mail.from')} hint={t('admin.mail.fromHint')} value={f.from} onChange={(e) => set({ from: e.target.value })} required />
         <FormError message={error} />
         {note && (
-          <p role="status" className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-900">
+          <p role="status" className="rounded-lg bg-success-soft px-3 py-2 text-sm text-success">
             {note}
           </p>
         )}
@@ -236,7 +236,7 @@ function UsersSection() {
         {users.map((u) => {
           const self = u.id === data.me;
           return (
-            <li key={u.id} aria-label={u.email} className={`flex flex-col gap-2 rounded-lg border border-border p-3 ${u.disabledAt ? 'opacity-70' : ''}`}>
+            <li key={u.id} aria-label={u.email} className={`flex flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-card ${u.disabledAt ? 'opacity-70' : ''}`}>
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="font-medium">
@@ -249,7 +249,7 @@ function UsersSection() {
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   {u.role === 'admin' && <span className="rounded-full bg-primary px-2 text-xs text-primary-foreground">{t('admin.users.admin')}</span>}
-                  {u.disabledAt && <span className="rounded-full bg-red-100 px-2 text-xs text-red-800">{t('admin.users.disabled')}</span>}
+                  {u.disabledAt && <span className="rounded-full bg-danger-soft px-2 text-xs text-danger">{t('admin.users.disabled')}</span>}
                 </div>
               </div>
               {!self && (
@@ -312,11 +312,11 @@ function AiSection() {
   return (
     <section className="flex flex-col gap-4">
       <h2 className="text-lg font-semibold">{t('admin.ai')}</h2>
-      <p role="status" className={`rounded-lg px-3 py-2 text-sm ${ai.available ? 'bg-green-50 text-green-800' : 'bg-muted'}`}>
+      <p role="status" className={`rounded-lg px-3 py-2 text-sm ${ai.available ? 'bg-success-soft text-success' : 'bg-muted'}`}>
         {t('admin.status')}: {ai.available ? t('admin.available') : `${t('admin.unavailable')} (${t(`admin.reasons.${ai.reason}`)})`}
       </p>
       {ai.pausedReason && (
-        <div className="flex items-center justify-between gap-2 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+        <div className="flex items-center justify-between gap-2 rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
           <span>{t('admin.paused', { reason: t(`admin.pauseReasons.${ai.pausedReason}`) })}</span>
           <Button size="sm" variant="outline" onClick={() => patch.mutate({ clearPause: true })}>
             {t('admin.resume')}
@@ -358,7 +358,7 @@ function AiSection() {
         {t('admin.saveLimits')}
       </Button>
 
-      <div className="flex flex-col gap-3 rounded-lg border border-border p-4">
+      <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-card">
         <h3 className="font-medium">{t('admin.key')}</h3>
         <p className="text-sm text-muted-foreground">
           {ai.keySource === 'admin' && ai.keyLast4
@@ -455,8 +455,8 @@ function InvitationsSection() {
       </Button>
       {created && (
         <div role="status" className="flex flex-col gap-2 rounded-lg bg-muted p-3 text-sm">
-          {sent?.ok && <span className="font-medium text-green-800">{t('admin.inviteSent', { to: sent.to })}</span>}
-          {sent && !sent.ok && <span className="font-medium text-red-700">{t('admin.inviteNotSent', { error: sent.error ?? '' })}</span>}
+          {sent?.ok && <span className="font-medium text-success">{t('admin.inviteSent', { to: sent.to })}</span>}
+          {sent && !sent.ok && <span className="font-medium text-danger">{t('admin.inviteNotSent', { error: sent.error ?? '' })}</span>}
           <span>{t('admin.inviteCreated')}</span>
           <code className="break-all">{created}</code>
           <Button
