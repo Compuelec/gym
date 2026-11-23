@@ -2,6 +2,7 @@ import { completeOnboarding, createInvite, expect, test, uniqueEmail, waitForSer
 
 test.describe('US1 · cuenta e instalación', () => {
   test('sign-up with an invite link, onboarding with locations, and the same data on a second device', async ({ page, browser, baseURL }) => {
+    test.setTimeout(90_000); // several browser contexts
     const started = Date.now();
     const email = uniqueEmail('us1');
     const invite = createInvite();

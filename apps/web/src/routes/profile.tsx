@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
+import { Link, createFileRoute } from '@tanstack/react-router';
 import { EQUIPMENT, uuidv7 } from '@gym/shared';
 import { Button } from '@/components/ui/button';
 import { FormError } from '@/components/ui/field';
@@ -131,6 +131,10 @@ function ProfilePage() {
       </section>
 
       <InstallPrompt />
+
+      <Link to="/credits" className="text-sm underline">
+        {t('profile.credits')}
+      </Link>
 
       <section className="flex flex-col gap-2">
         <FormError message={error} />

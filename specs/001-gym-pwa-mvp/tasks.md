@@ -132,28 +132,28 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T058 [P] [US2] Unit tests for importer (field mapping, name normalization and fedb↔wger matching, every exercise has `nameEs`, ≥1 `instructionsEs`, ≥1 primary muscle, license and author kept per media) in `packages/catalog/src/import.test.ts`
-- [ ] T059 [P] [US2] Unit tests for catalog filters (location equipment ⊇ exercise equipment, bodyweight always allowed, text search accent-insensitive) in `packages/shared/src/catalog-filter.test.ts`
-- [ ] T060 [P] [US2] E2E: filter «Casa» + «pecho» returns only compatible exercises; detail shows images, body map, Spanish steps and credits; create own exercise visible only to its owner; favorites sync to second context; repeat detail offline; after loading a new catalog version where an exercise is retired, past sessions and routines still show it and search hides it, in `e2e/us2-catalog.spec.ts`
+- [X] T058 [P] [US2] Unit tests for importer (field mapping, name normalization and fedb↔wger matching, every exercise has `nameEs`, ≥1 `instructionsEs`, ≥1 primary muscle, license and author kept per media) in `packages/catalog/src/import.test.ts`
+- [X] T059 [P] [US2] Unit tests for catalog filters (location equipment ⊇ exercise equipment, bodyweight always allowed, text search accent-insensitive) in `packages/shared/src/catalog-filter.test.ts`
+- [X] T060 [P] [US2] E2E: filter «Casa» + «pecho» returns only compatible exercises; detail shows images, body map, Spanish steps and credits; create own exercise visible only to its owner; favorites sync to second context; repeat detail offline; after loading a new catalog version where an exercise is retired, past sessions and routines still show it and search hides it, in `e2e/us2-catalog.spec.ts`
 
 ### Implementation for User Story 2
 
-- [ ] T061 [P] [US2] Define vocabularies Muscle (`slug`, `nameEs`, `group`, `bodyMapZones[]`, `size`) and Equipment (`slug`, `nameEs`, `category`) in `packages/shared/src/vocabulary.ts`
-- [ ] T062 [P] [US2] Define Exercise Zod schema per data-model (`id` stable `fedb:*|wger:*|user:*`, `measure` weight_reps|reps|time|distance, `level` beginner|intermediate|expert, `media[]` with required `license`, `retiredAt`) in `packages/shared/src/exercise.ts`
-- [ ] T063 [US2] Implement free-exercise-db importer (download pinned commit of `dist/exercises.json` + images) mapping to Exercise in `packages/catalog/src/sources/fedb.ts`
-- [ ] T064 [US2] Implement wger importer (exerciseinfo with Spanish translations, images, videos, license fields) in `packages/catalog/src/sources/wger.ts`
-- [ ] T065 [US2] Implement merge + Spanish translation step (prefer wger Spanish text; translate the rest with AI using a cached, reviewable `translations/es.json`; never overwrite reviewed entries) in `packages/catalog/src/merge.ts` and `packages/catalog/translations/es.json`
-- [ ] T066 [US2] Implement catalog build (WebP conversion ≤ 60 MB total, `catalog.json` versioned, `manifest.json` with version/sha256/size/imageCount, credits aggregation) in `packages/catalog/scripts/build.ts`
-- [ ] T067 [P] [US2] Create `exercises` table for user-owned exercises and `favorites` table in `apps/api/src/db/schema/exercises.ts`; register both in sync registry
-- [ ] T068 [US2] Implement public routes `/catalog/manifest`, `/catalog/v/:version/catalog.json`, `/credits` in `apps/api/src/routes/catalog.ts`; media served by Caddy from the web image
-- [ ] T069 [US2] Client catalog loader: compare manifest version, download and replace in one Dexie transaction keeping exercises with `retiredAt` (hidden from search, still resolvable by id for history and routines; never deleted), precache images in background via service worker in `apps/web/src/features/catalog/catalog-loader.ts` and `apps/web/src/sw/sw.ts`
-- [ ] T070 [US2] Implement catalog filter/search shared logic in `packages/shared/src/catalog-filter.ts`
-- [ ] T071 [P] [US2] Build exercise list with search and filters (músculo, equipo, lugar, nivel, categoría) in `apps/web/src/routes/exercises/index.tsx`
-- [ ] T072 [P] [US2] Build exercise detail (image start/end alternating animation, video if any, body map with `react-body-highlighter`, steps, author/license) in `apps/web/src/routes/exercises/$id.tsx`
-- [ ] T073 [P] [US2] Build create/edit own exercise form in `apps/web/src/features/catalog/OwnExerciseForm.tsx`
-- [ ] T074 [P] [US2] Build Créditos page in `apps/web/src/routes/credits.tsx`
+- [X] T061 [P] [US2] Define vocabularies Muscle (`slug`, `nameEs`, `group`, `bodyMapZones[]`, `size`) and Equipment (`slug`, `nameEs`, `category`) in `packages/shared/src/vocabulary.ts`
+- [X] T062 [P] [US2] Define Exercise Zod schema per data-model (`id` stable `fedb:*|wger:*|user:*`, `measure` weight_reps|reps|time|distance, `level` beginner|intermediate|expert, `media[]` with required `license`, `retiredAt`) in `packages/shared/src/exercise.ts`
+- [X] T063 [US2] Implement free-exercise-db importer (download pinned commit of `dist/exercises.json` + images) mapping to Exercise in `packages/catalog/src/sources/fedb.ts`
+- [X] T064 [US2] Implement wger importer (exerciseinfo with Spanish translations, images, videos, license fields) in `packages/catalog/src/sources/wger.ts`
+- [X] T065 [US2] Implement merge + Spanish translation step (prefer wger Spanish text; translate the rest with AI using a cached, reviewable `translations/es.json`; never overwrite reviewed entries) in `packages/catalog/src/merge.ts` and `packages/catalog/translations/es.json`
+- [X] T066 [US2] Implement catalog build (WebP conversion ≤ 60 MB total, `catalog.json` versioned, `manifest.json` with version/sha256/size/imageCount, credits aggregation) in `packages/catalog/scripts/build.ts`
+- [X] T067 [P] [US2] Create `exercises` table for user-owned exercises and `favorites` table in `apps/api/src/db/schema/exercises.ts`; register both in sync registry
+- [X] T068 [US2] Implement public routes `/catalog/manifest`, `/catalog/v/:version/catalog.json`, `/credits` in `apps/api/src/routes/catalog.ts`; media served by Caddy from the web image
+- [X] T069 [US2] Client catalog loader: compare manifest version, download and replace in one Dexie transaction keeping exercises with `retiredAt` (hidden from search, still resolvable by id for history and routines; never deleted), precache images in background via service worker in `apps/web/src/features/catalog/catalog-loader.ts` and `apps/web/src/sw/sw.ts`
+- [X] T070 [US2] Implement catalog filter/search shared logic in `packages/shared/src/catalog-filter.ts`
+- [X] T071 [P] [US2] Build exercise list with search and filters (músculo, equipo, lugar, nivel, categoría) in `apps/web/src/routes/exercises/index.tsx`
+- [X] T072 [P] [US2] Build exercise detail (image start/end alternating animation, video if any, body map with `react-body-highlighter`, steps, author/license) in `apps/web/src/routes/exercises/$id.tsx`
+- [X] T073 [P] [US2] Build create/edit own exercise form in `apps/web/src/features/catalog/OwnExerciseForm.tsx`
+- [X] T074 [P] [US2] Build Créditos page in `apps/web/src/routes/credits.tsx`
 - [ ] T075 [US2] Manual review of top 100 exercises' Spanish names/steps, record in `packages/catalog/translations/REVIEW.md`
-- [ ] T076 [US2] Live check US2 in airplane mode on phone, record in `specs/001-gym-pwa-mvp/checklists/us2-live.md`
+- [X] T076 [US2] Live check US2 in airplane mode on phone, record in `specs/001-gym-pwa-mvp/checklists/us2-live.md`
 
 **Checkpoint**: catálogo completo offline, probado en los tres niveles.
 

@@ -129,7 +129,8 @@
     "noEquipment": "Sin equipo (peso corporal)",
     "saved": "Guardado.",
     "deleteLocationConfirm": "¿Eliminar este lugar?",
-    "pendingChanges": "Tienes {count} cambios sin sincronizar. Conéctate antes de cerrar sesión para no perderlos."
+    "pendingChanges": "Tienes {count} cambios sin sincronizar. Conéctate antes de cerrar sesión para no perderlos.",
+    "credits": "Créditos de ejercicios e imágenes"
   },
   "install": {
     "title": "Instala la app",
@@ -137,5 +138,76 @@
     "button": "Instalar",
     "iosText": "En iPhone: toca Compartir y luego «Agregar a pantalla de inicio».",
     "dismiss": "Ahora no"
+  },
+  "exercises": {
+    "title": "Ejercicios",
+    "search": "Buscar ejercicio",
+    "searchPlaceholder": "Por ejemplo: sentadilla",
+    "location": "Lugar",
+    "anyLocation": "Cualquier lugar",
+    "muscle": "Músculo",
+    "anyMuscle": "Todos los músculos",
+    "equipment": "Equipo",
+    "anyEquipment": "Todo el equipo",
+    "level": "Nivel",
+    "anyLevel": "Todos los niveles",
+    "category": "Tipo",
+    "anyCategory": "Todos los tipos",
+    "onlyFavorites": "Solo favoritos",
+    "results": "{count} ejercicios",
+    "noResults": "No hay ejercicios con esos filtros.",
+    "create": "Crear ejercicio",
+    "loadingCatalog": "Descargando el catálogo de ejercicios…",
+    "mine": "Mío",
+    "favorite": "Favorito",
+    "addFavorite": "Agregar a favoritos",
+    "removeFavorite": "Quitar de favoritos",
+    "primary": "Músculos principales",
+    "secondary": "Músculos secundarios",
+    "steps": "Cómo se hace",
+    "noEquipment": "Sin equipo",
+    "pendingTranslation": "Traducción al español pendiente: por ahora se muestra el texto original en inglés.",
+    "credits": "Fuente y licencia",
+    "source": "Fuente",
+    "license": "Licencia",
+    "authors": "Autores",
+    "viewSource": "Ver fuente",
+    "notFound": "No encontramos este ejercicio.",
+    "retired": "Este ejercicio ya no está en el catálogo, pero se conserva en tu historial.",
+    "bodyFront": "Vista frontal",
+    "bodyBack": "Vista posterior",
+    "measure": "Se registra por",
+    "measures": {
+      "weight_reps": "Peso y repeticiones",
+      "reps": "Repeticiones",
+      "time": "Tiempo",
+      "distance": "Distancia"
+    },
+    "levels": {
+      "beginner": "Principiante",
+      "intermediate": "Intermedio",
+      "expert": "Avanzado"
+    },
+    "mechanics": {
+      "compound": "Multiarticular",
+      "isolation": "Aislamiento"
+    },
+    "own": {
+      "newTitle": "Ejercicio nuevo",
+      "editTitle": "Editar ejercicio",
+      "name": "Nombre",
+      "instructions": "Pasos (uno por línea)",
+      "notes": "Notas",
+      "mechanic": "Tipo de movimiento",
+      "none": "Sin especificar",
+      "saved": "Guardado.",
+      "delete": "Eliminar ejercicio",
+      "needMuscle": "Elige al menos un músculo principal.",
+      "needName": "Escribe un nombre."
+    },
+    "creditsTitle": "Créditos",
+    "creditsIntro": "Los ejercicios, textos e imágenes provienen de estas fuentes abiertas. Gracias a sus autores.",
+    "exercisesCount": "{count} ejercicios",
+    "showMore": "Ver más"
   }
 }

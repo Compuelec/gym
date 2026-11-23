@@ -5,3 +5,5 @@ export * from './uuid';
 export * from './sync';
 export * from './vocabulary';
 export * from './profile';
+export * from './exercise';
+export * from './catalog-filter';

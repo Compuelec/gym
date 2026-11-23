@@ -13,7 +13,9 @@ RUN pnpm --filter @gym/web build
 FROM caddy:2.11.7-alpine@sha256:003a97808e781aa9f7e75cc2f43d34d461099031faf5e20faefb9f61126836f0
 COPY infra/Caddyfile /etc/caddy/Caddyfile
 COPY --from=build /app/apps/web/dist /srv
-# Catalog images are copied here in User Story 2 (T066).
+# Exercise catalog (run `pnpm catalog:build` before building the image).
+COPY packages/catalog/out/catalog /srv/catalog
+COPY packages/catalog/out/media /srv/media
 ENV PORT=8080
 USER 1000:1000
 EXPOSE 8080

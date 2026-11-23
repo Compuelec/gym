@@ -3,7 +3,9 @@ import { Link, Navigate, Outlet, createRootRoute, useRouterState } from '@tansta
 import { AppShell } from '@/components/AppShell';
 import { FullPageSpinner } from '@/components/Spinner';
 import { t } from '@/i18n';
+import { getDB } from '@/db/database';
 import { requestPersistentStorage } from '@/db/persistence';
+import { ensureCatalog, scheduleImagePrecache } from '@/features/catalog/catalog-loader';
 import { UserContext } from '@/lib/auth-context';
 import { useProfile } from '@/lib/repos';
 import { useAuth, type SessionUser } from '@/lib/session';
@@ -51,6 +53,9 @@ function SignedIn({ user, path }: { user: SessionUser; path: string }) {
     void requestPersistentStorage();
     const engine = getSyncEngine(user.id);
     engine.start();
+    // Base catalog: download when new; the installed app also warms every image when idle.
+    const db = getDB(user.id);
+    void ensureCatalog(db).then(() => scheduleImagePrecache(db));
     return () => engine.stop();
   }, [user.id]);
 

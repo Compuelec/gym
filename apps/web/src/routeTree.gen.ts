@@ -10,7 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as ExercisesRouteImport } from './routes/exercises'
+import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
@@ -19,15 +19,19 @@ import { Route as ProgressRouteImport } from './routes/progress'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RoutinesRouteImport } from './routes/routines'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as ExercisesIndexRouteImport } from './routes/exercises/index'
+import { Route as ExercisesNewRouteImport } from './routes/exercises/new'
+import { Route as ExercisesIdIndexRouteImport } from './routes/exercises/$id/index'
+import { Route as ExercisesIdEditRouteImport } from './routes/exercises/$id/edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ExercisesRoute = ExercisesRouteImport.update({
-  id: '/exercises',
-  path: '/exercises',
+const CreditsRoute = CreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
@@ -70,10 +74,30 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ExercisesIndexRoute = ExercisesIndexRouteImport.update({
+  id: '/exercises/',
+  path: '/exercises/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExercisesNewRoute = ExercisesNewRouteImport.update({
+  id: '/exercises/new',
+  path: '/exercises/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExercisesIdIndexRoute = ExercisesIdIndexRouteImport.update({
+  id: '/exercises/$id/',
+  path: '/exercises/$id/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExercisesIdEditRoute = ExercisesIdEditRouteImport.update({
+  id: '/exercises/$id/edit',
+  path: '/exercises/$id/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/exercises': typeof ExercisesRoute
+  '/credits': typeof CreditsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
@@ -82,10 +106,14 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/routines': typeof RoutinesRoute
   '/signup': typeof SignupRoute
+  '/exercises/new': typeof ExercisesNewRoute
+  '/exercises/': typeof ExercisesIndexRoute
+  '/exercises/$id/edit': typeof ExercisesIdEditRoute
+  '/exercises/$id/': typeof ExercisesIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/exercises': typeof ExercisesRoute
+  '/credits': typeof CreditsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
@@ -94,11 +122,15 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/routines': typeof RoutinesRoute
   '/signup': typeof SignupRoute
+  '/exercises/new': typeof ExercisesNewRoute
+  '/exercises': typeof ExercisesIndexRoute
+  '/exercises/$id/edit': typeof ExercisesIdEditRoute
+  '/exercises/$id': typeof ExercisesIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/exercises': typeof ExercisesRoute
+  '/credits': typeof CreditsRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
@@ -107,12 +139,16 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/routines': typeof RoutinesRoute
   '/signup': typeof SignupRoute
+  '/exercises/new': typeof ExercisesNewRoute
+  '/exercises/': typeof ExercisesIndexRoute
+  '/exercises/$id/edit': typeof ExercisesIdEditRoute
+  '/exercises/$id/': typeof ExercisesIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/exercises'
+    | '/credits'
     | '/forgot-password'
     | '/login'
     | '/onboarding'
@@ -121,10 +157,14 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/routines'
     | '/signup'
+    | '/exercises/new'
+    | '/exercises/'
+    | '/exercises/$id/edit'
+    | '/exercises/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/exercises'
+    | '/credits'
     | '/forgot-password'
     | '/login'
     | '/onboarding'
@@ -133,10 +173,14 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/routines'
     | '/signup'
+    | '/exercises/new'
+    | '/exercises'
+    | '/exercises/$id/edit'
+    | '/exercises/$id'
   id:
     | '__root__'
     | '/'
-    | '/exercises'
+    | '/credits'
     | '/forgot-password'
     | '/login'
     | '/onboarding'
@@ -145,11 +189,15 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/routines'
     | '/signup'
+    | '/exercises/new'
+    | '/exercises/'
+    | '/exercises/$id/edit'
+    | '/exercises/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ExercisesRoute: typeof ExercisesRoute
+  CreditsRoute: typeof CreditsRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
@@ -158,6 +206,10 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   RoutinesRoute: typeof RoutinesRoute
   SignupRoute: typeof SignupRoute
+  ExercisesNewRoute: typeof ExercisesNewRoute
+  ExercisesIndexRoute: typeof ExercisesIndexRoute
+  ExercisesIdEditRoute: typeof ExercisesIdEditRoute
+  ExercisesIdIndexRoute: typeof ExercisesIdIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -169,11 +221,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/exercises': {
-      id: '/exercises'
-      path: '/exercises'
-      fullPath: '/exercises'
-      preLoaderRoute: typeof ExercisesRouteImport
+    '/credits': {
+      id: '/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof CreditsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/forgot-password': {
@@ -232,12 +284,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/exercises/': {
+      id: '/exercises/'
+      path: '/exercises'
+      fullPath: '/exercises/'
+      preLoaderRoute: typeof ExercisesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exercises/new': {
+      id: '/exercises/new'
+      path: '/exercises/new'
+      fullPath: '/exercises/new'
+      preLoaderRoute: typeof ExercisesNewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exercises/$id/': {
+      id: '/exercises/$id/'
+      path: '/exercises/$id'
+      fullPath: '/exercises/$id/'
+      preLoaderRoute: typeof ExercisesIdIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/exercises/$id/edit': {
+      id: '/exercises/$id/edit'
+      path: '/exercises/$id/edit'
+      fullPath: '/exercises/$id/edit'
+      preLoaderRoute: typeof ExercisesIdEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ExercisesRoute: ExercisesRoute,
+  CreditsRoute: CreditsRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
@@ -246,6 +326,10 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   RoutinesRoute: RoutinesRoute,
   SignupRoute: SignupRoute,
+  ExercisesNewRoute: ExercisesNewRoute,
+  ExercisesIndexRoute: ExercisesIndexRoute,
+  ExercisesIdEditRoute: ExercisesIdEditRoute,
+  ExercisesIdIndexRoute: ExercisesIdIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

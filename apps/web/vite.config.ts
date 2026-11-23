@@ -4,6 +4,29 @@ import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
+import { createReadStream, existsSync, statSync } from 'node:fs';
+import { extname, join, normalize } from 'node:path';
+import type { Connect, Plugin } from 'vite';
+
+const CATALOG_OUT = fileURLToPath(new URL('../../packages/catalog/out', import.meta.url));
+const TYPES: Record<string, string> = { '.json': 'application/json', '.webp': 'image/webp' };
+
+/** Serves the built catalog (/catalog, /media) in dev and preview, like Caddy does in production. */
+function serveCatalog(): Plugin {
+  const handler: Connect.NextHandleFunction = (req, res, next) => {
+    const url = (req.url ?? '').split('?')[0]!;
+    if (!url.startsWith('/catalog/') && !url.startsWith('/media/')) return next();
+    const file = normalize(join(CATALOG_OUT, decodeURIComponent(url)));
+    if (!file.startsWith(CATALOG_OUT) || !existsSync(file) || !statSync(file).isFile()) return next();
+    res.setHeader('content-type', TYPES[extname(file)] ?? 'application/octet-stream');
+    createReadStream(file).pipe(res);
+  };
+  return {
+    name: 'gym-serve-catalog',
+    configureServer: (server) => void server.middlewares.use(handler),
+    configurePreviewServer: (server) => void server.middlewares.use(handler),
+  };
+}
 
 const apiProxy = { '/api': process.env.API_PROXY_TARGET ?? 'http://localhost:3000' };
 
@@ -13,6 +36,7 @@ export default defineConfig({
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),
     tailwindcss(),
+    serveCatalog(),
     VitePWA({
       strategies: 'injectManifest',
       srcDir: 'src/sw',

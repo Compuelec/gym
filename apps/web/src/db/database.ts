@@ -32,6 +32,14 @@ export const ENTITY_STORES: Record<string, string> = {
   // US1
   profile: 'id',
   location: 'id, serverVersion',
+  // US2
+  exercise: 'id, serverVersion',
+  favorite: 'id, exerciseId',
+};
+
+/** Local-only stores (not synced): the base exercise catalog. */
+export const LOCAL_STORES: Record<string, string> = {
+  catalog: 'id',
 };
 
 export class GymDB extends Dexie {
@@ -43,6 +51,7 @@ export class GymDB extends Dexie {
     this.version(1).stores({
       outbox: '++seq, mutationId, [entity+id]',
       meta: 'key',
+      ...LOCAL_STORES,
       ...entityStores,
     });
   }
@@ -52,7 +61,7 @@ export class GymDB extends Dexie {
   }
 
   entityNames(): string[] {
-    return this.tables.map((t) => t.name).filter((n) => n !== 'outbox' && n !== 'meta');
+    return this.tables.map((t) => t.name).filter((n) => n !== 'outbox' && n !== 'meta' && !(n in LOCAL_STORES));
   }
 }
 
