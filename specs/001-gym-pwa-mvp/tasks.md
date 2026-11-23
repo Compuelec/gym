@@ -198,23 +198,23 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T092 [P] [US4] Unit tests for progression (double progression, increments 2,5 kg barbell / 1–2 kg dumbbell, two failed sessions → hold or −10 %, RIR adjustment, Spanish `reason`) in `packages/engine/src/progression.test.ts`
-- [ ] T093 [P] [US4] Unit tests for 1RM (Epley; Brzycki ≤10 reps; only sets 1–12 reps) and PR detection (max_weight, max_reps, est_1rm, max_volume) in `packages/engine/src/records.test.ts`
-- [ ] T094 [P] [US4] Unit tests for recovery (primary 1, secondary 0,5 effective sets; exponential decay with half-life by muscle size 24–48 h; thresholds recuperado/parcial/fatigado) in `packages/engine/src/recovery.test.ts`
-- [ ] T095 [P] [US4] Unit tests for today's routine (focus on most recovered/least trained muscles, location equipment filter, time budget = sets × (work + rest), compound before isolation, routine and each item carry a Spanish `reason`) in `packages/engine/src/today.test.ts`
-- [ ] T096 [P] [US4] E2E with seeded history: suggestion shown with reason; body map shows fatigue; «Rutina de hoy» 30 min en casa excludes legs after heavy leg day; PR toast on new best — all offline, in `e2e/us4-smart.spec.ts`
+- [X] T092 [P] [US4] Unit tests for progression (double progression, increments 2,5 kg barbell / 1–2 kg dumbbell, two failed sessions → hold or −10 %, RIR adjustment, Spanish `reason`) in `packages/engine/src/progression.test.ts`
+- [X] T093 [P] [US4] Unit tests for 1RM (Epley; Brzycki ≤10 reps; only sets 1–12 reps) and PR detection (max_weight, max_reps, est_1rm, max_volume) in `packages/engine/src/records.test.ts`
+- [X] T094 [P] [US4] Unit tests for recovery (primary 1, secondary 0,5 effective sets; exponential decay with half-life by muscle size 24–48 h; thresholds recuperado/parcial/fatigado) in `packages/engine/src/recovery.test.ts`
+- [X] T095 [P] [US4] Unit tests for today's routine (focus on most recovered/least trained muscles, location equipment filter, time budget = sets × (work + rest), compound before isolation, routine and each item carry a Spanish `reason`) in `packages/engine/src/today.test.ts`
+- [X] T096 [P] [US4] E2E with seeded history: suggestion shown with reason; body map shows fatigue; «Rutina de hoy» 30 min en casa excludes legs after heavy leg day; PR toast on new best — all offline, in `e2e/us4-smart.spec.ts`
 
 ### Implementation for User Story 4
 
-- [ ] T097 [P] [US4] Implement progression in `packages/engine/src/progression.ts`
-- [ ] T098 [P] [US4] Implement 1RM and PR detection in `packages/engine/src/records.ts`
-- [ ] T099 [P] [US4] Implement recovery model in `packages/engine/src/recovery.ts`
-- [ ] T100 [US4] Implement today's routine generator with a Spanish `reason` for the chosen focus and for each exercise (e.g. «Piernas descansan: las trabajaste ayer») in `packages/engine/src/today.ts` (depends on T099)
-- [ ] T101 [US4] Show suggestion + «¿por qué?» in session set row and store `suggested` on SetEntry in `apps/web/src/features/session/Suggestion.tsx`
-- [ ] T102 [P] [US4] Build recovery body map screen in `apps/web/src/features/smart/RecoveryMap.tsx`
-- [ ] T103 [US4] Build «Rutina de hoy» flow (objective, minutes, location → preview → start session) in `apps/web/src/features/smart/TodayRoutine.tsx`
-- [ ] T104 [US4] PR toast on set save and PR list per exercise (derived locally from history) in `apps/web/src/features/smart/records.ts`
-- [ ] T105 [US4] Live check US4, record in `specs/001-gym-pwa-mvp/checklists/us4-live.md`
+- [X] T097 [P] [US4] Implement progression in `packages/engine/src/progression.ts`
+- [X] T098 [P] [US4] Implement 1RM and PR detection in `packages/engine/src/records.ts`
+- [X] T099 [P] [US4] Implement recovery model in `packages/engine/src/recovery.ts`
+- [X] T100 [US4] Implement today's routine generator with a Spanish `reason` for the chosen focus and for each exercise (e.g. «Piernas descansan: las trabajaste ayer») in `packages/engine/src/today.ts` (depends on T099)
+- [X] T101 [US4] Show suggestion + «¿por qué?» in session set row and store `suggested` on SetEntry in `apps/web/src/features/session/Suggestion.tsx`
+- [X] T102 [P] [US4] Build recovery body map screen in `apps/web/src/features/smart/RecoveryMap.tsx`
+- [X] T103 [US4] Build «Rutina de hoy» flow (objective, minutes, location → preview → start session) in `apps/web/src/features/smart/TodayRoutine.tsx`
+- [X] T104 [US4] PR toast on set save and PR list per exercise (derived locally from history) in `apps/web/src/features/smart/records.ts`
+- [X] T105 [US4] Live check US4, record in `specs/001-gym-pwa-mvp/checklists/us4-live.md`
 
 **Checkpoint**: inteligencia local funcionando sin conexión.
 

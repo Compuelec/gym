@@ -9,9 +9,9 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import pLimit from 'p-limit';
 import sharp from 'sharp';
 import { CatalogExerciseSchema, type CatalogFile, type CatalogManifest } from '@gym/shared';
-import { CACHE_DIR, FEDB_BASE, FEDB_COMMIT, IMAGE_QUALITY, IMAGE_WIDTH, OUT_DIR, TRANSLATIONS_FILE, WGER_API } from '../src/config';
+import { CACHE_DIR, FEDB_BASE, FEDB_COMMIT, IMAGE_QUALITY, IMAGE_WIDTH, IMPORTER_VERSION, OUT_DIR, TRANSLATIONS_FILE, WGER_API } from '../src/config';
 import { mergeCatalog, type Translations } from '../src/merge';
-import { FedbExerciseSchema } from '../src/sources/fedb';
+import { EQUIPMENT_OVERRIDES, FedbExerciseSchema } from '../src/sources/fedb';
 import { WgerExerciseSchema, spanishNamesByEnglish } from '../src/sources/wger';
 
 const FEDB_REPO = 'https://github.com/yuhonas/free-exercise-db';
@@ -63,7 +63,8 @@ async function main() {
     .update(FEDB_COMMIT)
     .update(JSON.stringify(translations))
     .update(JSON.stringify([...wgerNames.entries()]))
-    .update(`${IMAGE_WIDTH}:${IMAGE_QUALITY}`)
+    .update(`${IMAGE_WIDTH}:${IMAGE_QUALITY}:${IMPORTER_VERSION}`)
+    .update(JSON.stringify(EQUIPMENT_OVERRIDES))
     .digest('hex');
   const version = parseInt(versionHash.slice(0, 8), 16);
 

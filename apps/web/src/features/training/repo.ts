@@ -77,10 +77,20 @@ export function useActiveSession(userId: string) {
   }, [userId]);
 }
 
-/** Starts a session from a routine (copying its exercises) or empty. Works offline. */
+export interface PlanItem {
+  exerciseId: string;
+  restSeconds: number;
+  supersetGroup?: string | null;
+  targetSets: number | null;
+  repMin: number | null;
+  repMax: number | null;
+  targetSeconds: number | null;
+}
+
+/** Starts a session from a routine or a generated plan (copying targets), or empty. Offline-safe. */
 export async function startSession(
   userId: string,
-  opts: { name: string; routine?: LocalRoutine | null; locationId: string | null },
+  opts: { name: string; routine?: LocalRoutine | null; plan?: PlanItem[]; locationId: string | null },
 ): Promise<string> {
   const db = getDB(userId);
   const sessionId = uuidv7();
@@ -96,8 +106,13 @@ export async function startSession(
     perceivedEffort: null,
   };
   await saveRecord(db, 'workoutSession', session);
-  for (const item of [...(opts.routine?.items ?? [])].sort((a, b) => a.position - b.position)) {
-    await addSessionExercise(userId, sessionId, item.exerciseId, item.restSeconds, item.supersetGroup, item.position, false);
+  const plan: PlanItem[] =
+    opts.plan ??
+    [...(opts.routine?.items ?? [])]
+      .sort((a, b) => a.position - b.position)
+      .map((i) => ({ exerciseId: i.exerciseId, restSeconds: i.restSeconds, supersetGroup: i.supersetGroup, targetSets: i.targetSets, repMin: i.repMin, repMax: i.repMax, targetSeconds: i.targetSeconds }));
+  for (const [position, item] of plan.entries()) {
+    await addSessionExercise(userId, sessionId, item.exerciseId, item.restSeconds, item.supersetGroup ?? null, position, false, item);
   }
   sync(userId);
   return sessionId;
@@ -111,6 +126,7 @@ export async function addSessionExercise(
   supersetGroup: string | null = null,
   position?: number,
   doSync = true,
+  targets?: Pick<PlanItem, 'targetSets' | 'repMin' | 'repMax' | 'targetSeconds'>,
 ) {
   const db = getDB(userId);
   const count = await db.entityTable('sessionExercise').where('sessionId').equals(sessionId).count();
@@ -123,6 +139,10 @@ export async function addSessionExercise(
     supersetGroup,
     restSeconds,
     notes: null,
+    targetSets: targets?.targetSets ?? null,
+    repMin: targets?.repMin ?? null,
+    repMax: targets?.repMax ?? null,
+    targetSeconds: targets?.targetSeconds ?? null,
   };
   await saveRecord(db, 'sessionExercise', se);
   if (doSync) sync(userId);
@@ -208,4 +228,46 @@ export async function lastPerformance(userId: string, exerciseId: string, exclud
 export const STALE_SESSION_MS = 6 * 60 * 60 * 1000;
 export function isStale(session: Pick<WorkoutSession, 'startedAt' | 'status'>, now = Date.now()) {
   return session.status === 'in_progress' && now - Date.parse(session.startedAt) > STALE_SESSION_MS;
+}
+
+// ── History for the smart engine ────────────────────────────────────────────
+
+export interface HistorySession {
+  date: string;
+  sessionId: string;
+  sets: LocalSet[];
+}
+
+/** Completed sessions of an exercise with their sets, newest first. */
+export async function exerciseHistory(userId: string, exerciseId: string, excludeSessionId?: string): Promise<HistorySession[]> {
+  const db = getDB(userId);
+  const ses = (await db.entityTable('sessionExercise').where('exerciseId').equals(exerciseId).toArray()) as unknown as LocalSessionExercise[];
+  const out: HistorySession[] = [];
+  for (const se of ses) {
+    if (se.sessionId === excludeSessionId) continue;
+    const s = (await db.entityTable('workoutSession').get(se.sessionId)) as unknown as LocalSession | undefined;
+    if (!s || s.status !== 'completed') continue;
+    const sets = ((await db.entityTable('setEntry').where('sessionExerciseId').equals(se.id).toArray()) as unknown as LocalSet[]).sort(
+      (a, b) => a.position - b.position,
+    );
+    if (sets.length) out.push({ date: s.startedAt, sessionId: s.id, sets });
+  }
+  return out.sort((a, b) => b.date.localeCompare(a.date));
+}
+
+/** Every set (any exercise) logged since `sinceMs`, with the exercise id; includes the current session. */
+export async function setsSince(userId: string, sinceMs: number) {
+  const db = getDB(userId);
+  const sessions = ((await db.entityTable('workoutSession').toArray()) as unknown as LocalSession[]).filter(
+    (s) => s.status !== 'discarded' && Date.parse(s.startedAt) >= sinceMs - 24 * 3_600_000,
+  );
+  const out: Array<LocalSet & { exerciseId: string }> = [];
+  for (const s of sessions) {
+    const ses = (await db.entityTable('sessionExercise').where('sessionId').equals(s.id).toArray()) as unknown as LocalSessionExercise[];
+    for (const se of ses) {
+      const sets = (await db.entityTable('setEntry').where('sessionExerciseId').equals(se.id).toArray()) as unknown as LocalSet[];
+      for (const set of sets) if (Date.parse(set.completedAt) >= sinceMs) out.push({ ...set, exerciseId: se.exerciseId });
+    }
+  }
+  return out;
 }

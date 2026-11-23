@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
 import { Check, Repeat, X } from 'lucide-react';
 import { SET_TYPES, displayToKg, kgToDisplay, setProblem, type RoutineItem } from '@gym/shared';
@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import type { ExerciseView } from '@/features/catalog/exercises';
 import { muscleName, names } from '@/features/catalog/labels';
 import { t } from '@/i18n';
-import { deleteSet, lastPerformance, logSet, type LocalSessionExercise, type LocalSet } from './repo';
+import { formatNumber } from '@/lib/format';
+import { newRecords, suggestNext, type RecordKind, type Suggestion } from '@gym/engine';
+import { deleteSet, exerciseHistory, logSet, type HistorySession, type LocalSessionExercise, type LocalSet } from './repo';
 
 type Units = 'kg' | 'lb';
 
@@ -14,10 +16,16 @@ function describeSets(sets: LocalSet[], units: Units) {
   return sets
     .map((s) => {
       if (s.seconds !== null) return `${s.seconds} s`;
-      if (s.weightKg !== null && s.weightKg > 0) return `${kgToDisplay(s.weightKg, units)} ${units} × ${s.reps}`;
+      if (s.weightKg !== null && s.weightKg > 0) return `${formatNumber(kgToDisplay(s.weightKg, units))} ${units} × ${s.reps}`;
       return `${s.reps}`;
     })
     .join(' · ');
+}
+
+function describeSuggestion(s: Suggestion, units: Units) {
+  if (s.seconds) return `${s.seconds} s`;
+  if (s.weightKg != null) return `${formatNumber(kgToDisplay(s.weightKg, units))} ${units} × ${s.reps}`;
+  return `${s.reps} reps`;
 }
 
 const inputCls = 'h-12 w-full rounded-lg border border-border bg-background px-2 text-center text-lg tabular-nums';
@@ -42,19 +50,37 @@ export function SessionExerciseCard({
   onSwap: () => void;
 }) {
   const measure = exercise?.measure ?? 'weight_reps';
-  const [previous, setPrevious] = useState<LocalSet[] | null>(null);
+  const [history, setHistory] = useState<HistorySession[] | null>(null);
+  const [records, setRecords] = useState<RecordKind[]>([]);
+  const [showWhy, setShowWhy] = useState(false);
   useEffect(() => {
-    void lastPerformance(userId, se.exerciseId, sessionId).then(setPrevious);
+    void exerciseHistory(userId, se.exerciseId, sessionId).then(setHistory);
   }, [userId, se.exerciseId, sessionId]);
+  const previous = history ? (history[0]?.sets ?? []) : null;
 
-  // Prefill the next set: last set of today, else same set last time, else the routine target.
+  // Session targets (routine or today's plan) win over the routine lookup.
+  const goal = {
+    targetSets: se.targetSets ?? target?.targetSets ?? 3,
+    repMin: se.repMin ?? target?.repMin ?? null,
+    repMax: se.repMax ?? target?.repMax ?? null,
+    targetSeconds: se.targetSeconds ?? target?.targetSeconds ?? null,
+  };
+  const suggestion: Suggestion | null = useMemo(
+    () => (history ? suggestNext({ measure, equipment: exercise?.equipment ?? [], target: goal, history, units }) : null),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [history, measure, exercise?.equipment, goal.targetSets, goal.repMin, goal.repMax, goal.targetSeconds, units],
+  );
+
+  // Prefill the next set: last set of today, else the engine suggestion, else last time, else target.
   const index = se.sets.length;
-  const basis = se.sets.at(-1) ?? previous?.[index] ?? previous?.at(-1);
+  const today = se.sets.at(-1);
+  const lastTime = previous?.[index] ?? previous?.at(-1);
+  const weightKg = today?.weightKg ?? suggestion?.weightKg ?? lastTime?.weightKg ?? null;
   const defaults = {
-    weight: basis?.weightKg != null ? String(kgToDisplay(basis.weightKg, units)) : '',
-    reps: String(basis?.reps ?? target?.repMax ?? target?.repMin ?? (measure === 'time' ? '' : 10)),
-    seconds: String(basis?.seconds ?? target?.targetSeconds ?? (measure === 'time' ? 30 : '')),
-    meters: basis?.meters != null ? String(basis.meters) : '',
+    weight: weightKg != null ? String(kgToDisplay(weightKg, units)) : '',
+    reps: String(today?.reps ?? suggestion?.reps ?? lastTime?.reps ?? goal.repMax ?? goal.repMin ?? (measure === 'time' ? '' : 10)),
+    seconds: String(today?.seconds ?? suggestion?.seconds ?? lastTime?.seconds ?? goal.targetSeconds ?? (measure === 'time' ? 30 : '')),
+    meters: lastTime?.meters != null ? String(lastTime.meters) : '',
   };
 
   const name = exercise?.nameEs ?? se.exerciseId;
@@ -66,11 +92,11 @@ export function SessionExerciseCard({
             {name}
           </Link>
           {exercise && <p className="text-sm text-muted-foreground">{names(exercise.primaryMuscles, muscleName)}</p>}
-          {target && (
+          {(se.targetSets || target) && (
             <p className="text-sm text-muted-foreground">
               {t('routines.target', {
-                sets: target.targetSets,
-                reps: target.targetSeconds ? `${target.targetSeconds} s` : target.repMin === target.repMax || !target.repMax ? `${target.repMin ?? target.repMax ?? ''}` : `${target.repMin}–${target.repMax}`,
+                sets: goal.targetSets,
+                reps: goal.targetSeconds ? `${goal.targetSeconds} s` : goal.repMin === goal.repMax || !goal.repMax ? `${goal.repMin ?? goal.repMax ?? ''}` : `${goal.repMin}–${goal.repMax}`,
               })}
             </p>
           )}
@@ -100,15 +126,44 @@ export function SessionExerciseCard({
         </ol>
       )}
 
+      {suggestion && index === 0 && (
+        <div className="flex flex-col gap-1 rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-900">
+          <div className="flex items-center justify-between gap-2">
+            <span>
+              {t('smart.suggestion')}: <strong>{describeSuggestion(suggestion, units)}</strong>
+            </span>
+            <button type="button" className="underline" aria-expanded={showWhy} onClick={() => setShowWhy((v) => !v)}>
+              {t('smart.why')}
+            </button>
+          </div>
+          {showWhy && <p>{suggestion.reason}</p>}
+        </div>
+      )}
+      {records.length > 0 && (
+        <p role="status" className="rounded-lg bg-amber-100 px-3 py-2 text-sm font-medium text-amber-900">
+          {t('smart.newRecord', { kinds: records.map((k) => t(`smart.records.${k}`)).join(', ') })}
+        </p>
+      )}
       <NextSetRow
-        key={`${index}-${previous ? 'h' : 'n'}-${target?.repMax ?? ''}-${target?.targetSeconds ?? ''}-${units}`}
+        key={`${index}-${history ? 'h' : 'n'}-${goal.repMax ?? ''}-${goal.targetSeconds ?? ''}-${suggestion?.weightKg ?? ''}-${units}`}
         defaults={defaults}
         index={index}
         measure={measure}
         units={units}
         label={name}
         onLog={async (values, type) => {
-          await logSet(userId, { ...values, sessionExerciseId: se.id, position: index, type, rir: null, rpe: null, suggested: null });
+          const before = [...(history ?? []).flatMap((h) => h.sets), ...se.sets];
+          await logSet(userId, {
+            ...values,
+            sessionExerciseId: se.id,
+            position: index,
+            type,
+            rir: null,
+            rpe: null,
+            // Keep what the engine proposed next to what was done (constitution IV: explainable).
+            suggested: suggestion && index === 0 ? { weightKg: suggestion.weightKg, reps: suggestion.reps, seconds: suggestion.seconds, reason: suggestion.reason } : null,
+          });
+          setRecords(newRecords(before, { ...values, rir: null, type }));
           onLogged(se.restSeconds);
         }}
       />

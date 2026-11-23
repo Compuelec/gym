@@ -29,6 +29,13 @@
       "when": 1795405784637,
       "tag": "0003_us3_training",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1795406860037,
+      "tag": "0004_us4_session_targets",
+      "breakpoints": true
     }
   ]
 }

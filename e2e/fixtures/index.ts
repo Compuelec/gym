@@ -82,4 +82,32 @@ export async function completeOnboarding(page: Page) {
   await expect(page.getByRole('heading', { name: /Hola/ })).toBeVisible();
 }
 
+/** Pushes sync mutations as the signed-in user (to seed realistic history through the real API). */
+export async function seed(request: APIRequestContext, baseURL: string, mutations: Array<{ entity: string; id: string; data: Record<string, unknown> }>) {
+  const body = {
+    clientId: crypto.randomUUID(),
+    mutations: mutations.map((m) => ({ mutationId: crypto.randomUUID(), op: 'upsert', clientUpdatedAt: new Date().toISOString(), ...m })),
+  };
+  const res = await request.post('/api/sync/push', { headers: { origin: new URL(baseURL).origin }, data: body });
+  const json = (await res.json()) as { results: Array<{ status: string }> };
+  expect(json.results.every((r) => r.status === 'applied'), JSON.stringify(json)).toBe(true);
+}
+
+/** A completed session with sets, `hoursAgo` in the past. */
+export function seededSession(hoursAgo: number, exercises: Array<{ exerciseId: string; sets: Array<{ weightKg: number | null; reps: number }> }>) {
+  const at = (offsetMin: number) => new Date(Date.now() - hoursAgo * 3_600_000 + offsetMin * 60_000).toISOString();
+  const sessionId = crypto.randomUUID();
+  const out: Array<{ entity: string; id: string; data: Record<string, unknown> }> = [
+    { entity: 'workoutSession', id: sessionId, data: { routineId: null, locationId: null, name: 'Historial', startedAt: at(0), endedAt: at(60), status: 'completed', notes: null, perceivedEffort: 7 } },
+  ];
+  exercises.forEach((ex, position) => {
+    const seId = crypto.randomUUID();
+    out.push({ entity: 'sessionExercise', id: seId, data: { sessionId, position, exerciseId: ex.exerciseId, replacedFromExerciseId: null, supersetGroup: null, restSeconds: 90, notes: null } });
+    ex.sets.forEach((s, i) =>
+      out.push({ entity: 'setEntry', id: crypto.randomUUID(), data: { sessionExerciseId: seId, position: i, type: 'normal', weightKg: s.weightKg, reps: s.reps, seconds: null, meters: null, rir: 2, rpe: null, completedAt: at(5 + position * 10 + i), suggested: null } }),
+    );
+  });
+  return out;
+}
+
 export const test = base;

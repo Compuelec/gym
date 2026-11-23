@@ -1,7 +1,12 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { deleteRoutine, duplicateRoutine, startSession, useRoutines } from '@/features/training/repo';
+import { Button, buttonVariants } from '@/components/ui/button';
+import {
+  deleteRoutine,
+  duplicateRoutine,
+  startSession,
+  useRoutines,
+} from '@/features/training/repo';
 import { t } from '@/i18n';
 import { useUser } from '@/lib/auth-context';
 import { useLocations } from '@/lib/repos';
@@ -18,11 +23,9 @@ function RoutinesPage() {
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold">{t('routines.title')}</h1>
-        <Link to="/routines/new">
-          <Button size="sm" variant="outline">
-            <Plus className="size-4" aria-hidden />
-            {t('routines.new')}
-          </Button>
+        <Link to="/routines/new" className={buttonVariants({ variant: 'outline', size: 'sm' })}>
+          <Plus className="size-4" aria-hidden />
+          {t('routines.new')}
         </Link>
       </header>
       {routines.length === 0 && <p className="text-muted-foreground">{t('routines.empty')}</p>}
@@ -33,25 +36,37 @@ function RoutinesPage() {
               <h2 className="font-semibold">{r.name}</h2>
               <p className="text-sm text-muted-foreground">
                 {t('routines.exercises', { count: r.items.length })}
-                {r.locationId && locations.get(r.locationId) ? ` · ${locations.get(r.locationId)}` : ''}
+                {r.locationId && locations.get(r.locationId)
+                  ? ` · ${locations.get(r.locationId)}`
+                  : ''}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
               <Button
                 size="sm"
                 onClick={async () => {
-                  const id = await startSession(user.id, { name: r.name, routine: r, locationId: r.locationId });
+                  const id = await startSession(user.id, {
+                    name: r.name,
+                    routine: r,
+                    locationId: r.locationId,
+                  });
                   await navigate({ to: '/session/$id', params: { id } });
                 }}
               >
                 {t('routines.start')}
               </Button>
-              <Link to="/routines/$id/edit" params={{ id: r.id }}>
-                <Button size="sm" variant="outline">
-                  {t('routines.edit')}
-                </Button>
+              <Link
+                to="/routines/$id/edit"
+                params={{ id: r.id }}
+                className={buttonVariants({ variant: 'outline', size: 'sm' })}
+              >
+                {t('routines.edit')}
               </Link>
-              <Button size="sm" variant="ghost" onClick={() => void duplicateRoutine(user.id, r, t('routines.copySuffix'))}>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => void duplicateRoutine(user.id, r, t('routines.copySuffix'))}
+              >
                 {t('routines.duplicate')}
               </Button>
               <Button size="sm" variant="ghost" onClick={() => void deleteRoutine(user.id, r.id)}>

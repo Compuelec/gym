@@ -3,7 +3,7 @@ import { completeOnboarding, expect, signUpViaApi, test, waitForServiceWorker } 
 
 async function createRoutine(page: Page, name: string, exercises: string[]) {
   await page.getByRole('navigation').getByRole('link', { name: 'Rutinas' }).click();
-  await page.getByRole('button', { name: 'Nueva rutina' }).click();
+  await page.getByRole('link', { name: 'Nueva rutina' }).click();
   await expect(page.getByRole('heading', { name: 'Nueva rutina' })).toBeVisible();
   await page.getByLabel('Nombre de la rutina').fill(name);
   for (const ex of exercises) {
@@ -115,12 +115,12 @@ test.describe('US3 · entrenar y registrar sin conexión', () => {
     await page2.goto('/routines');
     await expect(page2.getByRole('heading', { name: 'Pierna' })).toBeVisible({ timeout: 20_000 });
 
-    await page.getByRole('button', { name: 'Editar' }).click();
+    await page.getByRole('link', { name: 'Editar' }).click();
     await page.getByLabel('Nombre de la rutina').fill('Pierna A');
     await page.getByRole('button', { name: 'Guardar' }).click();
     await expect(page.getByRole('heading', { name: 'Pierna A' })).toBeVisible();
 
-    await page2.getByRole('button', { name: 'Editar' }).click();
+    await page2.getByRole('link', { name: 'Editar' }).click();
     await page2.getByLabel('Nombre de la rutina').fill('Pierna B');
     await page2.getByRole('button', { name: 'Guardar' }).click();
 

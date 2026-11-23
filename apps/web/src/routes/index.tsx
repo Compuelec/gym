@@ -1,11 +1,19 @@
 import { useState } from 'react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Play } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Activity, Play, Sparkles } from 'lucide-react';
+import { Button, buttonVariants } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
 import { SelectField } from '@/components/ui/field';
 import { InstallPrompt } from '@/features/install/InstallPrompt';
 import { formatClock } from '@/features/training/rest-timer';
-import { discardSession, finishSession, isStale, startSession, useActiveSession, useRoutines } from '@/features/training/repo';
+import {
+  discardSession,
+  finishSession,
+  isStale,
+  startSession,
+  useActiveSession,
+  useRoutines,
+} from '@/features/training/repo';
 import { t } from '@/i18n';
 import { useUser } from '@/lib/auth-context';
 import { useLocations } from '@/lib/repos';
@@ -36,7 +44,9 @@ function TrainPage() {
   return (
     <section className="flex flex-col gap-5">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">{t('app.greeting', { name: user.name.split(' ')[0] ?? user.name })}</h1>
+        <h1 className="text-2xl font-semibold">
+          {t('app.greeting', { name: user.name.split(' ')[0] ?? user.name })}
+        </h1>
         <p className="text-muted-foreground">{t('app.tagline')}</p>
       </header>
 
@@ -45,7 +55,10 @@ function TrainPage() {
           <div>
             <h2 className="font-semibold">{t('train.inProgress')}</h2>
             <p className="text-sm text-muted-foreground">
-              {active.name} · {t('train.elapsed', { time: formatClock(Math.floor((now - Date.parse(active.startedAt)) / 1000)) })}
+              {active.name} ·{' '}
+              {t('train.elapsed', {
+                time: formatClock(Math.floor((now - Date.parse(active.startedAt)) / 1000)),
+              })}
             </p>
           </div>
           {isStale(active, now) && (
@@ -55,14 +68,22 @@ function TrainPage() {
                 <Button size="sm" onClick={() => void finishSession(user.id, active)}>
                   {t('train.finishIt')}
                 </Button>
-                <Button size="sm" variant="ghost" onClick={() => void discardSession(user.id, active)}>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => void discardSession(user.id, active)}
+                >
                   {t('train.discardIt')}
                 </Button>
               </div>
             </div>
           )}
-          <Link to="/session/$id" params={{ id: active.id }}>
-            <Button className="w-full">{t('train.continue')}</Button>
+          <Link
+            to="/session/$id"
+            params={{ id: active.id }}
+            className={cn(buttonVariants(), 'w-full')}
+          >
+            {t('train.continue')}
           </Link>
         </article>
       )}
@@ -70,7 +91,11 @@ function TrainPage() {
       {!active && (
         <>
           {locations.length > 1 && (
-            <SelectField label={t('train.where')} value={where ?? ''} onChange={(e) => setLocationId(e.target.value)}>
+            <SelectField
+              label={t('train.where')}
+              value={where ?? ''}
+              onChange={(e) => setLocationId(e.target.value)}
+            >
               {locations.map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.name}
@@ -81,20 +106,39 @@ function TrainPage() {
           <ul className="flex flex-col gap-2">
             {routines.map((r) => (
               <li key={r.id}>
-                <Button className="w-full justify-start" size="lg" variant="outline" onClick={() => void start(r.id)}>
+                <Button
+                  className="w-full justify-start"
+                  size="lg"
+                  variant="outline"
+                  onClick={() => void start(r.id)}
+                >
                   <Play className="size-4" aria-hidden />
                   {t('train.startRoutine', { name: r.name })}
                 </Button>
               </li>
             ))}
           </ul>
-          {routines.length === 0 && <p className="text-sm text-muted-foreground">{t('train.noRoutines')}</p>}
+          {routines.length === 0 && (
+            <p className="text-sm text-muted-foreground">{t('train.noRoutines')}</p>
+          )}
+          <Link
+            to="/today"
+            className={cn(buttonVariants({ variant: 'outline', size: 'lg' }), 'w-full')}
+          >
+            <Sparkles className="size-4" aria-hidden />
+            {t('smart.todayLink')}
+          </Link>
           <Button size="lg" onClick={() => void start(null)}>
             <Play className="size-4" aria-hidden />
             {t('train.free')}
           </Button>
         </>
       )}
+
+      <Link to="/recovery" className="flex items-center gap-2 text-sm underline">
+        <Activity className="size-4" aria-hidden />
+        {t('smart.recoveryLink')}
+      </Link>
 
       <InstallPrompt />
     </section>

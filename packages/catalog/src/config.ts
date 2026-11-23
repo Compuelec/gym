@@ -13,3 +13,6 @@ export const TRANSLATIONS_FILE = `${ROOT}translations/es.json`;
 /** Image output: small enough for phones, ~25 KB each. */
 export const IMAGE_WIDTH = 480;
 export const IMAGE_QUALITY = 62;
+
+/** Bump when the importer's mapping logic changes, so clients download a new catalog. */
+export const IMPORTER_VERSION = 2;

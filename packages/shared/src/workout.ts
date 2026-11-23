@@ -65,6 +65,11 @@ export const SessionExerciseSchema = z.object({
   supersetGroup: z.string().max(8).nullable(),
   restSeconds: z.number().int().min(0).max(600),
   notes: Text(500).nullable(),
+  // Targets copied from the routine or today's plan (null for free sessions).
+  targetSets: z.number().int().min(1).max(10).nullable().optional(),
+  repMin: z.number().int().min(1).max(100).nullable().optional(),
+  repMax: z.number().int().min(1).max(100).nullable().optional(),
+  targetSeconds: z.number().int().min(5).max(3600).nullable().optional(),
 });
 export type SessionExercise = z.infer<typeof SessionExerciseSchema>;
 

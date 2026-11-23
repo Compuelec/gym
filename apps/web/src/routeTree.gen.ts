@@ -16,8 +16,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProgressRouteImport } from './routes/progress'
+import { Route as RecoveryRouteImport } from './routes/recovery'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as SignupRouteImport } from './routes/signup'
+import { Route as TodayRouteImport } from './routes/today'
 import { Route as ExercisesIndexRouteImport } from './routes/exercises/index'
 import { Route as ExercisesNewRouteImport } from './routes/exercises/new'
 import { Route as RoutinesIndexRouteImport } from './routes/routines/index'
@@ -62,6 +64,11 @@ const ProgressRoute = ProgressRouteImport.update({
   path: '/progress',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RecoveryRoute = RecoveryRouteImport.update({
+  id: '/recovery',
+  path: '/recovery',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -70,6 +77,11 @@ const ResetPasswordRoute = ResetPasswordRouteImport.update({
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TodayRoute = TodayRouteImport.update({
+  id: '/today',
+  path: '/today',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ExercisesIndexRoute = ExercisesIndexRouteImport.update({
@@ -121,8 +133,10 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
+  '/recovery': typeof RecoveryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/today': typeof TodayRoute
   '/exercises/new': typeof ExercisesNewRoute
   '/routines/new': typeof RoutinesNewRoute
   '/session/$id': typeof SessionIdRoute
@@ -140,8 +154,10 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
+  '/recovery': typeof RecoveryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/today': typeof TodayRoute
   '/exercises/new': typeof ExercisesNewRoute
   '/routines/new': typeof RoutinesNewRoute
   '/session/$id': typeof SessionIdRoute
@@ -160,8 +176,10 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
+  '/recovery': typeof RecoveryRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/today': typeof TodayRoute
   '/exercises/new': typeof ExercisesNewRoute
   '/routines/new': typeof RoutinesNewRoute
   '/session/$id': typeof SessionIdRoute
@@ -181,8 +199,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/progress'
+    | '/recovery'
     | '/reset-password'
     | '/signup'
+    | '/today'
     | '/exercises/new'
     | '/routines/new'
     | '/session/$id'
@@ -200,8 +220,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/progress'
+    | '/recovery'
     | '/reset-password'
     | '/signup'
+    | '/today'
     | '/exercises/new'
     | '/routines/new'
     | '/session/$id'
@@ -219,8 +241,10 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/profile'
     | '/progress'
+    | '/recovery'
     | '/reset-password'
     | '/signup'
+    | '/today'
     | '/exercises/new'
     | '/routines/new'
     | '/session/$id'
@@ -239,8 +263,10 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   ProgressRoute: typeof ProgressRoute
+  RecoveryRoute: typeof RecoveryRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  TodayRoute: typeof TodayRoute
   ExercisesNewRoute: typeof ExercisesNewRoute
   RoutinesNewRoute: typeof RoutinesNewRoute
   SessionIdRoute: typeof SessionIdRoute
@@ -302,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProgressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/recovery': {
+      id: '/recovery'
+      path: '/recovery'
+      fullPath: '/recovery'
+      preLoaderRoute: typeof RecoveryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -314,6 +347,13 @@ declare module '@tanstack/react-router' {
       path: '/signup'
       fullPath: '/signup'
       preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/today': {
+      id: '/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof TodayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/exercises/': {
@@ -383,8 +423,10 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   ProgressRoute: ProgressRoute,
+  RecoveryRoute: RecoveryRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  TodayRoute: TodayRoute,
   ExercisesNewRoute: ExercisesNewRoute,
   RoutinesNewRoute: RoutinesNewRoute,
   SessionIdRoute: SessionIdRoute,

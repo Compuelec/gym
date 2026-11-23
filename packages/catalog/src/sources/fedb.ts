@@ -61,6 +61,31 @@ export const FEDB_CATEGORY: Record<string, string> = {
   strongman: 'strongman',
 };
 
+/**
+ * Corrections to upstream equipment, by free-exercise-db id: the source marks bar exercises as
+ * "body only", which would offer pull-ups at home without a bar. Reviewed by hand.
+ */
+export const EQUIPMENT_OVERRIDES: Record<string, string[]> = {
+  'Band_Assisted_Pull-Up': ['pull_up_bar', 'band'],
+  Bench_Dips: ['bench'],
+  'Chin-Up': ['pull_up_bar'],
+  'Dips_-_Triceps_Version': ['other'], // parallel bars
+  Hanging_Leg_Raise: ['pull_up_bar'],
+  Hanging_Pike: ['pull_up_bar'],
+  Kipping_Muscle_Up: ['pull_up_bar'],
+  Muscle_Up: ['pull_up_bar'],
+  'One_Arm_Chin-Up': ['pull_up_bar'],
+  Pullups: ['pull_up_bar'],
+  'Rocky_Pull-Ups_Pulldowns': ['pull_up_bar'],
+  'Scapular_Pull-Up': ['pull_up_bar'],
+  'V-Bar_Pullup': ['pull_up_bar'],
+  'Wide-Grip_Rear_Pull-Up': ['pull_up_bar'],
+};
+
+export function exerciseEquipment(ex: { id: string; equipment: string | null }): string[] {
+  return EQUIPMENT_OVERRIDES[ex.id] ?? mapEquipment(ex.equipment);
+}
+
 export function mapEquipment(raw: string | null): string[] {
   if (raw === null) return [];
   const mapped = FEDB_EQUIPMENT[raw];

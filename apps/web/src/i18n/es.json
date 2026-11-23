@@ -309,5 +309,48 @@
     "notFound": "No encontramos este entrenamiento.",
     "emptySession": "Agrega un ejercicio para empezar.",
     "minutes": "{count} min"
+  },
+  "smart": {
+    "suggestion": "Sugerencia",
+    "why": "¿Por qué?",
+    "newRecord": "¡Nuevo récord! {kinds}",
+    "records": {
+      "max_weight": "peso máximo",
+      "max_reps": "más repeticiones",
+      "est_1rm": "1RM estimado",
+      "max_volume": "mayor volumen en una serie"
+    },
+    "yourRecords": "Tus récords",
+    "noRecords": "Todavía no hay registros de este ejercicio.",
+    "recordLabels": {
+      "max_weight": "Peso máximo",
+      "max_reps": "Repeticiones máximas",
+      "est_1rm": "1RM estimado",
+      "max_volume": "Mayor volumen (serie)"
+    },
+    "recoveryTitle": "Recuperación",
+    "recoveryIntro": "Según tus series de los últimos 7 días.",
+    "recoveryLink": "Ver recuperación muscular",
+    "status": {
+      "recovered": "Recuperado",
+      "partial": "Recuperándose",
+      "fatigued": "Fatigado"
+    },
+    "legend": "Rojo: fatigado · Ámbar: recuperándose · Gris: recuperado",
+    "lastTrained": "Última vez: hace {hours} h",
+    "neverTrained": "Sin trabajar esta semana",
+    "weeklySets": "{sets} series esta semana",
+    "todayTitle": "Rutina de hoy",
+    "todayLink": "Rutina de hoy",
+    "minutes": "¿Cuánto tiempo tienes?",
+    "minutesOption": "{count} minutos",
+    "location": "Lugar",
+    "generate": "Proponer rutina",
+    "start": "Empezar esta rutina",
+    "estimated": "Duración estimada: {minutes} min",
+    "noExercises": "No encontramos ejercicios para hoy con ese equipo. Prueba otro lugar o más tiempo.",
+    "itemTarget": "{sets} × {reps}",
+    "lastTrainedRecent": "Última vez: hace menos de 1 h",
+    "weeklySet": "{sets} serie esta semana"
   }
 }

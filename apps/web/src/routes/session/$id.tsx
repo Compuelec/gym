@@ -20,6 +20,7 @@ import {
   type LocalSessionExercise,
 } from '@/features/training/repo';
 import { t } from '@/i18n';
+import { formatNumber } from '@/lib/format';
 import { useUser } from '@/lib/auth-context';
 import { useLocations, useProfile } from '@/lib/repos';
 import { useNow } from '@/lib/use-now';
@@ -240,7 +241,7 @@ function Summary({
         <div className="rounded-lg bg-muted p-3">
           <dt className="text-xs text-muted-foreground">{t('session.volume')}</dt>
           <dd className="text-lg font-semibold">
-            {volume} {units}
+            {formatNumber(volume, 0)} {units}
           </dd>
         </div>
       </dl>

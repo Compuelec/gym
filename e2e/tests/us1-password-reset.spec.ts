@@ -31,4 +31,5 @@ test('password reset: the email arrives in Spanish and its link sets a new passw
   const again = await page.context().browser()!.newPage();
   await again.goto(link!);
   await expect(again.getByRole('alert')).toContainText('venció o ya se usó');
+  await again.close();
 });

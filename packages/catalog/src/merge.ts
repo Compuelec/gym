@@ -1,5 +1,5 @@
 import type { CatalogExercise } from '@gym/shared';
-import { inferMeasure, mapEquipment, mapMuscles, FEDB_CATEGORY, type FedbExercise } from './sources/fedb';
+import { exerciseEquipment, inferMeasure, mapEquipment, mapMuscles, FEDB_CATEGORY, type FedbExercise } from './sources/fedb';
 import { normalizeName, type spanishNamesByEnglish } from './sources/wger';
 
 /** Reviewed or machine-translated Spanish text, keyed by free-exercise-db id. */
@@ -27,7 +27,7 @@ export interface MergeInputs {
  */
 export function mergeCatalog({ fedb, wgerNames, translations, version, fedbRepoUrl }: MergeInputs): CatalogExercise[] {
   return fedb.map((ex) => {
-    const equipment = mapEquipment(ex.equipment);
+    const equipment = exerciseEquipment(ex);
     const primary = mapMuscles(ex.primaryMuscles);
     const secondary = mapMuscles(ex.secondaryMuscles).filter((m) => !primary.includes(m));
     const tr = translations[ex.id];
@@ -49,7 +49,8 @@ export function mergeCatalog({ fedb, wgerNames, translations, version, fedbRepoU
       category: category as CatalogExercise['category'],
       mechanic: ex.mechanic,
       force: ex.force,
-      measure: inferMeasure(ex, equipment),
+      // Measured by the upstream equipment: a pull-up is still a bodyweight (reps) exercise.
+      measure: inferMeasure(ex, mapEquipment(ex.equipment)),
       media: ex.images.map((_, i) => ({
         type: 'image' as const,
         url: `/media/exercises/${ex.id}/${i}.webp`,

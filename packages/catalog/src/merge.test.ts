@@ -56,6 +56,12 @@ describe('mergeCatalog', () => {
     expect(english).toMatchObject({ nameEs: 'Pushups', translated: false });
   });
 
+  it('applies reviewed equipment corrections (pull-ups need a bar, not «body only»)', () => {
+    const pullups = merge({ fedb: [{ ...base, id: 'Pullups', name: 'Pullups', equipment: 'body only' }] });
+    expect(pullups.equipment).toEqual(['pull_up_bar']);
+    expect(pullups.measure).toBe('reps');
+  });
+
   it('rejects unknown upstream values instead of guessing', () => {
     expect(() => mapEquipment('jetpack')).toThrow();
   });

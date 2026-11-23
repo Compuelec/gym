@@ -66,7 +66,7 @@ test.describe('US2 · catálogo de ejercicios', () => {
 
     // Own exercise.
     await page.getByRole('navigation').getByRole('link', { name: 'Ejercicios' }).click();
-    await page.getByRole('button', { name: 'Crear ejercicio' }).click();
+    await page.getByRole('link', { name: 'Crear ejercicio' }).click();
     await expect(page.getByRole('heading', { name: 'Ejercicio nuevo' })).toBeVisible();
     await page.getByLabel('Nombre').fill('Remo con mochila');
     await page.getByRole('group', { name: 'Músculos principales' }).getByText('Espalda media').click();

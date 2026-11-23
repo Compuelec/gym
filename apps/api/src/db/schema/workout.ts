@@ -47,6 +47,10 @@ export const sessionExercises = pgTable('session_exercises', {
   supersetGroup: text('superset_group'),
   restSeconds: integer('rest_seconds').notNull(),
   notes: text('notes'),
+  targetSets: integer('target_sets'),
+  repMin: integer('rep_min'),
+  repMax: integer('rep_max'),
+  targetSeconds: integer('target_seconds'),
 });
 
 export const setEntries = pgTable('set_entries', {

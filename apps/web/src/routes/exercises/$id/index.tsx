@@ -1,12 +1,21 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Star } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { BodyMap } from '@/features/catalog/BodyMap';
 import { ExerciseImages } from '@/features/catalog/ExerciseImages';
-import { deleteOwnExercise, toggleFavorite, useExercise, useFavoriteIds } from '@/features/catalog/exercises';
+import {
+  deleteOwnExercise,
+  toggleFavorite,
+  useExercise,
+  useFavoriteIds,
+} from '@/features/catalog/exercises';
 import { categoryName, equipmentName, muscleName, names } from '@/features/catalog/labels';
+import { useRecords } from '@/features/smart/hooks';
 import { t } from '@/i18n';
+import { formatNumber } from '@/lib/format';
 import { useUser } from '@/lib/auth-context';
+import { useProfile } from '@/lib/repos';
+import { kgToDisplay } from '@gym/shared';
 
 export const Route = createFileRoute('/exercises/$id/')({ component: ExerciseDetailPage });
 
@@ -15,6 +24,8 @@ function ExerciseDetailPage() {
   const user = useUser();
   const ex = useExercise(user.id, id);
   const favorites = useFavoriteIds(user.id);
+  const records = useRecords(user.id, id);
+  const profile = useProfile(user.id);
   const navigate = useNavigate();
 
   if (ex === undefined) return null;
@@ -42,7 +53,9 @@ function ExerciseDetailPage() {
         </Button>
       </header>
 
-      {ex.retiredAt && <p className="rounded-lg bg-muted px-3 py-2 text-sm">{t('exercises.retired')}</p>}
+      {ex.retiredAt && (
+        <p className="rounded-lg bg-muted px-3 py-2 text-sm">{t('exercises.retired')}</p>
+      )}
 
       <ExerciseImages media={ex.media} alt={ex.nameEs} />
 
@@ -60,7 +73,11 @@ function ExerciseDetailPage() {
           )}
           <div>
             <dt className="font-medium">{t('exercises.equipment')}</dt>
-            <dd className="text-muted-foreground">{ex.equipment.length ? names(ex.equipment, equipmentName) : t('exercises.noEquipment')}</dd>
+            <dd className="text-muted-foreground">
+              {ex.equipment.length
+                ? names(ex.equipment, equipmentName)
+                : t('exercises.noEquipment')}
+            </dd>
           </div>
           <div>
             <dt className="font-medium">{t('exercises.measure')}</dt>
@@ -74,7 +91,11 @@ function ExerciseDetailPage() {
 
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">{t('exercises.steps')}</h2>
-        {!ex.translated && <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">{t('exercises.pendingTranslation')}</p>}
+        {!ex.translated && (
+          <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            {t('exercises.pendingTranslation')}
+          </p>
+        )}
         <ol className="flex list-decimal flex-col gap-2 pl-5">
           {ex.instructionsEs.map((step, i) => (
             <li key={i}>{step}</li>
@@ -83,10 +104,36 @@ function ExerciseDetailPage() {
         {ex.notes && <p className="text-sm text-muted-foreground">{ex.notes}</p>}
       </section>
 
+      <section className="flex flex-col gap-2">
+        <h2 className="text-lg font-semibold">{t('smart.yourRecords')}</h2>
+        {records ? (
+          <dl className="grid grid-cols-2 gap-2 text-sm">
+            {(['max_weight', 'est_1rm', 'max_reps', 'max_volume'] as const)
+              .filter((k) => records[k] > 0)
+              .map((k) => (
+                <div key={k} className="rounded-lg bg-muted p-2">
+                  <dt className="text-xs text-muted-foreground">{t(`smart.recordLabels.${k}`)}</dt>
+                  <dd className="font-semibold">
+                    {k === 'max_reps'
+                      ? records[k]
+                      : `${formatNumber(kgToDisplay(records[k], profile?.units ?? 'kg'))} ${profile?.units ?? 'kg'}`}
+                  </dd>
+                </div>
+              ))}
+          </dl>
+        ) : (
+          <p className="text-sm text-muted-foreground">{t('smart.noRecords')}</p>
+        )}
+      </section>
+
       {ex.own ? (
         <div className="flex gap-2">
-          <Link to="/exercises/$id/edit" params={{ id: ex.id }}>
-            <Button variant="outline">{t('common.edit')}</Button>
+          <Link
+            to="/exercises/$id/edit"
+            params={{ id: ex.id }}
+            className={buttonVariants({ variant: 'outline' })}
+          >
+            {t('common.edit')}
           </Link>
           <Button
             variant="ghost"
