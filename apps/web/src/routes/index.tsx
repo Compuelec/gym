@@ -2,9 +2,9 @@ import { useQuery } from '@tanstack/react-query';
 import { apiFetch } from '@/lib/api';
 import { useState } from 'react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Activity, Flame, MessageSquare, Play, Sparkles } from 'lucide-react';
-import { weeklyFrequency, weeklyStreak } from '@gym/engine';
-import { useCompletedSessions } from '@/features/progress/data';
+import { Activity, Flame, MessageSquare, Play, Sparkles, Target } from 'lucide-react';
+import { goalPlan, weeklyFrequency, weeklyStreak } from '@gym/engine';
+import { useCompletedSessions, useMeasurements } from '@/features/progress/data';
 import { useProfile } from '@/lib/repos';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -48,6 +48,8 @@ function TrainPage() {
   const goal = profile?.daysPerWeek ?? 3;
   const weekPct = Math.min(100, Math.round((thisWeek / goal) * 100));
   const streak = weeklyStreak(dates, now);
+  const measurements = useMeasurements(user.id) ?? [];
+  const currentWeight = measurements.find((m) => m.weightKg != null)?.weightKg ?? profile?.bodyweightKg ?? null;
 
   async function start(routineId: string | null) {
     const routine = routines.find((r) => r.id === routineId) ?? null;
@@ -94,6 +96,20 @@ function TrainPage() {
           </div>
         </div>
       </div>
+
+      <Link to="/goal" className="flex items-center gap-3 rounded-2xl border border-border bg-card p-3 shadow-card">
+        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-accent-soft text-accent">
+          <Target className="size-5" aria-hidden />
+        </span>
+        <span className="flex min-w-0 flex-col">
+          <span className="text-sm font-semibold">{t('goal.title')}</span>
+          <span className="line-clamp-2 text-xs text-muted-foreground">
+            {profile?.targetWeightKg
+              ? goalPlan({ weightKg: currentWeight, targetWeightKg: profile.targetWeightKg, targetDate: profile.targetDate, now }).message
+              : t('home.goalEmpty')}
+          </span>
+        </span>
+      </Link>
 
       {active && (
         <article className="flex flex-col gap-3 rounded-3xl border-2 border-primary bg-card p-4 shadow-card">

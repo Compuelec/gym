@@ -38,10 +38,27 @@ describe('push', () => {
     expect((await call(app, '/api/push/rest-timer', { method: 'POST', cookie: u.cookie, body: { sessionId, fireAt: at(90) } })).status).toBe(200);
     await call(app, '/api/push/rest-timer', { method: 'POST', cookie: u.cookie, body: { sessionId, fireAt: at(60) } });
     let rows = await db.select().from(scheduledPushes).where(eq(scheduledPushes.sessionId, sessionId));
-    expect(rows.filter((r) => !r.cancelledAt)).toHaveLength(1);
+    // The latest rest only: a «get ready» 10 s before the end, and the end.
+    const live = rows.filter((r) => !r.cancelledAt).sort((x, y) => x.fireAt.getTime() - y.fireAt.getTime());
+    expect(live.map((r) => r.kind)).toEqual(['rest_warning', 'rest_end']);
+    expect(live[1]!.fireAt.getTime() - live[0]!.fireAt.getTime()).toBe(10_000);
     await call(app, `/api/push/rest-timer/${sessionId}`, { method: 'DELETE', cookie: u.cookie });
     rows = await db.select().from(scheduledPushes).where(eq(scheduledPushes.sessionId, sessionId));
     expect(rows.every((r) => r.cancelledAt)).toBe(true);
+  });
+
+  it('the rest alerts name what comes next; a short rest only gets the end alert', async () => {
+    const u = await user();
+    const sessionId = uuidv7();
+    const at = (s: number) => new Date(Date.now() + s * 1000).toISOString();
+    await call(app, '/api/push/rest-timer', { method: 'POST', cookie: u.cookie, body: { sessionId, fireAt: at(60), next: 'Serie 2 de 3 · Remo' } });
+    let live = (await db.select().from(scheduledPushes).where(eq(scheduledPushes.sessionId, sessionId))).filter((r) => !r.cancelledAt);
+    expect(live.find((r) => r.kind === 'rest_warning')!.body).toBe('Prepárate: Serie 2 de 3 · Remo');
+    expect(live.find((r) => r.kind === 'rest_end')!.body).toBe('Serie 2 de 3 · Remo');
+    await call(app, '/api/push/rest-timer', { method: 'POST', cookie: u.cookie, body: { sessionId, fireAt: at(5) } });
+    live = (await db.select().from(scheduledPushes).where(eq(scheduledPushes.sessionId, sessionId))).filter((r) => !r.cancelledAt);
+    expect(live.map((r) => r.kind)).toEqual(['rest_end']);
+    expect((await call(app, '/api/push/rest-timer', { method: 'POST', cookie: u.cookie, body: { sessionId, fireAt: at(60), next: 'x'.repeat(121) } })).status).toBe(400);
   });
 
   it('rejects past or far-future times', async () => {
@@ -101,13 +118,13 @@ describe('push', () => {
     expect((await post(`https://updates.push.services.mozilla.com/wpush/v2/${uuidv7()}`)).status).toBe(200);
   });
 
-  it('keeps at most one pending rest notification and ten devices per user', async () => {
+  it('keeps only the latest rest (its two alerts) and ten devices per user', async () => {
     const u = await user();
     for (let i = 0; i < 12; i++) await call(app, '/api/push/subscriptions', { method: 'POST', cookie: u.cookie, body: sub(uuidv7()) });
     expect(await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.ownerId, u.id))).toHaveLength(10);
     const fireAt = new Date(Date.now() + 60_000).toISOString();
     for (let i = 0; i < 5; i++) await call(app, '/api/push/rest-timer', { method: 'POST', cookie: u.cookie, body: { sessionId: uuidv7(), fireAt } });
     const pending = (await db.select().from(scheduledPushes).where(eq(scheduledPushes.ownerId, u.id))).filter((r) => !r.cancelledAt && !r.sentAt);
-    expect(pending).toHaveLength(1);
+    expect(pending.map((r) => r.kind).sort()).toEqual(['rest_end', 'rest_warning']);
   });
 });

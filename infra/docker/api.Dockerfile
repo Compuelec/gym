@@ -6,8 +6,10 @@ RUN corepack enable
 COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.base.json ./
 COPY apps/api/package.json apps/api/
 COPY packages/shared/package.json packages/shared/
+COPY packages/engine/package.json packages/engine/
 RUN pnpm install --frozen-lockfile --prod=false --filter @gym/api...
 COPY packages/shared packages/shared
+COPY packages/engine packages/engine
 COPY apps/api apps/api
 RUN pnpm --filter @gym/api bundle
 

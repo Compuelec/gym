@@ -71,6 +71,13 @@
       "when": 1795450476175,
       "tag": "0009_admin_mail_users",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1795457098207,
+      "tag": "0010_goals_and_notifications",
+      "breakpoints": true
     }
   ]
 }

@@ -347,7 +347,8 @@
     "setsCount": "{count} series",
     "setsCountOne": "1 serie",
     "restShort": "descanso {rest}",
-    "minutesLabel": "Minutos"
+    "minutesLabel": "Minutos",
+    "restWarning": "Quedan {seconds} s de descanso"
   },
   "smart": {
     "suggestion": "Sugerencia",
@@ -626,7 +627,11 @@
       "rejected": "Rechazada"
     },
     "failed": "No se pudo completar: {message}",
-    "newRequest": "Nueva consulta"
+    "newRequest": "Nueva consulta",
+    "goalShortcut": "Plan para lograr mi objetivo",
+    "reviewShortcut": "Analizar mi progreso",
+    "goalMessage": "Ármame un programa para lograr mi objetivo de peso en la fecha que indiqué.",
+    "reviewMessage": "Analiza mi progreso hacia mi objetivo: entrenamientos, peso y medidas."
   },
   "equipmentGroups": {
     "free_weights": "Pesas",
@@ -663,7 +668,8 @@
     "streakWeeksOne": "1 semana seguida",
     "todayTitle": "Tu entrenamiento de hoy",
     "todayHint": "Según tu recuperación, tu tiempo y el equipo que tienes.",
-    "todayCta": "Ver y empezar"
+    "todayCta": "Ver y empezar",
+    "goalEmpty": "Ponte una meta de peso y te decimos el ritmo saludable."
   },
   "theme": {
     "title": "Apariencia",
@@ -671,5 +677,62 @@
     "light": "Claro",
     "dark": "Oscuro",
     "hint": "Automático sigue el modo de tu teléfono."
+  },
+  "goal": {
+    "title": "Mi objetivo",
+    "link": "Mi objetivo",
+    "intro": "Con tus datos calculamos un ritmo saludable y, si el coach está activo, te arma rutinas para lograrlo.",
+    "body": "Tus datos",
+    "weight": "Peso actual (kg)",
+    "height": "Estatura (cm)",
+    "age": "Edad",
+    "sex": "Sexo",
+    "noAnswer": "No indicar",
+    "female": "Mujer",
+    "male": "Hombre",
+    "other": "Otro",
+    "activity": "Actividad diaria (sin contar el entrenamiento)",
+    "injuries": "Lesiones o limitaciones",
+    "injuriesPlaceholder": "Por ejemplo: dolor en la rodilla derecha al correr",
+    "target": "Tu meta",
+    "targetWeight": "Peso objetivo (kg)",
+    "targetDate": "Fecha meta",
+    "bmi": "Índice de masa corporal: {bmi} ({label}).",
+    "health": "Es una guía general: si tienes una condición de salud, consulta a un profesional antes de cambiar tu peso o tu entrenamiento.",
+    "invalid": "Revisa los datos: peso entre 20 y 400 kg, estatura entre 100 y 250 cm y edad entre 13 y 100 años.",
+    "save": "Guardar mi objetivo",
+    "askCoach": "Pedirle al coach un plan para mi objetivo"
+  },
+  "notify": {
+    "title": "Avisos",
+    "link": "Avisos y recordatorios",
+    "intro": "Elige qué avisos quieres recibir en este teléfono, aunque la app esté cerrada.",
+    "device": "Avisos en este teléfono",
+    "deviceOn": "Activados.",
+    "deviceOff": "Desactivados: actívalos para recibir los avisos con la pantalla bloqueada.",
+    "unsupported": "Este navegador no permite avisos. En iPhone, instala la app en la pantalla de inicio.",
+    "enable": "Activar los avisos",
+    "reminder": "Recordatorio de entrenar",
+    "reminderHint": "Te avisamos los días elegidos a la hora que digas; si ese día ya entrenaste, no te molestamos.",
+    "days": "Días del recordatorio",
+    "time": "Hora del recordatorio",
+    "training": "Durante el entrenamiento",
+    "trainingHint": "Te avisamos 10 segundos antes de que termine el descanso y cuando termina, con la serie o el ejercicio que sigue.",
+    "weekly": "Resumen semanal",
+    "weeklyHint": "El domingo en la tarde: cuántos días entrenaste y cómo va tu peso. Si el coach está activo, también analiza tu progreso.",
+    "day0": "Domingo",
+    "dayShort0": "D",
+    "day1": "Lunes",
+    "dayShort1": "L",
+    "day2": "Martes",
+    "dayShort2": "M",
+    "day3": "Miércoles",
+    "dayShort3": "X",
+    "day4": "Jueves",
+    "dayShort4": "J",
+    "day5": "Viernes",
+    "dayShort5": "V",
+    "day6": "Sábado",
+    "dayShort6": "S"
   }
 }

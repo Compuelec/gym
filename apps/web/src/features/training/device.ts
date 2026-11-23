@@ -42,6 +42,15 @@ export async function restFinishedFeedback(title: string, body: string) {
   }
 }
 
+/** Short double buzz and a local notification when 10 s of rest are left. */
+export async function restWarningFeedback(title: string, body: string) {
+  navigator.vibrate?.([80, 60, 80]);
+  if (document.visibilityState === 'hidden' && 'Notification' in window && Notification.permission === 'granted') {
+    const reg = await navigator.serviceWorker?.getRegistration();
+    await reg?.showNotification(title, { body, tag: 'rest-timer', icon: '/pwa-192x192.png' });
+  }
+}
+
 // ── Web Push (server-sent rest notification, arrives with the screen locked) ──
 
 interface PushConfig {
@@ -81,9 +90,12 @@ export async function hasPushSubscription(): Promise<boolean> {
 }
 
 /** Best effort: with network, the server pushes when the rest ends even if the phone is locked. */
-export async function scheduleRestPush(sessionId: string, endsAt: number) {
+export async function scheduleRestPush(sessionId: string, endsAt: number, next?: string) {
   if (!navigator.onLine || !(await hasPushSubscription())) return;
-  await apiFetch('/push/rest-timer', { method: 'POST', body: JSON.stringify({ sessionId, fireAt: new Date(endsAt).toISOString() }) }).catch(() => {});
+  await apiFetch('/push/rest-timer', {
+    method: 'POST',
+    body: JSON.stringify({ sessionId, fireAt: new Date(endsAt).toISOString(), ...(next ? { next: next.slice(0, 120) } : {}) }),
+  }).catch(() => {});
 }
 
 export async function cancelRestPush(sessionId: string) {

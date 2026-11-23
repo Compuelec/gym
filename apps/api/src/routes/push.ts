@@ -12,7 +12,7 @@ const SubscriptionSchema = z.object({
   endpoint: z.url().max(2000),
   keys: z.object({ p256dh: z.string().min(1).max(200), auth: z.string().min(1).max(100) }),
 });
-const RestTimerSchema = z.object({ sessionId: z.uuid(), fireAt: z.iso.datetime({ offset: true }) });
+const RestTimerSchema = z.object({ sessionId: z.uuid(), fireAt: z.iso.datetime({ offset: true }), next: z.string().trim().max(120).optional() });
 const MAX_REST_MS = 60 * 60 * 1000;
 
 export function pushRoutes(db: Database, config: Env) {
@@ -52,7 +52,7 @@ export function pushRoutes(db: Database, config: Env) {
       const fireAt = new Date(body.data.fireAt);
       const delta = fireAt.getTime() - Date.now();
       if (delta < 0 || delta > MAX_REST_MS) return apiError(c, 400, 'VALIDATION');
-      await scheduleRestPush(db, c.get('user').id, body.data.sessionId, fireAt);
+      await scheduleRestPush(db, c.get('user').id, body.data.sessionId, fireAt, body.data.next);
       return c.json({ ok: true });
     })
     .delete('/rest-timer/:sessionId', async (c) => {

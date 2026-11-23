@@ -12,6 +12,15 @@ export const profiles = pgTable('profiles', {
   bodyweightKg: real('bodyweight_kg'),
   birthYear: integer('birth_year'),
   sex: text('sex'),
+  heightCm: integer('height_cm'),
+  targetWeightKg: real('target_weight_kg'),
+  targetDate: text('target_date'),
+  activityLevel: text('activity_level'),
+  injuries: text('injuries'),
+  reminderDays: integer('reminder_days').array(),
+  reminderTime: text('reminder_time'),
+  timeZone: text('time_zone'),
+  weeklySummary: boolean('weekly_summary'),
   medicalAckAt: timestamp('medical_ack_at', { withTimezone: true, mode: 'string' }).notNull(),
 });
 

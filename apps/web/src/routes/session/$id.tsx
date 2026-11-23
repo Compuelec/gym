@@ -10,7 +10,7 @@ import { RestBar, useRest } from '@/features/training/RestBar';
 import { SessionExerciseCard } from '@/features/training/SessionExerciseCard';
 import { SubstituteSheet } from '@/features/training/SubstituteSheet';
 import { enableRestAlerts, hasPushSubscription, pushSupported, useWakeLock } from '@/features/training/device';
-import { formatClock } from '@/features/training/rest-timer';
+import { formatClock, nextUp } from '@/features/training/rest-timer';
 import {
   addSessionExercise,
   discardSession,
@@ -100,7 +100,21 @@ function SessionPage() {
           exercise={byId.get(se.exerciseId)}
           target={targets.get(se.exerciseId)}
           units={units}
-          onLogged={(secs) => rest.start(secs)}
+          onLogged={(secs) =>
+            rest.start(
+              secs,
+              nextUp(
+                detail.exercises.map((x) => ({
+                  id: x.id,
+                  name: byId.get(x.exerciseId)?.nameEs ?? '',
+                  targetSets: x.targetSets ?? null,
+                  // The set just logged is not in `x.sets` yet.
+                  done: x.sets.filter((st) => st.type !== 'warmup').length + (x.id === se.id ? 1 : 0),
+                })),
+                se.id,
+              ),
+            )
+          }
           onSwap={() => setSwapping(se)}
         />
       ))}
