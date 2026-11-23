@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { canApplyUpdateNow, registerUpdateBlocker } from './update-guard';
+import { describe, expect, it, vi } from 'vitest';
+import { canApplyUpdateNow, registerUpdateBlocker, whenUpdateAllowed } from './update-guard';
 
 describe('update guard', () => {
   it('allows updates when nothing blocks them', async () => {
@@ -13,5 +13,21 @@ describe('update guard', () => {
     inProgress = false;
     expect(await canApplyUpdateNow()).toBe(true);
     unregister();
+  });
+
+  it('an update accepted during a workout goes ahead once the workout ends', async () => {
+    vi.useFakeTimers();
+    let inProgress = true;
+    const unregister = registerUpdateBlocker(async () => inProgress);
+    let applied = false;
+    const wait = whenUpdateAllowed(1000);
+    void wait.done.then(() => (applied = true));
+    await vi.advanceTimersByTimeAsync(3000);
+    expect(applied).toBe(false);
+    inProgress = false;
+    await vi.advanceTimersByTimeAsync(1000);
+    expect(applied).toBe(true);
+    unregister();
+    vi.useRealTimers();
   });
 });

@@ -21,6 +21,14 @@ describe('rest timer', () => {
     expect(remainingSeconds(addRest(s, 15, 100_000), 100_000)).toBe(15);
   });
 
+  it('takes time off without moving the end into the past', () => {
+    const s = startRest(60, 0);
+    expect(remainingSeconds(addRest(s, -15, 10_000), 10_000)).toBe(35);
+    const nearEnd = addRest(s, -15, 50_000);
+    expect(remainingSeconds(nearEnd, 50_000)).toBe(0);
+    expect(nearEnd.endsAt).toBe(50_000);
+  });
+
   it('survives a reload (persisted per session)', () => {
     const s = startRest(120, 5_000);
     saveRest('ses-1', s);

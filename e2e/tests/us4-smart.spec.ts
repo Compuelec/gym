@@ -39,13 +39,13 @@ test.describe('US4 · recomendaciones inteligentes sin conexión', () => {
     await waitForServiceWorker(page);
     await context.setOffline(true);
     await page.getByRole('button', { name: 'Empezar «Brazos»' }).click();
-    const curl = page.getByRole('region', { name: 'Curl Martillo' });
+    const curl = page.getByRole('region', { name: 'Curl martillo' });
     await expect(curl.getByText('Sugerencia: 14 kg × 8')).toBeVisible();
     await curl.getByRole('button', { name: '¿Por qué?' }).click();
     await expect(curl.getByText('Completaste 3×12 con 12 kg: sube a 14 kg y vuelve a 8 repeticiones.')).toBeVisible();
     // Prefilled with the suggestion: one tap logs it, and it is a new record.
-    await expect(curl.getByLabel('Peso (kg)')).toHaveValue('14');
-    await curl.getByRole('button', { name: 'Registrar serie: Curl Martillo' }).click();
+    await expect(curl.getByLabel('Peso (kg)', { exact: true })).toHaveValue('14');
+    await curl.getByRole('button', { name: 'Registrar serie: Curl martillo' }).click();
     await expect(curl.getByRole('status')).toContainText('¡Nuevo récord! peso máximo, 1RM estimado');
     await context.setOffline(false);
   });
@@ -72,7 +72,7 @@ test.describe('US4 · recomendaciones inteligentes sin conexión', () => {
     await expect(page.getByText(/Duración estimada: \d+ min/)).toBeVisible();
     await page.getByRole('button', { name: 'Empezar esta rutina' }).click();
     await expect(page.getByRole('heading', { name: 'Rutina de hoy' })).toBeVisible();
-    await expect(page.getByText(/^Objetivo: \d × /).first()).toBeVisible();
+    await expect(page.getByText(/^\d series × /).first()).toBeVisible();
     if (browserName !== 'webkit') await context.setOffline(false);
   });
 

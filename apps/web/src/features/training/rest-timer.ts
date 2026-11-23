@@ -24,7 +24,9 @@ export function startRest(seconds: number, now = Date.now()): RestState {
 
 export function addRest(state: RestState, seconds: number, now = Date.now()): RestState {
   const base = Math.max(state.endsAt, now);
-  return { endsAt: base + seconds * 1000, totalSeconds: state.totalSeconds + seconds };
+  // Taking time off never moves the end into the past: it just ends now.
+  const endsAt = Math.max(now, base + seconds * 1000);
+  return { endsAt, totalSeconds: Math.max(0, state.totalSeconds + (endsAt - base) / 1000) };
 }
 
 export function formatClock(totalSeconds: number): string {

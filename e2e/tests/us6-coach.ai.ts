@@ -49,7 +49,7 @@ test.describe('US6 · coach con IA', () => {
 
     await page.getByRole('navigation').getByRole('link', { name: 'Entrenar' }).click();
     await page.getByRole('button', { name: 'Empezar «Fuerza en casa · Día 1»' }).click();
-    await expect(page.getByText('Objetivo: 3 × 8–12').first()).toBeVisible();
+    await expect(page.getByText('3 series × 8–12 reps', { exact: false }).first()).toBeVisible();
     await expect(page.getByText('Te quedan', { exact: false })).toHaveCount(0);
   });
 

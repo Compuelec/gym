@@ -4,6 +4,7 @@ import { Bell, Plus } from 'lucide-react';
 import { findSubstitutes } from '@gym/engine';
 import { Button } from '@/components/ui/button';
 import { SelectField, TextField } from '@/components/ui/field';
+import { Thumbnail } from '@/features/catalog/ExerciseImages';
 import { useExercises, type ExerciseView } from '@/features/catalog/exercises';
 import { ExercisePicker } from '@/features/training/ExercisePicker';
 import { RestBar, useRest } from '@/features/training/RestBar';
@@ -145,7 +146,7 @@ function SessionPage() {
         </section>
       )}
 
-      <RestBar rest={rest.rest} onAdd={() => rest.add(15)} onSkip={() => rest.clear()} />
+      <RestBar rest={rest.rest} onAdd={() => rest.add(15)} onSubtract={() => rest.add(-15)} onSkip={() => rest.clear()} />
 
       {picking && (
         <ExercisePicker
@@ -201,9 +202,12 @@ function SubstituteSheet({
         {subs.length === 0 && <li className="py-4 text-muted-foreground">{t('session.noSubstitutes')}</li>}
         {subs.map((s) => (
           <li key={s.exerciseId}>
-            <button type="button" className="flex w-full flex-col items-start gap-1 py-3 text-left" onClick={() => onPick(s.exerciseId)}>
-              <span className="font-medium">{byId.get(s.exerciseId)?.nameEs ?? s.exerciseId}</span>
-              <span className="text-sm text-muted-foreground">{s.reason}</span>
+            <button type="button" className="flex w-full items-center gap-3 py-3 text-left" onClick={() => onPick(s.exerciseId)}>
+              <Thumbnail media={byId.get(s.exerciseId)?.media ?? []} />
+              <span className="flex flex-col items-start gap-1">
+                <span className="font-medium">{byId.get(s.exerciseId)?.nameEs ?? s.exerciseId}</span>
+                <span className="text-sm text-muted-foreground">{s.reason}</span>
+              </span>
             </button>
           </li>
         ))}

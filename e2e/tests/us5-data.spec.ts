@@ -31,7 +31,7 @@ test.describe('US5 · progreso y datos propios', () => {
     await page.goto('/measurements');
     await page.getByRole('button', { name: 'Guardar medida' }).click();
     await expect(page.getByRole('alert')).toHaveText('Indica al menos una medida.');
-    await page.getByLabel('Peso (kg)').fill('80,5');
+    await page.getByLabel('Peso (kg)', { exact: true }).fill('80,5');
     await page.getByLabel('Cintura (cm)').fill('88');
     await page.getByRole('button', { name: 'Guardar medida' }).click();
     await expect(page.getByText('80,5 kg · Cintura 88 cm')).toBeVisible();

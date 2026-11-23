@@ -34,7 +34,7 @@ export function useRest(sessionId: string) {
   };
 }
 
-export function RestBar({ rest, onAdd, onSkip }: { rest: RestState | null; onAdd: () => void; onSkip: () => void }) {
+export function RestBar({ rest, onAdd, onSubtract, onSkip }: { rest: RestState | null; onAdd: () => void; onSubtract?: () => void; onSkip: () => void }) {
   const now = useNow(250, Boolean(rest));
   const notified = useRef<number | null>(null);
   const remaining = remainingSeconds(rest, now);
@@ -61,12 +61,18 @@ export function RestBar({ rest, onAdd, onSkip }: { rest: RestState | null; onAdd
         <span className="flex-1 font-medium tabular-nums">
           {done ? `${t('session.restDone')} ${t('session.overtime', { time: formatClock(overtimeSeconds(rest, now)) })}` : `${t('session.rest')} ${formatClock(remaining)}`}
         </span>
+        {!done && onSubtract && (
+          <Button size="sm" variant="outline" onClick={onSubtract}>
+            {t('session.sub15')}
+          </Button>
+        )}
         {!done && (
           <Button size="sm" variant="outline" onClick={onAdd}>
             {t('session.add15')}
           </Button>
         )}
-        <Button size="sm" variant={done ? 'outline' : 'ghost'} onClick={onSkip}>
+        {/* On the green bar the outline button has a white background: keep its text dark. */}
+        <Button size="sm" variant={done ? 'outline' : 'ghost'} className={done ? 'text-foreground' : undefined} onClick={onSkip}>
           {done ? t('common.next') : t('session.skip')}
         </Button>
       </div>

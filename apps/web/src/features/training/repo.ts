@@ -149,12 +149,26 @@ export async function addSessionExercise(
   return se.id;
 }
 
+/** Drops view-only fields (the card passes the exercise together with its sets). */
+function storedSessionExercise(se: LocalSessionExercise & { sets?: unknown }): LocalSessionExercise {
+  const { sets: _sets, ...rest } = se;
+  return rest;
+}
+
 export async function swapSessionExercise(userId: string, se: LocalSessionExercise, newExerciseId: string) {
   await saveRecord(getDB(userId), 'sessionExercise', {
-    ...se,
+    ...storedSessionExercise(se),
     exerciseId: newExerciseId,
     replacedFromExerciseId: se.replacedFromExerciseId ?? se.exerciseId,
   });
+  sync(userId);
+}
+
+export type SessionTargets = Pick<LocalSessionExercise, 'targetSets' | 'repMin' | 'repMax' | 'targetSeconds' | 'restSeconds'>;
+
+/** Changes the goal of one exercise for this session only (the routine stays as it is). */
+export async function updateSessionTargets(userId: string, se: LocalSessionExercise, targets: SessionTargets) {
+  await saveRecord(getDB(userId), 'sessionExercise', { ...storedSessionExercise(se), ...targets });
   sync(userId);
 }
 
@@ -228,6 +242,12 @@ export async function lastPerformance(userId: string, exerciseId: string, exclud
 export const STALE_SESSION_MS = 6 * 60 * 60 * 1000;
 export function isStale(session: Pick<WorkoutSession, 'startedAt' | 'status'>, now = Date.now()) {
   return session.status === 'in_progress' && now - Date.parse(session.startedAt) > STALE_SESSION_MS;
+}
+
+/** A workout is really going on (a forgotten one older than 6 hours does not count). */
+export async function hasActiveSession(userId: string, now = Date.now()) {
+  const open = (await getDB(userId).entityTable('workoutSession').where('status').equals('in_progress').toArray()) as unknown as LocalSession[];
+  return open.some((s) => !isStale(s, now));
 }
 
 // ── History for the smart engine ────────────────────────────────────────────

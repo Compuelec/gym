@@ -16,4 +16,9 @@ describe('RestBar for screen readers', () => {
     render(<RestBar rest={{ endsAt: Date.now() - 1_000, totalSeconds: 60 }} onAdd={() => {}} onSkip={() => {}} />);
     expect(screen.getByRole('status').textContent).toMatch(/Descanso terminado/);
   });
+
+  it('the «Siguiente» button stays readable on the green bar (dark text on its white background)', () => {
+    render(<RestBar rest={{ endsAt: Date.now() - 1_000, totalSeconds: 60 }} onAdd={() => {}} onSkip={() => {}} />);
+    expect(screen.getByRole('button', { name: 'Siguiente' }).className).toContain('text-foreground');
+  });
 });

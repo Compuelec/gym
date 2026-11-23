@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { t } from '@/i18n';
-import { canApplyUpdateNow } from '@/lib/update-guard';
+import { canApplyUpdateNow, whenUpdateAllowed } from '@/lib/update-guard';
 
 /**
  * Shows «Hay una versión nueva» when a new service worker is waiting. It never reloads by itself:
- * the user decides, and while a workout is in progress the update waits until it ends.
+ * the user decides, and while a workout is in progress the accepted update waits until it ends
+ * and then installs.
  */
 export function UpdatePrompt() {
   const {
@@ -13,6 +14,14 @@ export function UpdatePrompt() {
     updateServiceWorker,
   } = useRegisterSW();
   const [deferred, setDeferred] = useState(false);
+
+  // Accepted during a workout: install as soon as the workout is finished or discarded.
+  useEffect(() => {
+    if (!deferred) return;
+    const wait = whenUpdateAllowed();
+    void wait.done.then(() => updateServiceWorker(true));
+    return wait.stop;
+  }, [deferred, updateServiceWorker]);
 
   if (!needRefresh) return null;
 

@@ -5,6 +5,7 @@ import { FullPageSpinner } from '@/components/Spinner';
 import { t } from '@/i18n';
 import { getDB } from '@/db/database';
 import { registerUpdateBlocker } from '@/lib/update-guard';
+import { hasActiveSession } from '@/features/training/repo';
 import { requestPersistentStorage } from '@/db/persistence';
 import { ensureCatalog, scheduleImagePrecache } from '@/features/catalog/catalog-loader';
 import { UserContext } from '@/lib/auth-context';
@@ -58,7 +59,8 @@ function SignedIn({ user, path }: { user: SessionUser; path: string }) {
     const db = getDB(user.id);
     void ensureCatalog(db).then(() => scheduleImagePrecache(db));
     // Never apply a new app version in the middle of a workout.
-    const unblock = registerUpdateBlocker(async () => (await db.entityTable('workoutSession').where('status').equals('in_progress').count()) > 0);
+    // A forgotten session (older than 6 h) does not hold updates back forever.
+    const unblock = registerUpdateBlocker(() => hasActiveSession(user.id));
     return () => {
       engine.stop();
       unblock();
