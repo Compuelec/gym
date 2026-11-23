@@ -1,12 +1,30 @@
 node_modules/
 dist/
+build/
 coverage/
 playwright-report/
 test-results/
+*.log
 .env
 .env.*
 !.env.example
 .DS_Store
+Thumbs.db
+*.tmp
+*.swp
+.vscode/
+.idea/
 .claude/settings.local.json
 .qodo/
-*.log
+# Kubernetes secrets never committed
+*.secret.yaml
+secrets/
+kubeconfig*
+*.key
+*.crt
+# Generated catalog artifacts
+packages/catalog/.cache/
+packages/catalog/out/
+
+# Real deployment values (host, registry, domain)
+deploy/site.env

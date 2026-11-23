@@ -1,0 +1,10 @@
+# Backups volume: pre-migration dumps (migrate-job.yaml) and daily backups (backup.yaml, US5).
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: gym-backups
+  namespace: gym
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests: { storage: 5Gi }

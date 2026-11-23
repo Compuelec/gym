@@ -44,10 +44,15 @@ del registro de peticiones.
 ## Catálogo
 | Método | Ruta | Descripción |
 |---|---|---|
-| GET | `/catalog/manifest` | **público** — `{version, url, sizeBytes, sha256, imageCount}` |
-| GET | `/catalog/v/:version/catalog.json` | **público**, caché inmutable — ejercicios base + vocabularios |
-| GET | `/media/exercises/:file` | **público**, caché inmutable (servido por Caddy) |
-| GET | `/credits` | **público** — autores y licencias agregados |
+Archivos estáticos servidos por Caddy (no pasan por la API; decisión de implementación US2):
+
+| Método | Ruta | Descripción |
+|---|---|---|
+| GET | `/catalog/manifest.json` | **público**, sin caché — `{version, file, sha256, sizeBytes, exerciseCount, imageCount, translatedCount}` |
+| GET | `/catalog/catalog-<version>.json` | **público**, caché inmutable — ejercicios base + créditos |
+| GET | `/media/exercises/<id>/<n>.webp` | **público**, caché inmutable |
+
+Los créditos (autores y licencias) vienen dentro del archivo del catálogo y se muestran en `/credits` de la PWA.
 
 Los ejercicios propios, favoritos y todo dato de usuario viajan por `/sync`.
 

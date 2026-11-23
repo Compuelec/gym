@@ -1,0 +1,24 @@
+{
+  "name": "@gym/catalog",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build:catalog": "tsx scripts/build.ts",
+    "translate:catalog": "tsx --env-file-if-exists=../../.env scripts/translate.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.12.0",
+    "@gym/shared": "workspace:*",
+    "p-limit": "^7.3.3",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "tsx": "^4.23.15"
+  }
+}

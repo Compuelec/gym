@@ -1,0 +1,36 @@
+{
+  "name": "@gym/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "worker": "tsx --env-file-if-exists=../../.env src/worker.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=../../.env src/db/migrate.ts",
+    "admin:invite": "tsx --env-file-if-exists=../../.env src/cli/admin.ts invite",
+    "admin:promote": "tsx --env-file-if-exists=../../.env src/cli/admin.ts promote"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.12.0",
+    "@gym/shared": "workspace:*",
+    "@hono/node-server": "^2.1.11",
+    "better-auth": "^1.7.27",
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.20",
+    "nodemailer": "^10.6.1",
+    "pg": "^8.23.1",
+    "pino": "^10.4.0",
+    "web-push": "^3.6.7",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
+    "@types/web-push": "^3.6.4",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.23.15"
+  }
+}

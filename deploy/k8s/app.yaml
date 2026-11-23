@@ -1,0 +1,137 @@
+# Gym: web (Caddy serving the PWA, proxying /api) + api + worker.
+# The Cloudflare tunnel targets service/gym (http://gym.gym.svc.cluster.local:80).
+apiVersion: v1
+kind: Service
+metadata:
+  name: gym
+  namespace: gym
+spec:
+  selector: { app: gym-web }
+  ports: [{ port: 80, targetPort: 8080, name: http }]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gym-api
+  namespace: gym
+spec:
+  selector: { app: gym-api }
+  ports: [{ port: 3000, targetPort: 3000, name: http }]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gym-web
+  namespace: gym
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: gym-web }
+  template:
+    metadata:
+      labels: { app: gym-web }
+    spec:
+      imagePullSecrets:
+        - name: gym-registry
+      containers:
+        - name: web
+          # Pin version@sha256 after each push (see deploy/README.md).
+          image: registry.example.com/owner/gym-web:0.1.0
+          ports: [{ containerPort: 8080 }]
+          env:
+            - { name: API_UPSTREAM, value: "gym-api:3000" }
+          readinessProbe:
+            httpGet: { path: /, port: 8080 }
+            periodSeconds: 10
+          livenessProbe:
+            httpGet: { path: /, port: 8080 }
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          resources:
+            requests: { cpu: 20m, memory: 32Mi }
+            limits: { memory: 128Mi }
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: [ALL] }
+            seccompProfile: { type: RuntimeDefault }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gym-api
+  namespace: gym
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: gym-api }
+  template:
+    metadata:
+      labels: { app: gym-api }
+    spec:
+      imagePullSecrets:
+        - name: gym-registry
+      containers:
+        - name: api
+          image: registry.example.com/owner/gym-api:0.1.0
+          ports: [{ containerPort: 3000 }]
+          envFrom: [{ secretRef: { name: gym-secrets } }]
+          env:
+            # Cloudflare Tunnel sets CF-Connecting-IP; only the tunnel reaches the app.
+            - { name: AUTH_IP_HEADER, value: cf-connecting-ip }
+            - { name: NODE_OPTIONS, value: "--max-old-space-size=384" }
+          startupProbe:
+            httpGet: { path: /api/health, port: 3000 }
+            periodSeconds: 5
+            failureThreshold: 36
+          readinessProbe:
+            httpGet: { path: /api/health, port: 3000 }
+            periodSeconds: 10
+          # Liveness doesn't check the database: a busy database must not restart the app.
+          livenessProbe:
+            httpGet: { path: /api/health/live, port: 3000 }
+            initialDelaySeconds: 20
+            periodSeconds: 30
+          resources:
+            requests: { cpu: 100m, memory: 192Mi }
+            limits: { memory: 512Mi }
+          securityContext:
+            runAsUser: 100
+            runAsGroup: 101
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: [ALL] }
+            seccompProfile: { type: RuntimeDefault }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gym-worker
+  namespace: gym
+spec:
+  replicas: 1
+  selector:
+    matchLabels: { app: gym-worker }
+  template:
+    metadata:
+      labels: { app: gym-worker }
+    spec:
+      imagePullSecrets:
+        - name: gym-registry
+      containers:
+        - name: worker
+          image: registry.example.com/owner/gym-api:0.1.0
+          command: ["node", "--import", "tsx", "src/worker.ts"]
+          envFrom: [{ secretRef: { name: gym-secrets } }]
+          resources:
+            requests: { cpu: 20m, memory: 128Mi }
+            limits: { memory: 384Mi }
+          securityContext:
+            runAsUser: 100
+            runAsGroup: 101
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: [ALL] }
+            seccompProfile: { type: RuntimeDefault }

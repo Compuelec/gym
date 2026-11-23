@@ -1,0 +1,10 @@
+node_modules/
+dist/
+build/
+coverage/
+pnpm-lock.yaml
+.specify/
+.claude/
+specs/
+packages/catalog/.cache/
+packages/catalog/out/
