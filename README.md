@@ -82,8 +82,9 @@ Kubernetes (namespace `gym`), imágenes en un registro de contenedores y publica
 Cloudflare. Los datos propios del servidor van en `deploy/site.env` (no versionado). Guía paso a
 paso: [`deploy/README.md`](deploy/README.md).
 
-Ramas: `main` = versión estable; `development` = integración; cada funcionalidad en su rama
-`NNN-nombre`.
+Ramas: `main` = siempre la última versión publicada (etiquetas `vX.Y.Z`); `development` =
+integración; cada funcionalidad en su rama `NNN-nombre`. Cambios de cada versión en
+[`CHANGELOG.md`](CHANGELOG.md).
 
 ## Licencia
 

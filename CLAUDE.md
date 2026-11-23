@@ -13,6 +13,11 @@
   en `deploy/site.env.example`). Guía: `deploy/README.md`. El repo es público en GitHub: nunca
   versionar hosts, IPs, dominios reales ni secretos.
 - Remotos: `origin` = Forgejo (principal); `github` = espejo público en GitHub.
-- Ramas: `main` = versión estable (lo que se instala en el servidor); `development` = integración.
+- Ramas: `main` = reflejo de la última versión publicada (lo que se instala en el servidor; sólo
+  recibe merges `--no-ff` desde `development` al publicar); `development` = integración.
+- Versiones: SemVer. Publicar = subir `version` en todos los `package.json`, agregar la entrada en
+  `CHANGELOG.md`, merge `development` → `main`, etiqueta anotada `vX.Y.Z` en `main`, push de `main`,
+  `development` y la etiqueta a `origin` y `github`, y release en GitHub con las notas del
+  `CHANGELOG.md`. Las imágenes se construyen con la misma versión.
   Cada funcionalidad nace de `development` en su propia rama (`NNN-nombre`), se prueba en los tres
   niveles y vuelve a `development` con merge `--no-ff`. Nunca se trabaja directo sobre `main`.
