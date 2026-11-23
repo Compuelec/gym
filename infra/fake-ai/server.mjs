@@ -36,9 +36,14 @@ export function reply(body) {
     ? { highlightsEs: ['Entrenaste 3 días esta semana.'], concernsEs: [], adjustments: [] }
     : {
         name: 'Fuerza en casa',
-        summaryEs: 'Programa de 4 semanas con mancuernas, 3 días por semana.',
+        // [[LONG]]: texts over the schema limits (600 / 400 chars), as the real model sometimes writes.
+        summaryEs: text.includes('[[LONG]]')
+          ? 'Programa de 4 semanas con mancuernas, 3 días por semana. '.repeat(15)
+          : 'Programa de 4 semanas con mancuernas, 3 días por semana.',
         weeks: 4,
-        progressionNoteEs: 'Sube el peso cuando completes todas las repeticiones.',
+        progressionNoteEs: text.includes('[[LONG]]')
+          ? 'Sube el peso cuando completes todas las repeticiones. '.repeat(12)
+          : 'Sube el peso cuando completes todas las repeticiones.',
         days: [1, 2, 3].map((dayIndex, d) => ({
           dayIndex,
           title: `Día ${dayIndex}`,
