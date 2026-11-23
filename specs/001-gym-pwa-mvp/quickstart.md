@@ -68,20 +68,24 @@ Escenarios mínimos (Playwright, navegador real):
 8. Página de créditos visible y con autores/licencias.
 
 ## Despliegue en Kubernetes + Cloudflare Tunnel
+Guía completa en `deploy/README.md` (mismo patrón que Al Día).
 ```bash
-# imágenes
-docker build -f infra/docker/web.Dockerfile -t <registro>/gym-web:<versión> .
-docker build -f infra/docker/api.Dockerfile -t <registro>/gym-api:<versión> .
-# secretos (una vez): DATABASE_URL, BETTER_AUTH_SECRET, APP_ENCRYPTION_KEY, GOOGLE_*, SMTP_*, VAPID_*
-kubectl -n gym create secret generic gym-secrets --from-env-file=.env.prod
-# aplicar (Job de migración incluido)
-kubectl apply -k infra/k8s/overlays/prod
-# Cloudflare Tunnel: ruta del hostname al Service gym-web
+# imágenes (Forgejo)
+docker buildx build --platform linux/amd64 -f infra/docker/web.Dockerfile \
+  -t registry.example.com/carlos/gym-web:<versión> --push .
+docker buildx build --platform linux/amd64 -f infra/docker/api.Dockerfile \
+  -t registry.example.com/carlos/gym-api:<versión> --push .
+# fijar los digests nuevos en deploy/k8s/app.yaml y migrate-job.yaml, luego aplicar:
+ssh root@k8s-master.example.com 'kubectl apply -f -' < deploy/k8s/namespace.yaml
+ssh root@k8s-master.example.com 'kubectl apply -f -' < deploy/k8s/postgres.yaml
+ssh root@k8s-master.example.com 'kubectl apply -f -' < deploy/k8s/migrate-job.yaml
+ssh root@k8s-master.example.com 'kubectl apply -f -' < deploy/k8s/app.yaml
+ssh root@k8s-master.example.com 'kubectl apply -f -' < deploy/k8s/network-policy.yaml
+# Cloudflare Zero Trust → Tunnels → Public Hostnames → http://gym.gym.svc.cluster.local:80
 ```
 Comprobar: pods `web`, `api`, `worker` y `postgres` listos; `https://<dominio>/api/health`
-responde a través del túnel; el CronJob de respaldo generó su primer archivo; restauración de
-prueba en una base aparte. (Registro, forma de desplegar y `cloudflared` se ajustan en la etapa 0
-a como Carlos lo hace en sus otros proyectos.)
+responde a través del túnel; desde otro namespace la app no responde (NetworkPolicy); el
+CronJob de respaldo generó su primer archivo y la verificación de restauración pasa.
 
 ## Al informar cada etapa
 Indicar qué se probó en los tres niveles y qué quedó sin probar y por qué (principio III).

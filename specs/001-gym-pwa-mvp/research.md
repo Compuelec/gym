@@ -137,12 +137,22 @@ Fecha: 2026-11-22. Cada decisión: **Decisión / Razón / Alternativas**.
   - Secretos (`Secret` de Kubernetes): `DATABASE_URL`, `BETTER_AUTH_SECRET`,
     `APP_ENCRYPTION_KEY`, credenciales de Google y SMTP, claves VAPID.
   - La ruta de Cloudflare Tunnel apunta al Service de `web`.
-- Imágenes construidas con Docker; los manifiestos viven en `infra/k8s/` (Kustomize con
-  `base/` y `overlays/prod`). Docker Compose se mantiene **sólo** para desarrollo local y el
-  entorno de pruebas desechable.
-- **Pendiente para la etapa 0** (no bloquea el plan): confirmar cómo se hace «como siempre» —
-  registro de imágenes, cómo se despliega (manual, Argo CD, Flux…), si `cloudflared` corre en el
-  clúster y si ya hay un PostgreSQL compartido.
+- **Confirmado el 2026-11-22** revisando `../finanzas` (Al Día) y `../agendas`, y el clúster en
+  modo lectura: k8s v1.30.14 con 4 nodos Debian (amd64), Longhorn como almacenamiento por
+  defecto, Calico con NetworkPolicy, `cloudflared-tunnel` en el namespace `cloudflare`. Se sigue
+  el mismo patrón:
+  - Código e imágenes en **Forgejo** (`registry.example.com/carlos/gym`, imágenes
+    `registry.example.com/carlos/gym-web` y `gym-api`), con pull secret `gym-registry`.
+  - Despliegue con `ssh root@k8s-master.example.com 'kubectl apply -f -' < deploy/k8s/<archivo>`
+    (manifiestos planos en `deploy/k8s/`, sin Kustomize ni Argo CD).
+  - **PostgreSQL propio** en el namespace `gym` (cada app tiene el suyo), fijado por digest.
+  - Imágenes con versión + `@sha256`, `linux/amd64`; probes `/api/health/live` y `/api/health`;
+    IP real por `CF-Connecting-IP`; NetworkPolicy que sólo deja entrar al túnel.
+  - Hostname público agregado a mano en Cloudflare Zero Trust → Tunnels → Public Hostnames →
+    `http://gym.gym.svc.cluster.local:80` (lo hace Carlos).
+  - Respaldos como Al Día: diario 03:30 hora de Chile, 30 días (mínimo 7), verificación mensual
+    de restauración.
+- Docker Compose se mantiene **sólo** para desarrollo local y el entorno de pruebas desechable.
 - **Alternativas**: LXC con Docker Compose (descartado: Carlos ya opera Kubernetes y un túnel
   estándar), nube gestionada (para la etapa comercial; los manifiestos son portables).
 
