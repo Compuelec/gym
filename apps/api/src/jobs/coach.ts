@@ -18,6 +18,7 @@ import { loadCatalog } from '../lib/catalog';
 import { buildContext, profileText } from '../lib/coach-context';
 import { COACH_SYSTEM, REVIEW_SYSTEM } from '../lib/coach-prompt';
 import { validateProgram, validateReview } from '../lib/coach-validate';
+import { parseStructured } from '../lib/structured-output';
 import { logger } from '../logger';
 
 export type ClientFactory = (apiKey: string) => Anthropic;
@@ -54,12 +55,15 @@ async function callStructured<T extends z.ZodType>(
     cacheable: string;
     user: string;
     schema: T;
+    requestId: string;
   },
   sleep: (ms: number) => Promise<void>,
 ) {
   for (let attempt = 0; ; attempt++) {
     try {
-      const response = await client.messages.parse({
+      // create (not parse): the SDK's parse throws on any length overrun and loses the usage of a
+      // call that was already billed. We parse ourselves, repairing overruns.
+      const response = await client.messages.create({
         model: opts.model,
         max_tokens: 8000,
         // Stable prefix (instructions + catalog) is cached; the user's request goes last.
@@ -75,11 +79,18 @@ async function callStructured<T extends z.ZodType>(
         output: response.usage.output_tokens ?? 0,
         cacheRead: response.usage.cache_read_input_tokens ?? 0,
       };
-      return {
-        stopReason: response.stop_reason,
-        parsed: response.parsed_output as z.infer<T> | null,
-        usage,
-      };
+      const text = response.content.map((b) => (b.type === 'text' ? b.text : '')).join('');
+      let parsed: z.infer<T> | null = null;
+      if (response.stop_reason === 'end_turn') {
+        const out = parseStructured(opts.schema, text);
+        if (out.ok) {
+          parsed = out.data;
+          if (out.adjusted.length) logger.info({ requestId: opts.requestId, adjusted: out.adjusted }, 'coach output shortened');
+        } else {
+          logger.warn({ requestId: opts.requestId, reason: out.reason, issues: out.issues }, 'coach output rejected');
+        }
+      }
+      return { stopReason: response.stop_reason, parsed, usage };
     } catch (err) {
       if (isTransient(err) && attempt < BACKOFF_MS.length) {
         await sleep(BACKOFF_MS[attempt]!);
@@ -174,6 +185,7 @@ export async function processNextCoachRequest(
             cacheable,
             user,
             schema: CoachProgramSchema,
+            requestId: req.id,
           },
           sleep,
         );
@@ -210,7 +222,7 @@ export async function processNextCoachRequest(
       const user = `${profileText(ctx)}\n\nÚltimas 4 semanas:\n${ctx.historyText}\n\nComentario del usuario para la revisión semanal:\n${message}`;
       const r = await callStructured(
         client,
-        { model, effort: 'low', system: REVIEW_SYSTEM, cacheable, user, schema: CoachReviewSchema },
+        { model, effort: 'low', system: REVIEW_SYSTEM, cacheable, user, schema: CoachReviewSchema, requestId: req.id },
         sleep,
       );
       add(r.usage);
