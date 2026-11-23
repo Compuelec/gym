@@ -1,5 +1,6 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Star } from 'lucide-react';
+import { PageSpinner } from '@/components/Spinner';
+import { ListPlus, Star } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { BodyMap } from '@/features/catalog/BodyMap';
 import { ExerciseImages } from '@/features/catalog/ExerciseImages';
@@ -11,6 +12,8 @@ import {
 } from '@/features/catalog/exercises';
 import { categoryName, equipmentName, muscleName, names } from '@/features/catalog/labels';
 import { useRecords } from '@/features/smart/hooks';
+import { AddToRoutineSheet } from '@/features/training/AddToRoutineSheet';
+import { useState } from 'react';
 import { t } from '@/i18n';
 import { formatNumber } from '@/lib/format';
 import { useUser } from '@/lib/auth-context';
@@ -27,8 +30,9 @@ function ExerciseDetailPage() {
   const records = useRecords(user.id, id);
   const profile = useProfile(user.id);
   const navigate = useNavigate();
+  const [adding, setAdding] = useState(false);
 
-  if (ex === undefined) return null;
+  if (ex === undefined) return <PageSpinner />;
   if (ex === null) return <p>{t('exercises.notFound')}</p>;
   const fav = favorites.has(ex.id);
 
@@ -58,6 +62,12 @@ function ExerciseDetailPage() {
       )}
 
       <ExerciseImages media={ex.media} alt={ex.nameEs} />
+
+      <Button size="lg" onClick={() => setAdding(true)}>
+        <ListPlus className="size-5" aria-hidden />
+        {t('addToRoutine.title')}
+      </Button>
+      {adding && <AddToRoutineSheet userId={user.id} exercises={[ex]} onClose={() => setAdding(false)} />}
 
       <section className="grid grid-cols-[1fr_auto] gap-4">
         <dl className="flex flex-col gap-3 text-sm">

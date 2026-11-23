@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Link } from '@tanstack/react-router';
 import { ChartLine, Dumbbell, ListChecks, Play, User } from 'lucide-react';
 import { t } from '@/i18n';
+import { BackButton } from './BackButton';
 import { StatusBar } from './StatusBar';
 import { UpdatePrompt } from './UpdatePrompt';
 
@@ -18,7 +19,10 @@ export function AppShell({ children, userId }: { children: ReactNode; userId: st
     <div className="flex min-h-dvh flex-col">
       <StatusBar userId={userId} />
       <UpdatePrompt />
-      <main className="mx-auto w-full max-w-md flex-1 px-4 pt-4 pb-24">{children}</main>
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col px-4 pt-4 pb-28">
+        <BackButton />
+        {children}
+      </main>
       <nav
         aria-label={t('app.name')}
         className="fixed inset-x-0 bottom-0 border-t border-border bg-background pb-[env(safe-area-inset-bottom)]"

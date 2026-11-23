@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from '@tanstack/react-router';
-import { BookOpen, Check, Minus, Plus, Repeat, SlidersHorizontal, X } from 'lucide-react';
+import { BookOpen, Check, Repeat, SlidersHorizontal, X } from 'lucide-react';
+import { Stepper } from '@/components/ui/stepper';
 import { SET_TYPES, displayToKg, kgToDisplay, setProblem, type RoutineItem } from '@gym/shared';
 import { Button } from '@/components/ui/button';
 import { AnimatedThumbnail, ExerciseImages } from '@/features/catalog/ExerciseImages';
@@ -30,7 +31,6 @@ function describeSuggestion(s: Suggestion, units: Units) {
   return `${s.reps} reps`;
 }
 
-const inputCls = 'h-12 w-full min-w-0 rounded-lg border border-border bg-background px-1 text-center text-lg tabular-nums';
 
 function repRange(min: number | null, max: number | null) {
   if (min && max && min !== max) return `${min}–${max}`;
@@ -236,38 +236,6 @@ export function SessionExerciseCard({
 
 type Measure = 'weight_reps' | 'reps' | 'time' | 'distance';
 type SetValues = { weightKg: number | null; reps: number | null; seconds: number | null; meters: number | null };
-
-/** Number box with large − / + buttons, easy to use with sweaty hands. */
-function Stepper({ label, value, onChange, step, min = 0, decimal = false }: { label: string; value: string; onChange: (v: string) => void; step: number; min?: number; decimal?: boolean }) {
-  const bump = (dir: 1 | -1) => {
-    const current = value === '' ? 0 : Number(value);
-    const next = Math.max(min, Math.round((current + dir * step) * 100) / 100);
-    onChange(String(next));
-  };
-  return (
-    <div className="flex min-w-0 flex-1 flex-col gap-1 text-xs">
-      <span>{label}</span>
-      <div className="flex items-center gap-1">
-        <Button type="button" size="sm" variant="outline" className="size-12 shrink-0 px-0" aria-label={`${t('session.less')} ${label}`} onClick={() => bump(-1)}>
-          <Minus className="size-4" aria-hidden />
-        </Button>
-        <input
-          aria-label={label}
-          className={inputCls}
-          type="number"
-          inputMode={decimal ? 'decimal' : 'numeric'}
-          step={decimal ? 'any' : 1}
-          min={min}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-        />
-        <Button type="button" size="sm" variant="outline" className="size-12 shrink-0 px-0" aria-label={`${t('session.more')} ${label}`} onClick={() => bump(1)}>
-          <Plus className="size-4" aria-hidden />
-        </Button>
-      </div>
-    </div>
-  );
-}
 
 /** Inputs for the next set, initialized from `defaults`; a new key resets it after each logged set. */
 function NextSetRow({

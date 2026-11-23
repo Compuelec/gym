@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { muscleRecovery } from './recovery';
-import { generateToday, type TodayCandidate } from './today';
+import { estimateMinutes, fitToTime, generateToday, type TodayCandidate } from './today';
 
 const NOW = Date.parse('2026-11-23T12:00:00Z');
 const c = (id: string, primary: string[], equipment: string[], o: Partial<TodayCandidate> = {}): TodayCandidate => ({
@@ -73,7 +73,37 @@ describe('generateToday', () => {
     const short = generateToday({ goal: 'strength', level: 'beginner', minutes: 20, equipment: ['dumbbell', 'band'], locationName: 'Casa', recovery, catalog });
     const long = generateToday({ goal: 'strength', level: 'beginner', minutes: 75, equipment: ['dumbbell', 'band'], locationName: 'Casa', recovery, catalog });
     expect(long.items.length).toBeGreaterThan(short.items.length);
-    expect(short.items[0]).toMatchObject({ sets: 4, repMin: 4, repMax: 6, restSeconds: 150 });
+    expect(short.items[0]).toMatchObject({ repMin: 4, repMax: 6, restSeconds: 150 });
+    // Strength scheme is 4 sets, but 20 minutes do not fit them: fewer sets, never under 2.
+    expect(short.estimatedMinutes).toBeLessThanOrEqual(20);
+    expect(short.items.every((i) => i.sets >= 2 && i.sets <= 5)).toBe(true);
+  });
+
+  it('a fresh beginner gets a balanced session (legs, back, chest), not «abs and arms»', () => {
+    const balanced = [
+      ...catalog,
+      c('crunch', ['abdominals'], [], { measure: 'reps' }),
+      c('hip-thrust', ['glutes'], ['dumbbell']),
+    ];
+    const r = generateToday({ goal: 'health', level: 'beginner', minutes: 45, equipment: ['dumbbell', 'band'], locationName: 'Casa', recovery: muscleRecovery([], NOW), catalog: balanced });
+    expect(r.focus.slice(0, 2)).toEqual(['Piernas', 'Espalda']);
+    expect(r.focus).not.toContain('Abdomen');
+  });
+
+  it('uses the time available: extra sets when there is room, fewer when it is over', () => {
+    const plan = [
+      { sets: 3, restSeconds: 90, seconds: null },
+      { sets: 3, restSeconds: 90, seconds: null },
+      { sets: 1, restSeconds: 0, seconds: 10 * 60 },
+    ];
+    expect(estimateMinutes(plan)).toBe(26);
+    const longer = fitToTime(plan, 35);
+    expect(longer.map((i) => i.sets)).toEqual([5, 5, 1]); // 34,5 min
+    expect(estimateMinutes(longer)).toBeLessThanOrEqual(35);
+    const shorter = fitToTime(plan, 20);
+    expect(shorter.map((i) => i.sets)).toEqual([2, 2, 1]);
+    // Cardio keeps its length; strength never goes under 2 sets even if time is too short.
+    expect(fitToTime(plan, 5).map((i) => i.sets)).toEqual([2, 2, 1]);
   });
 
   it('strength first and cardio to finish, on the machine the place has', () => {
