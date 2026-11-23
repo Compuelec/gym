@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { z } from 'zod';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { PageSpinner } from '@/components/Spinner';
 import { Button } from '@/components/ui/button';
 import { FormError, SelectField, TextField } from '@/components/ui/field';
 import { t } from '@/i18n';
@@ -8,7 +10,14 @@ import { ApiRequestError, apiFetch } from '@/lib/api';
 import { useUser } from '@/lib/auth-context';
 import { formatNumber } from '@/lib/format';
 
-export const Route = createFileRoute('/admin')({ component: AdminPage });
+const TABS = ['ai', 'mail', 'invitations', 'users', 'audit'] as const;
+type Tab = (typeof TABS)[number];
+
+export const Route = createFileRoute('/admin')({
+  // The open section lives in the address: back and reload keep it.
+  validateSearch: z.object({ tab: z.enum(TABS).optional().catch(undefined) }),
+  component: AdminPage,
+});
 
 interface AiView {
   enabled: boolean;
@@ -38,14 +47,226 @@ const message = (err: unknown) => (err instanceof ApiRequestError ? err.message 
 
 function AdminPage() {
   const user = useUser();
+  const { tab = 'ai' } = Route.useSearch();
+  const navigate = useNavigate({ from: '/admin' });
   if (user.role !== 'admin') return <p>{t('admin.forbidden')}</p>;
   return (
-    <div className="flex flex-col gap-8">
+    <div className="flex flex-col gap-6">
       <h1 className="text-2xl font-semibold">{t('admin.title')}</h1>
-      <AiSection />
-      <InvitationsSection />
-      <AuditSection />
+      <nav aria-label={t('admin.sections')} className="-mx-1 flex gap-1 overflow-x-auto pb-1">
+        {TABS.map((k) => (
+          <button
+            key={k}
+            type="button"
+            aria-current={tab === k ? 'page' : undefined}
+            className={`shrink-0 rounded-full px-3 py-1.5 text-sm ${tab === k ? 'bg-primary text-primary-foreground' : 'bg-muted text-foreground'}`}
+            onClick={() => void navigate({ search: { tab: k as Tab }, replace: true })}
+          >
+            {t(`admin.tabs.${k}`)}
+          </button>
+        ))}
+      </nav>
+      {tab === 'ai' && <AiSection />}
+      {tab === 'mail' && <MailSection />}
+      {tab === 'invitations' && <InvitationsSection />}
+      {tab === 'users' && <UsersSection />}
+      {tab === 'audit' && <AuditSection />}
     </div>
+  );
+}
+
+interface MailView {
+  source: 'admin' | 'secret' | null;
+  host: string | null;
+  port: number | null;
+  secure: boolean | null;
+  user: string | null;
+  passwordSet: boolean;
+  from: string | null;
+  defaultFrom: string;
+  encryptionReady: boolean;
+}
+
+function MailSection() {
+  const qc = useQueryClient();
+  const me = useUser();
+  const { data: mail } = useQuery({ queryKey: ['admin-mail'], queryFn: () => apiFetch('/admin/settings/mail') as Promise<MailView> });
+  const [form, setForm] = useState<{ host: string; port: string; secure: boolean; user: string; password: string; from: string } | null>(null);
+  const [note, setNote] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const save = useMutation({
+    mutationFn: (body: Record<string, unknown>) => apiFetch('/admin/settings/mail', { method: 'PUT', body: JSON.stringify(body) }) as Promise<MailView>,
+    onSuccess: (v) => {
+      qc.setQueryData(['admin-mail'], v);
+      void qc.invalidateQueries({ queryKey: ['admin-audit'] });
+      setForm(null);
+      setError(null);
+      setNote(t('admin.mail.saved'));
+    },
+    onError: (e) => setError(message(e)),
+  });
+  const remove = useMutation({
+    mutationFn: () => apiFetch('/admin/settings/mail', { method: 'DELETE' }) as Promise<MailView>,
+    onSuccess: (v) => {
+      qc.setQueryData(['admin-mail'], v);
+      setForm(null);
+      setNote(null);
+    },
+  });
+  const test = useMutation({
+    mutationFn: () => apiFetch('/admin/settings/mail/test', { method: 'POST', body: '{}' }) as Promise<{ ok: boolean; to: string; error?: string }>,
+    onSuccess: (r) => {
+      if (r.ok) {
+        setError(null);
+        setNote(t('admin.mail.testOk', { to: r.to }));
+      } else {
+        setNote(null);
+        setError(r.error ?? t('auth.errors.generic'));
+      }
+    },
+    onError: (e) => setError(message(e)),
+  });
+  if (!mail) return <PageSpinner />;
+  const f = form ?? {
+    host: mail.host ?? '',
+    port: String(mail.port ?? 465),
+    secure: mail.secure ?? true,
+    user: mail.user ?? '',
+    password: '',
+    from: mail.from ?? mail.defaultFrom,
+  };
+  const set = (patch: Partial<typeof f>) => setForm({ ...f, ...patch });
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-lg font-semibold">{t('admin.mail.title')}</h2>
+      <p className="rounded-lg bg-muted px-3 py-2 text-sm">
+        {mail.source === 'admin' ? t('admin.mail.sourceAdmin', { host: mail.host ?? '' }) : mail.source === 'secret' ? t('admin.mail.sourceSecret') : t('admin.mail.sourceNone')}
+      </p>
+      <p className="text-sm text-muted-foreground">{t('admin.mail.help')}</p>
+      <form
+        className="flex flex-col gap-3"
+        onSubmit={(e) => {
+          e.preventDefault();
+          save.mutate({
+            host: f.host.trim(),
+            port: Number(f.port),
+            secure: f.secure,
+            ...(f.user.trim() ? { user: f.user.trim() } : {}),
+            ...(f.password ? { password: f.password } : {}),
+            from: f.from.trim(),
+          });
+        }}
+      >
+        <div className="grid grid-cols-[1fr_6rem] gap-3">
+          <TextField label={t('admin.mail.host')} placeholder="mail.ejemplo.cl" value={f.host} onChange={(e) => set({ host: e.target.value })} required />
+          <TextField label={t('admin.mail.port')} type="number" min={1} max={65535} value={f.port} onChange={(e) => set({ port: e.target.value, secure: e.target.value === '465' })} required />
+        </div>
+        <SelectField label={t('admin.mail.security')} value={f.secure ? 'tls' : 'starttls'} onChange={(e) => set({ secure: e.target.value === 'tls' })}>
+          <option value="tls">{t('admin.mail.tls')}</option>
+          <option value="starttls">{t('admin.mail.starttls')}</option>
+        </SelectField>
+        <TextField label={t('admin.mail.user')} autoComplete="off" value={f.user} onChange={(e) => set({ user: e.target.value })} />
+        <TextField
+          label={t('admin.mail.password')}
+          type="password"
+          autoComplete="new-password"
+          placeholder={mail.passwordSet ? t('admin.mail.passwordKeep') : ''}
+          value={f.password}
+          onChange={(e) => set({ password: e.target.value })}
+        />
+        <TextField label={t('admin.mail.from')} hint={t('admin.mail.fromHint')} value={f.from} onChange={(e) => set({ from: e.target.value })} required />
+        <FormError message={error} />
+        {note && (
+          <p role="status" className="rounded-lg bg-green-50 px-3 py-2 text-sm text-green-900">
+            {note}
+          </p>
+        )}
+        <Button type="submit" disabled={save.isPending || !mail.encryptionReady}>
+          {t('common.save')}
+        </Button>
+      </form>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" disabled={!mail.source || test.isPending} onClick={() => test.mutate()}>
+          {test.isPending ? t('admin.mail.testing') : t('admin.mail.test', { to: me.email })}
+        </Button>
+        {mail.source === 'admin' && (
+          <Button variant="ghost" onClick={() => remove.mutate()}>
+            {t('admin.mail.remove')}
+          </Button>
+        )}
+      </div>
+    </section>
+  );
+}
+
+interface AdminUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'user' | 'admin';
+  createdAt: string;
+  disabledAt: string | null;
+  lastSeenAt: string | null;
+}
+
+function UsersSection() {
+  const qc = useQueryClient();
+  const { data } = useQuery({ queryKey: ['admin-users'], queryFn: () => apiFetch('/admin/users') as Promise<{ users: AdminUser[]; total: number; me: string }> });
+  const [error, setError] = useState<string | null>(null);
+  const [text, setText] = useState('');
+  const change = useMutation({
+    mutationFn: ({ id, body }: { id: string; body: Record<string, unknown> }) => apiFetch(`/admin/users/${id}`, { method: 'PATCH', body: JSON.stringify(body) }),
+    onSuccess: () => {
+      setError(null);
+      void qc.invalidateQueries({ queryKey: ['admin-users'] });
+      void qc.invalidateQueries({ queryKey: ['admin-audit'] });
+    },
+    onError: (e) => setError(message(e)),
+  });
+  if (!data) return <PageSpinner />;
+  const q = text.trim().toLowerCase();
+  const users = data.users.filter((u) => !q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+  const date = (iso: string | null) => (iso ? new Date(iso).toLocaleDateString('es', { day: 'numeric', month: 'short', year: 'numeric' }) : t('admin.users.never'));
+  return (
+    <section className="flex flex-col gap-3">
+      <h2 className="text-lg font-semibold">{t('admin.users.title', { count: data.total })}</h2>
+      {data.users.length > 5 && <TextField label={t('admin.users.search')} type="search" value={text} onChange={(e) => setText(e.target.value)} />}
+      <FormError message={error} />
+      <ul className="flex flex-col gap-2">
+        {users.map((u) => {
+          const self = u.id === data.me;
+          return (
+            <li key={u.id} aria-label={u.email} className={`flex flex-col gap-2 rounded-lg border border-border p-3 ${u.disabledAt ? 'opacity-70' : ''}`}>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="font-medium">
+                    {u.name} {self && <span className="text-sm text-muted-foreground">({t('admin.users.you')})</span>}
+                  </p>
+                  <p className="truncate text-sm text-muted-foreground">{u.email}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {t('admin.users.since', { date: date(u.createdAt) })} · {t('admin.users.lastSeen', { date: date(u.lastSeenAt) })}
+                  </p>
+                </div>
+                <div className="flex shrink-0 flex-col items-end gap-1">
+                  {u.role === 'admin' && <span className="rounded-full bg-primary px-2 text-xs text-primary-foreground">{t('admin.users.admin')}</span>}
+                  {u.disabledAt && <span className="rounded-full bg-red-100 px-2 text-xs text-red-800">{t('admin.users.disabled')}</span>}
+                </div>
+              </div>
+              {!self && (
+                <div className="flex flex-wrap gap-2">
+                  <Button size="sm" variant="outline" disabled={change.isPending} onClick={() => change.mutate({ id: u.id, body: { role: u.role === 'admin' ? 'user' : 'admin' } })}>
+                    {u.role === 'admin' ? t('admin.users.demote') : t('admin.users.promote')}
+                  </Button>
+                  <Button size="sm" variant="ghost" disabled={change.isPending} onClick={() => change.mutate({ id: u.id, body: { disabled: !u.disabledAt } })}>
+                    {u.disabledAt ? t('admin.users.enable') : t('admin.users.disable')}
+                  </Button>
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }
 
@@ -85,7 +306,7 @@ function AiSection() {
     onSuccess: (r) => (r.ok ? setNote(t('admin.testOk', { ms: r.latencyMs })) : setError(t('admin.testFail'))),
   });
 
-  if (!ai) return null;
+  if (!ai) return <PageSpinner />;
   const daily = limits?.daily ?? String(ai.dailyLimitPerUser);
   const budget = limits?.budget ?? String(ai.monthlyBudgetUsd);
   return (
@@ -194,13 +415,19 @@ function InvitationsSection() {
   const { data } = useQuery({ queryKey: ['admin-invites'], queryFn: () => apiFetch('/admin/invitations') as Promise<{ invitations: Invitation[] }> });
   const [email, setEmail] = useState('');
   const [days, setDays] = useState('7');
+  const [send, setSend] = useState(true);
   const [created, setCreated] = useState<string | null>(null);
+  const [sent, setSent] = useState<{ to: string; ok: boolean; error: string | null } | null>(null);
   const [copied, setCopied] = useState(false);
   const create = useMutation({
     mutationFn: () =>
-      apiFetch('/admin/invitations', { method: 'POST', body: JSON.stringify({ ...(email ? { email } : {}), days: Number(days) }) }) as Promise<{ url: string }>,
+      apiFetch('/admin/invitations', {
+        method: 'POST',
+        body: JSON.stringify({ ...(email ? { email, send } : {}), days: Number(days) }),
+      }) as Promise<{ url: string; emailed: boolean; emailError: string | null }>,
     onSuccess: (r) => {
       setCreated(r.url);
+      setSent(email && send ? { to: email, ok: r.emailed, error: r.emailError } : null);
       setCopied(false);
       setEmail('');
       void qc.invalidateQueries({ queryKey: ['admin-invites'] });
@@ -217,11 +444,19 @@ function InvitationsSection() {
         <TextField label={t('admin.inviteEmail')} type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         <TextField label={t('admin.inviteDays')} type="number" min={1} max={90} value={days} onChange={(e) => setDays(e.target.value)} />
       </div>
+      {email && (
+        <label className="flex items-center gap-2 text-sm">
+          <input type="checkbox" className="size-4" checked={send} onChange={(e) => setSend(e.target.checked)} />
+          {t('admin.inviteSend')}
+        </label>
+      )}
       <Button variant="outline" onClick={() => create.mutate()} disabled={create.isPending}>
-        {t('admin.createInvite')}
+        {email && send ? t('admin.createAndSend') : t('admin.createInvite')}
       </Button>
       {created && (
         <div role="status" className="flex flex-col gap-2 rounded-lg bg-muted p-3 text-sm">
+          {sent?.ok && <span className="font-medium text-green-800">{t('admin.inviteSent', { to: sent.to })}</span>}
+          {sent && !sent.ok && <span className="font-medium text-red-700">{t('admin.inviteNotSent', { error: sent.error ?? '' })}</span>}
           <span>{t('admin.inviteCreated')}</span>
           <code className="break-all">{created}</code>
           <Button

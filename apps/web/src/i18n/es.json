@@ -94,7 +94,8 @@
       "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
       "invalidEmail": "Revisa el correo: no parece válido.",
       "invalidToken": "El enlace venció o ya se usó. Pide uno nuevo.",
-      "offline": "Necesitas conexión a internet para esto."
+      "offline": "Necesitas conexión a internet para esto.",
+      "accountDisabled": "Tu cuenta está desactivada. Habla con quien administra la app."
     }
   },
   "onboarding": {
@@ -524,7 +525,62 @@
       "limits_changed": "Límites cambiados",
       "ai_resumed": "IA reanudada",
       "invite_created": "Invitación creada",
-      "invite_revoked": "Invitación revocada"
+      "invite_revoked": "Invitación revocada",
+      "mail_settings_changed": "Servidor de correo cambiado",
+      "mail_settings_deleted": "Servidor de correo quitado",
+      "mail_test": "Correo de prueba",
+      "user_promoted": "Usuario hecho administrador",
+      "user_demoted": "Administrador quitado",
+      "user_disabled": "Cuenta desactivada",
+      "user_enabled": "Cuenta reactivada"
+    },
+    "sections": "Secciones de administración",
+    "tabs": {
+      "ai": "IA",
+      "mail": "Correo",
+      "invitations": "Invitaciones",
+      "users": "Usuarios",
+      "audit": "Historial"
+    },
+    "inviteSend": "Enviarle la invitación por correo",
+    "createAndSend": "Crear y enviar invitación",
+    "inviteSent": "Invitación enviada a {to}.",
+    "inviteNotSent": "No se pudo enviar el correo: {error} Comparte el enlace a mano.",
+    "mail": {
+      "title": "Servidor de correo",
+      "help": "Se usa para las invitaciones y para recuperar contraseñas. Usa el puerto 465 (SSL/TLS) o 587 (STARTTLS): el servidor no deja salir por otros puertos. La contraseña se guarda cifrada y nunca se vuelve a mostrar.",
+      "sourceAdmin": "Usando el servidor configurado aquí ({host}).",
+      "sourceSecret": "Usando el servidor definido en la instalación. Puedes reemplazarlo aquí.",
+      "sourceNone": "No hay servidor de correo: las invitaciones hay que compartirlas a mano y no se puede recuperar la contraseña.",
+      "host": "Servidor (SMTP)",
+      "port": "Puerto",
+      "security": "Seguridad",
+      "tls": "SSL/TLS (normalmente puerto 465)",
+      "starttls": "STARTTLS (normalmente puerto 587)",
+      "user": "Usuario",
+      "password": "Contraseña",
+      "passwordKeep": "Guardada (déjala vacía para no cambiarla)",
+      "from": "Remitente",
+      "fromHint": "Por ejemplo: Gym <no-reply@tu-dominio.cl>",
+      "saved": "Guardado. Envía un correo de prueba para confirmar que funciona.",
+      "test": "Enviar correo de prueba a {to}",
+      "testing": "Enviando…",
+      "testOk": "Correo de prueba enviado a {to}. Revisa tu bandeja (y el spam).",
+      "remove": "Volver al servidor de la instalación"
+    },
+    "users": {
+      "title": "Usuarios ({count})",
+      "search": "Buscar por nombre o correo",
+      "you": "tú",
+      "since": "Desde {date}",
+      "lastSeen": "último uso {date}",
+      "never": "nunca",
+      "admin": "Administrador",
+      "disabled": "Desactivada",
+      "promote": "Hacer administrador",
+      "demote": "Quitar administrador",
+      "disable": "Desactivar cuenta",
+      "enable": "Reactivar cuenta"
     }
   },
   "coach": {

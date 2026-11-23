@@ -31,6 +31,17 @@ export const appSettings = pgTable('app_settings', {
     .default(5),
   aiPausedReason: text('ai_paused_reason'),
   aiPricing: jsonb('ai_pricing'),
+  // Outgoing email from the admin screen; without it the SMTP_URL Secret (if any) is used.
+  mailHost: text('mail_host'),
+  mailPort: integer('mail_port'),
+  // true = TLS from the start (465); false = STARTTLS when offered (587/25).
+  mailSecure: boolean('mail_secure'),
+  mailUser: text('mail_user'),
+  mailPasswordCiphertext: text('mail_password_ciphertext'),
+  mailPasswordIv: text('mail_password_iv'),
+  mailPasswordTag: text('mail_password_tag'),
+  mailFrom: text('mail_from'),
+  mailUpdatedAt: timestamp('mail_updated_at', { withTimezone: true }),
   updatedBy: text('updated_by'),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });

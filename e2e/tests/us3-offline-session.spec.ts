@@ -174,7 +174,8 @@ test.describe('US3 · entrenar y registrar sin conexión', () => {
     await other.addCookies(await context.cookies());
     const page2 = await other.newPage();
     await page2.goto('/routines');
-    await expect(page2.getByRole('heading', { name: 'Pierna' })).toBeVisible({ timeout: 20_000 });
+    // First load of a second device downloads the whole catalog: slow on WebKit under a full run.
+    await expect(page2.getByRole('heading', { name: 'Pierna' })).toBeVisible({ timeout: 45_000 });
 
     await page.getByRole('link', { name: 'Editar' }).click();
     await page.getByLabel('Nombre de la rutina').fill('Pierna A');

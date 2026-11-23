@@ -1,3 +1,4 @@
+import { eq } from 'drizzle-orm';
 import { betterAuth } from 'better-auth';
 import { APIError } from 'better-auth/api';
 import { drizzleAdapter } from 'better-auth/adapters/drizzle';
@@ -14,8 +15,9 @@ import {
 import { createMailer, resetPasswordMail, type Mailer } from './mailer';
 
 const INVITE_REQUIRED_MESSAGE = 'Necesitas una invitación válida para crear una cuenta.';
+export const ACCOUNT_DISABLED_MESSAGE = 'Tu cuenta está desactivada. Habla con quien administra la app.';
 
-export function createAuth(db: Database, config: Env, mailer: Mailer = createMailer(config)) {
+export function createAuth(db: Database, config: Env, mailer: Mailer = createMailer(config, db)) {
   const google =
     config.GOOGLE_CLIENT_ID && config.GOOGLE_CLIENT_SECRET
       ? { google: { clientId: config.GOOGLE_CLIENT_ID, clientSecret: config.GOOGLE_CLIENT_SECRET } }
@@ -44,6 +46,15 @@ export function createAuth(db: Database, config: Env, mailer: Mailer = createMai
       },
     },
     databaseHooks: {
+      session: {
+        create: {
+          // A deactivated account cannot sign in (email or Google).
+          before: async (session) => {
+            const [row] = await db.select({ disabledAt: schema.user.disabledAt }).from(schema.user).where(eq(schema.user.id, session.userId));
+            if (row?.disabledAt) throw new APIError('FORBIDDEN', { message: ACCOUNT_DISABLED_MESSAGE, code: 'ACCOUNT_DISABLED' });
+          },
+        },
+      },
       user: {
         create: {
           // Registration is by invitation only: email sign-up sends `inviteCode` in the body;
@@ -69,6 +80,8 @@ export function createAuth(db: Database, config: Env, mailer: Mailer = createMai
       additionalFields: {
         // Never settable from sign-up or profile updates; only via the admin CLI.
         role: { type: 'string', required: false, defaultValue: 'user', input: false },
+        // Set only by an administrator (deactivation); read on every request.
+        disabledAt: { type: 'date', required: false, input: false },
       },
     },
     session: {

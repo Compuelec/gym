@@ -24,6 +24,8 @@ export function requireSession(auth: Auth): MiddlewareHandler<{ Variables: AppVa
   return async (c, next) => {
     const session = await auth.api.getSession({ headers: c.req.raw.headers });
     if (!session) return apiError(c, 401, 'UNAUTHORIZED');
+    // Deactivated while signed in: treat as signed out (its sessions are also deleted).
+    if ((session.user as { disabledAt?: Date | null }).disabledAt) return apiError(c, 401, 'UNAUTHORIZED');
     c.set('user', session.user);
     await next();
   };

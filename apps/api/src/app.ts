@@ -8,6 +8,7 @@ import { createAuth, type Auth } from './lib/auth';
 import { apiError } from './lib/errors';
 import { originCheck, requireAdmin, requireSession, type AppVariables } from './lib/middleware';
 import { createAiGateway, type AiGateway } from './lib/ai-client';
+import { createMailer, type Mailer } from './lib/mailer';
 import { SyncRegistry } from './lib/sync-registry';
 import { logger } from './logger';
 import { adminRoutes } from './routes/admin';
@@ -24,13 +25,14 @@ export interface AppDeps {
   registry?: SyncRegistry;
   auth?: Auth;
   ai?: AiGateway;
+  mailer?: Mailer;
 }
 
 /**
  * HTTP application. Everything lives under /api so the PWA and the API share one origin
  * (Caddy in production, Vite proxy in development).
  */
-export function createApp({ db, config, registry = new SyncRegistry(), auth = createAuth(db, config), ai = createAiGateway(config) }: AppDeps) {
+export function createApp({ db, config, registry = new SyncRegistry(), mailer = createMailer(config, db), auth = createAuth(db, config, mailer), ai = createAiGateway(config) }: AppDeps) {
   const allowedOrigin = new URL(config.BETTER_AUTH_URL).origin;
 
   const app = new Hono<{ Variables: AppVariables }>().basePath('/api');
@@ -73,7 +75,7 @@ export function createApp({ db, config, registry = new SyncRegistry(), auth = cr
   app.use('/me', requireSession(auth));
   app.route('/me', meRoutes(db, registry, auth));
   app.use('/admin/*', requireSession(auth), requireAdmin());
-  app.route('/admin', adminRoutes(db, config, ai));
+  app.route('/admin', adminRoutes(db, config, ai, mailer));
   app.use('/coach/*', requireSession(auth));
   app.route('/coach', coachRoutes(db, config));
 
