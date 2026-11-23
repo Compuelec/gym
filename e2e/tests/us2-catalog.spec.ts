@@ -42,25 +42,25 @@ test.describe('US2 · catálogo de ejercicios', () => {
   });
 
   test('search ignores accents and case; detail shows images, body map, steps and license', async ({ page }) => {
-    await page.getByLabel('Buscar ejercicio').fill('SENTADILLA AL CAJON');
+    await page.getByLabel('Buscar ejercicio').fill('SENTADILLA AL CAJON CON CADENAS');
     await expect(page.getByText('1 ejercicio')).toBeVisible({ timeout: 15_000 });
-    await page.getByRole('link', { name: /Sentadilla al Cajón/ }).click();
-    await expect(page.getByRole('heading', { name: 'Sentadilla al Cajón' })).toBeVisible();
-    await expect(page.getByRole('img', { name: 'Sentadilla al Cajón' })).toBeVisible();
+    await page.getByRole('link', { name: /Sentadilla al cajón con cadenas/ }).click();
+    await expect(page.getByRole('heading', { name: 'Sentadilla al cajón con cadenas' })).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Sentadilla al cajón con cadenas' })).toBeVisible();
     await expect(page.getByText('Músculos principales')).toBeVisible();
     await expect(page.getByText('Cuádriceps').first()).toBeVisible();
     await expect(page.locator('svg').first()).toBeVisible(); // body map
     await expect(page.getByRole('heading', { name: 'Cómo se hace' })).toBeVisible();
     await expect(page.getByText(/Licencia: Unlicense/)).toBeVisible();
     // Image actually loads.
-    const loaded = await page.getByRole('img', { name: 'Sentadilla al Cajón' }).evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0);
+    const loaded = await page.getByRole('img', { name: 'Sentadilla al cajón con cadenas' }).evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0);
     expect(loaded).toBe(true);
   });
 
   test('favorites sync to a second device; own exercises are private', async ({ page, browser, baseURL, context }) => {
     test.setTimeout(90_000); // several browser contexts
     await page.getByLabel('Buscar ejercicio').fill('curl martillo');
-    await page.getByRole('link', { name: /Curl Martillo/ }).click();
+    await page.getByRole('link', { name: /^Curl martillo(?! (alterno|en|cruzado|predicador))/ }).click();
     await page.getByRole('button', { name: 'Agregar a favoritos' }).click();
     await expect(page.getByRole('button', { name: 'Quitar de favoritos' })).toBeVisible();
 
@@ -83,7 +83,7 @@ test.describe('US2 · catálogo de ejercicios', () => {
     await expect(async () => {
       await page2.goto('/exercises');
       await page2.getByLabel('Solo favoritos').check();
-      await expect(page2.getByRole('link', { name: /Curl Martillo/ })).toBeVisible({ timeout: 3_000 });
+      await expect(page2.getByRole('link', { name: /^Curl martillo(?! (alterno|en|cruzado|predicador))/ })).toBeVisible({ timeout: 3_000 });
     }).toPass({ timeout: 30_000 });
     await page2.getByLabel('Solo favoritos').uncheck();
     await page2.getByLabel('Buscar ejercicio').fill('mochila');
@@ -105,13 +105,13 @@ test.describe('US2 · catálogo de ejercicios', () => {
   test('exercise details and images work offline after the first load', async ({ page, context, browserName }) => {
     test.skip(browserName === 'webkit', 'Playwright WebKit does not run service workers');
     await waitForServiceWorker(page);
-    await page.getByLabel('Buscar ejercicio').fill('plancha');
-    await page.getByRole('link', { name: /Plancha de antebrazo/ }).click();
-    await expect(page.getByRole('img', { name: 'Plancha de antebrazo' })).toBeVisible();
+    await page.getByLabel('Buscar ejercicio').fill('giro ruso');
+    await page.getByRole('link', { name: /Giro ruso/ }).click();
+    await expect(page.getByRole('img', { name: 'Giro ruso' })).toBeVisible();
     await context.setOffline(true);
     await page.reload();
-    await expect(page.getByRole('heading', { name: 'Plancha de antebrazo' })).toBeVisible();
-    const loaded = await page.getByRole('img', { name: 'Plancha de antebrazo' }).evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0);
+    await expect(page.getByRole('heading', { name: 'Giro ruso' })).toBeVisible();
+    const loaded = await page.getByRole('img', { name: 'Giro ruso' }).evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0);
     expect(loaded).toBe(true);
     await context.setOffline(false);
   });
@@ -121,6 +121,6 @@ test.describe('US2 · catálogo de ejercicios', () => {
     await page.getByRole('link', { name: 'Créditos de ejercicios e imágenes' }).click();
     await expect(page.getByRole('heading', { name: 'Créditos' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'free-exercise-db' })).toBeVisible();
-    await expect(page.getByText('Licencia: CC-BY-SA 4.0')).toBeVisible();
+    await expect(page.getByText(/Licencia: Unlicense/)).toBeVisible();
   });
 });
