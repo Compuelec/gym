@@ -1,3 +1,4 @@
+import { Credits } from '@/components/Credits';
 import { useState, type FormEvent } from 'react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,7 @@ function LoginPage() {
           </Link>
         </p>
       </div>
+      <Credits />
     </div>
   );
 }

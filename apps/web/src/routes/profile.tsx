@@ -1,3 +1,4 @@
+import { Credits } from '@/components/Credits';
 import { useState } from 'react';
 import { PageSpinner } from '@/components/Spinner';
 import { Link, createFileRoute } from '@tanstack/react-router';
@@ -156,6 +157,7 @@ function ProfilePage() {
           <p className="text-sm text-muted-foreground">{tn('status.pending', sync.pending)}</p>
         )}
       </section>
+      <Credits />
     </div>
   );
 }

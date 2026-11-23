@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import type { Connect, Plugin } from 'vite';
 
@@ -28,9 +28,13 @@ function serveCatalog(): Plugin {
   };
 }
 
+// The released version (root package.json), shown at the foot of the app.
+const APP_VERSION = (JSON.parse(readFileSync(fileURLToPath(new URL('../../package.json', import.meta.url)), 'utf8')) as { version: string }).version;
+
 const apiProxy = { '/api': process.env.API_PROXY_TARGET ?? 'http://localhost:3000' };
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
   plugins: [
     // Router plugin must run before the React plugin.
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
