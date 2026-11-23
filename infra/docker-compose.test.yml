@@ -1,0 +1,24 @@
+# Disposable test environment: data lives in tmpfs and is discarded on stop.
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: gym
+      POSTGRES_PASSWORD: gym
+      POSTGRES_DB: gym_test
+    ports:
+      - '55432:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gym']
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '51025:1025'
+      - '58025:8025'
+  # The fake AI server is added with the coach tests (User Story 6).

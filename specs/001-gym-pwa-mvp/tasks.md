@@ -32,19 +32,19 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 **Purpose**: inicializar el monorepo y las herramientas.
 
-- [ ] T001 Create root workspace files `package.json` (scripts: dev, build, test, e2e, lint, typecheck, db:migrate, catalog:build, admin:invite, admin:promote), `pnpm-workspace.yaml` (apps/*, packages/*, e2e), `.nvmrc` (24), `.gitignore` (node_modules, dist, .env*, !.env.example, coverage, playwright-report)
-- [ ] T002 Create shared TypeScript config `tsconfig.base.json` (strict, ES2023, moduleResolution bundler, noUncheckedIndexedAccess) at repo root
-- [ ] T003 [P] Configure ESLint (flat config, typescript-eslint, react-hooks) in `eslint.config.js` and Prettier in `.prettierrc`
-- [ ] T004 [P] Scaffold `packages/shared` (package.json, tsconfig, `src/index.ts`) exporting Zod schemas and types
-- [ ] T005 [P] Scaffold `packages/engine` (package.json, tsconfig, `src/index.ts`, Vitest config) as pure TS with no runtime deps
-- [ ] T006 [P] Scaffold `packages/catalog` (package.json, tsconfig, `src/` and `scripts/`) for catalog import/build
-- [ ] T007 [P] Scaffold `apps/api` with Hono + `@hono/node-server`, Drizzle, Zod, pino; entry `apps/api/src/index.ts` and `apps/api/src/worker.ts`
-- [ ] T008 [P] Scaffold `apps/web` with Vite + React 19 + TanStack Router/Query + Tailwind + shadcn/ui; entry `apps/web/src/main.tsx`
-- [ ] T009 [P] Scaffold `e2e/` with Playwright (Chromium + WebKit + mobile emulation projects) in `e2e/playwright.config.ts`
-- [ ] T010 [P] Configure Vitest workspace in `vitest.workspace.ts` covering packages/* and apps/*
-- [ ] T011 [P] Create `.env.example` with DATABASE_URL, BETTER_AUTH_SECRET, BETTER_AUTH_URL, APP_ENCRYPTION_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SMTP_HOST/PORT/USER/PASS/FROM, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT, ANTHROPIC_API_KEY (optional fallback), ADMIN_EMAIL
-- [ ] T012 [P] Create `infra/docker-compose.dev.yml` (postgres:17 + mailpit) and `infra/docker-compose.test.yml` (ephemeral postgres on tmpfs + mailpit + fake AI server port)
-- [ ] T013 [P] Create Git hooks/CI script `scripts/check.sh` running lint, typecheck and unit tests
+- [X] T001 Create root workspace files `package.json` (scripts: dev, build, test, e2e, lint, typecheck, db:migrate, catalog:build, admin:invite, admin:promote), `pnpm-workspace.yaml` (apps/*, packages/*, e2e), `.nvmrc` (24), `.gitignore` (node_modules, dist, .env*, !.env.example, coverage, playwright-report)
+- [X] T002 Create shared TypeScript config `tsconfig.base.json` (strict, ES2023, moduleResolution bundler, noUncheckedIndexedAccess) at repo root
+- [X] T003 [P] Configure ESLint (flat config, typescript-eslint, react-hooks) in `eslint.config.js` and Prettier in `.prettierrc`
+- [X] T004 [P] Scaffold `packages/shared` (package.json, tsconfig, `src/index.ts`) exporting Zod schemas and types
+- [X] T005 [P] Scaffold `packages/engine` (package.json, tsconfig, `src/index.ts`, Vitest config) as pure TS with no runtime deps
+- [X] T006 [P] Scaffold `packages/catalog` (package.json, tsconfig, `src/` and `scripts/`) for catalog import/build
+- [X] T007 [P] Scaffold `apps/api` with Hono + `@hono/node-server`, Drizzle, Zod, pino; entry `apps/api/src/index.ts` and `apps/api/src/worker.ts`
+- [X] T008 [P] Scaffold `apps/web` with Vite + React 19 + TanStack Router/Query + Tailwind + shadcn/ui; entry `apps/web/src/main.tsx`
+- [X] T009 [P] Scaffold `e2e/` with Playwright (Chromium + WebKit + mobile emulation projects) in `e2e/playwright.config.ts`
+- [X] T010 [P] Configure Vitest projects in `vitest.config.ts` (Vitest 5 replaced workspace files) covering packages/*, apps/api and apps/web (jsdom)
+- [X] T011 [P] Create `.env.example` with DATABASE_URL, BETTER_AUTH_SECRET, BETTER_AUTH_URL, APP_ENCRYPTION_KEY, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, SMTP_HOST/PORT/USER/PASS/FROM, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY, VAPID_SUBJECT, ANTHROPIC_API_KEY (optional fallback), ADMIN_EMAIL
+- [X] T012 [P] Create `infra/docker-compose.dev.yml` (postgres:17 + mailpit) and `infra/docker-compose.test.yml` (ephemeral postgres on tmpfs + mailpit + fake AI server port)
+- [X] T013 [P] Create Git hooks/CI script `scripts/check.sh` running lint, typecheck and unit tests
 
 ---
 

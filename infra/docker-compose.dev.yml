@@ -1,0 +1,26 @@
+# Local development services. Production runs on Kubernetes (infra/k8s).
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: gym
+      POSTGRES_PASSWORD: gym
+      POSTGRES_DB: gym
+    ports:
+      - '5432:5432'
+    volumes:
+      - gym-pg-dev:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gym']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+
+volumes:
+  gym-pg-dev:

@@ -1,0 +1,29 @@
+{
+  "name": "@gym/api",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file-if-exists=../../.env src/index.ts",
+    "worker": "tsx --env-file-if-exists=../../.env src/worker.ts",
+    "start": "tsx src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "db:migrate": "echo 'Migrations are added in Phase 2 (T017)' && exit 1",
+    "admin:invite": "echo 'Implemented in User Story 1 (T052)' && exit 1",
+    "admin:promote": "echo 'Implemented in User Story 1 (T052)' && exit 1"
+  },
+  "dependencies": {
+    "@gym/shared": "workspace:*",
+    "@hono/node-server": "^2.1.11",
+    "drizzle-orm": "^0.45.4",
+    "hono": "^4.13.20",
+    "pg": "^8.23.1",
+    "pino": "^10.4.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.23.1",
+    "drizzle-kit": "^0.31.11",
+    "tsx": "^4.23.15"
+  }
+}
