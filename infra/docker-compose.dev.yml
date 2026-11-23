@@ -1,4 +1,5 @@
 # Local development services. Production runs on Kubernetes (infra/k8s).
+name: gym-dev
 services:
   postgres:
     image: postgres:17

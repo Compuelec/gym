@@ -8,13 +8,15 @@
     "worker": "tsx --env-file-if-exists=../../.env src/worker.ts",
     "start": "tsx src/index.ts",
     "typecheck": "tsc --noEmit",
-    "db:migrate": "echo 'Migrations are added in Phase 2 (T017)' && exit 1",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "tsx --env-file-if-exists=../../.env src/db/migrate.ts",
     "admin:invite": "echo 'Implemented in User Story 1 (T052)' && exit 1",
     "admin:promote": "echo 'Implemented in User Story 1 (T052)' && exit 1"
   },
   "dependencies": {
     "@gym/shared": "workspace:*",
     "@hono/node-server": "^2.1.11",
+    "better-auth": "^1.7.27",
     "drizzle-orm": "^0.45.4",
     "hono": "^4.13.20",
     "pg": "^8.23.1",

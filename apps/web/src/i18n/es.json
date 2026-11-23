@@ -1,0 +1,31 @@
+{
+  "app": {
+    "name": "Gym",
+    "tagline": "Entrena en casa o en el gimnasio."
+  },
+  "nav": {
+    "train": "Entrenar",
+    "routines": "Rutinas",
+    "exercises": "Ejercicios",
+    "progress": "Progreso",
+    "profile": "Perfil"
+  },
+  "status": {
+    "offline": "Sin conexión: tus cambios se guardan en el teléfono.",
+    "syncing": "Sincronizando…",
+    "pending": "{count} cambios por sincronizar",
+    "synced": "Todo sincronizado",
+    "error": "No se pudo sincronizar. Reintentaremos.",
+    "authRequired": "Vuelve a iniciar sesión para sincronizar.",
+    "storageFull": "Tu teléfono no tiene espacio. Liberamos imágenes guardadas."
+  },
+  "update": {
+    "available": "Hay una versión nueva.",
+    "apply": "Actualizar",
+    "later": "Después",
+    "afterSession": "Se instalará al terminar tu entrenamiento."
+  },
+  "common": {
+    "comingSoon": "Próximamente."
+  }
+}

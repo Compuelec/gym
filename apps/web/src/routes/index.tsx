@@ -1,14 +1,13 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { t } from '@/i18n';
 
-export const Route = createFileRoute('/')({
-  component: Home,
-});
+export const Route = createFileRoute('/')({ component: Home });
 
 function Home() {
   return (
-    <main className="mx-auto flex max-w-md flex-col gap-2 p-6">
-      <h1 className="text-2xl font-semibold">Gym</h1>
-      <p className="text-muted-foreground">Entrena en casa o en el gimnasio.</p>
-    </main>
+    <section className="flex flex-col gap-2">
+      <h1 className="text-2xl font-semibold">{t('app.name')}</h1>
+      <p className="text-muted-foreground">{t('app.tagline')}</p>
+    </section>
   );
 }

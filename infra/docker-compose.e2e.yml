@@ -1,0 +1,53 @@
+# Production-like stack for end-to-end tests: the real images (Caddy + API + Postgres), disposable
+# data. Run: docker compose -f infra/docker-compose.e2e.yml up -d --build --wait
+name: gym-e2e
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    environment:
+      POSTGRES_USER: gym
+      POSTGRES_PASSWORD: gym
+      POSTGRES_DB: gym_e2e
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gym -d gym_e2e']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    image: gym-api:e2e
+    build: { context: .., dockerfile: infra/docker/api.Dockerfile }
+    command: ['node', '--import', 'tsx', 'src/db/migrate.ts']
+    environment: &api-env
+      DATABASE_URL: postgres://gym:gym@postgres:5432/gym_e2e
+      BETTER_AUTH_SECRET: e2e-secret-e2e-secret-e2e-secret-012345
+      BETTER_AUTH_URL: http://localhost:8088
+      NODE_ENV: production
+      LOG_LEVEL: warn
+      # Tests sign up many users from one IP; rate limiting is verified separately.
+      AUTH_RATE_LIMIT: 'off'
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    image: gym-api:e2e
+    environment: *api-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:3000/api/health || exit 1']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  web:
+    image: gym-web:e2e
+    build: { context: .., dockerfile: infra/docker/web.Dockerfile }
+    environment:
+      API_UPSTREAM: api:3000
+    ports:
+      - '8088:8080'
+    depends_on:
+      api: { condition: service_healthy }

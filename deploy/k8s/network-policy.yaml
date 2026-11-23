@@ -1,0 +1,47 @@
+# Who can reach what (Calico enforces it; kubelet probes from the node still get through).
+# web: only the Cloudflare tunnel and this namespace. api and postgres: only this namespace.
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gym-web
+  namespace: gym
+spec:
+  podSelector:
+    matchLabels: { app: gym-web }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels: { kubernetes.io/metadata.name: cloudflare }
+          podSelector:
+            matchLabels: { app: cloudflared }
+        - podSelector: {}
+      ports: [{ port: 8080, protocol: TCP }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gym-api
+  namespace: gym
+spec:
+  podSelector:
+    matchLabels: { app: gym-api }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector: {}
+      ports: [{ port: 3000, protocol: TCP }]
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gym-postgres
+  namespace: gym
+spec:
+  podSelector:
+    matchLabels: { app: postgres }
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - podSelector: {}
+      ports: [{ port: 5432, protocol: TCP }]

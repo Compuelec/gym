@@ -3,6 +3,7 @@ import js from '@eslint/js';
 import tseslint from 'typescript-eslint';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
+import i18next from 'eslint-plugin-i18next';
 
 export default tseslint.config(
   {
@@ -41,5 +42,11 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
     },
+  },
+  {
+    // Every visible UI text must come from src/i18n/es.json (constitution, principle II).
+    files: ['apps/web/src/**/*.tsx'],
+    plugins: { i18next },
+    rules: { 'i18next/no-literal-string': ['error', { mode: 'jsx-only' }] },
   },
 );

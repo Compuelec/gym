@@ -1,9 +1,13 @@
 import { serve } from '@hono/node-server';
 import { createApp } from './app';
+import { getDb } from './db/client';
+import { env } from './env';
+import { createSyncRegistry } from './entities';
 import { logger } from './logger';
 
-const port = Number(process.env.PORT ?? 3000);
+const config = env();
+const app = createApp({ db: getDb(), config, registry: createSyncRegistry() });
 
-serve({ fetch: createApp().fetch, port }, (info) => {
+serve({ fetch: app.fetch, port: config.PORT }, (info) => {
   logger.info({ port: info.port }, 'api listening');
 });

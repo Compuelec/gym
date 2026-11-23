@@ -1,0 +1,59 @@
+# Applies database migrations for a new version. Constitution: a backup is taken before every
+# migration; if the backup fails, the migration does not run.
+# Jobs are immutable: delete the previous one before applying a new version (see deploy/README.md).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: gym-migrate
+  namespace: gym
+spec:
+  backoffLimit: 0
+  ttlSecondsAfterFinished: 604800
+  template:
+    spec:
+      restartPolicy: Never
+      imagePullSecrets:
+        - name: gym-registry
+      initContainers:
+        - name: pre-migration-backup
+          image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+          command:
+            - sh
+            - -c
+            - |
+              set -eu
+              file="/backups/gym-premigrate-$(date +%Y%m%d-%H%M%S).dump"
+              pg_dump --format=custom --file="$file.tmp"
+              pg_restore --list "$file.tmp" > /dev/null
+              mv "$file.tmp" "$file"
+              echo "pre-migration backup: $file ($(du -h "$file" | cut -f1))"
+          env:
+            - { name: PGHOST, value: postgres }
+            - { name: PGUSER, value: gym }
+            - { name: PGDATABASE, value: gym }
+            - name: PGPASSWORD
+              valueFrom: { secretKeyRef: { name: gym-secrets, key: POSTGRES_PASSWORD } }
+          resources:
+            requests: { cpu: 50m, memory: 64Mi }
+            limits: { memory: 256Mi }
+          volumeMounts:
+            - { name: backups, mountPath: /backups }
+      containers:
+        - name: migrate
+          # Same image as deployment/gym-api (pin the same version@sha256).
+          image: registry.example.com/carlos/gym-api:0.1.0
+          command: ["node", "--import", "tsx", "src/db/migrate.ts"]
+          envFrom: [{ secretRef: { name: gym-secrets } }]
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { memory: 512Mi }
+          securityContext:
+            runAsUser: 100
+            runAsGroup: 101
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities: { drop: [ALL] }
+            seccompProfile: { type: RuntimeDefault }
+      volumes:
+        - name: backups
+          persistentVolumeClaim: { claimName: gym-backups }

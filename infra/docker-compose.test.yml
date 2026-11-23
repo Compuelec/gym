@@ -1,4 +1,5 @@
 # Disposable test environment: data lives in tmpfs and is discarded on stop.
+name: gym-test
 services:
   postgres:
     image: postgres:17
