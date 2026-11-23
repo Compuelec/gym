@@ -35,7 +35,7 @@ spec:
       containers:
         - name: migrate
           # Same image as deployment/gym-api (pin the same version@sha256).
-          image: registry.example.com/carlos/gym-api:0.1.0
+          image: registry.example.com/owner/gym-api:0.1.0
           command: ["node", "--import", "tsx", "src/db/migrate.ts"]
           envFrom: [{ secretRef: { name: gym-secrets } }]
           resources:

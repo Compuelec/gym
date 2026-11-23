@@ -25,3 +25,6 @@ kubeconfig*
 # Generated catalog artifacts
 packages/catalog/.cache/
 packages/catalog/out/
+
+# Real deployment values (host, registry, domain)
+deploy/site.env

@@ -15,21 +15,26 @@ Al Día y Agendas. Se publica sólo por el túnel de Cloudflare: no abre puertos
 | `secret/gym-secrets` | Secretos de la app (ver `k8s/secret.example.yaml`, nunca con valores reales en git) |
 | `secret/gym-registry` | Credencial de descarga del registro de Forgejo |
 
-Todos los comandos `kubectl` se ejecutan por SSH:
+Los datos reales del servidor (host SSH, registro de imágenes y dominio) no están en git: se
+copian de `deploy/site.env.example` a `deploy/site.env` (ignorado) y se cargan antes de empezar.
+Los manifiestos usan `registry.example.com/owner` y `gym.example.com`; `apply` los reemplaza por
+los valores reales al aplicarlos. Todos los comandos `kubectl` se ejecutan por SSH:
 
 ```bash
-K='ssh root@k8s-master.example.com'
+source deploy/site.env
+K="ssh root@$K8S_HOST"
+apply() { sed -e "s#registry.example.com/owner#$REGISTRY/$REGISTRY_OWNER#g" -e "s#gym.example.com#$DOMAIN#g" "$1" | $K 'kubectl apply -f -'; }
 ```
 
 ## 1. Primera instalación
 
 ```bash
 # 1) Namespace
-$K 'kubectl apply -f -' < deploy/k8s/namespace.yaml
+apply deploy/k8s/namespace.yaml
 
 # 2) Credencial del registro de Forgejo (token con alcance read:package)
 $K "kubectl -n gym create secret docker-registry gym-registry \
-  --docker-server=registry.example.com --docker-username=carlos --docker-password='<token>'"
+  --docker-server=$REGISTRY --docker-username=$REGISTRY_OWNER --docker-password='<token>'"
 
 # 3) Secretos de la app (no se muestran en pantalla). Generar valores:
 #    openssl rand -base64 24  → POSTGRES_PASSWORD
@@ -38,23 +43,25 @@ $K "kubectl -n gym create secret generic gym-secrets \
   --from-literal=POSTGRES_PASSWORD='<pg>' \
   --from-literal=DATABASE_URL='postgres://gym:<pg>@postgres:5432/gym' \
   --from-literal=BETTER_AUTH_SECRET='<auth>' \
-  --from-literal=BETTER_AUTH_URL='https://gym.example.com' \
-  --from-literal=APP_ENCRYPTION_KEY='<enc>'"
+  --from-literal=BETTER_AUTH_URL=\"https://$DOMAIN\" \
+  --from-literal=APP_ENCRYPTION_KEY='<enc>' \
+  --from-literal=MAIL_FROM=\"$MAIL_FROM\" \
+  --from-literal=VAPID_SUBJECT=\"$VAPID_SUBJECT\""
 
 # 4) Base de datos y volumen de respaldos
-$K 'kubectl apply -f -' < deploy/k8s/postgres.yaml
-$K 'kubectl apply -f -' < deploy/k8s/backups-pvc.yaml
+apply deploy/k8s/postgres.yaml
+apply deploy/k8s/backups-pvc.yaml
 $K 'kubectl -n gym rollout status statefulset/postgres'
 ```
 
 Luego seguir con **«Nueva versión»** (imágenes, migración y app) y, al final, las reglas de red:
 
 ```bash
-$K 'kubectl apply -f -' < deploy/k8s/network-policy.yaml
+apply deploy/k8s/network-policy.yaml
 ```
 
 **Exponerla:** Cloudflare Zero Trust → Networks → Tunnels → (túnel del clúster) → Public
-Hostnames → agregar `gym.example.com` → tipo HTTP → `gym.gym.svc.cluster.local:80`.
+Hostnames → agregar tu dominio (`$DOMAIN`) → tipo HTTP → `gym.gym.svc.cluster.local:80`.
 Si usas otro dominio, cambia `BETTER_AUTH_URL` en `secret/gym-secrets` y reinicia la API.
 
 ## 2. Nueva versión
@@ -62,33 +69,33 @@ Si usas otro dominio, cambia `BETTER_AUTH_URL` en `secret/gym-secrets` y reinici
 ```bash
 V=0.1.0
 docker buildx build --platform linux/amd64 -f infra/docker/api.Dockerfile \
-  -t registry.example.com/carlos/gym-api:$V --push .
+  -t $REGISTRY/$REGISTRY_OWNER/gym-api:$V --push .
 docker buildx build --platform linux/amd64 -f infra/docker/web.Dockerfile \
-  -t registry.example.com/carlos/gym-web:$V --push .
+  -t $REGISTRY/$REGISTRY_OWNER/gym-web:$V --push .
 # Obtener los digests y fijarlos (versión@sha256:…) en app.yaml y migrate-job.yaml:
-docker buildx imagetools inspect registry.example.com/carlos/gym-api:$V
-docker buildx imagetools inspect registry.example.com/carlos/gym-web:$V
+docker buildx imagetools inspect $REGISTRY/$REGISTRY_OWNER/gym-api:$V
+docker buildx imagetools inspect $REGISTRY/$REGISTRY_OWNER/gym-web:$V
 
 # Migración: primero respalda la base (si el respaldo falla, no migra)
 $K 'kubectl -n gym delete job gym-migrate --ignore-not-found'
-$K 'kubectl apply -f -' < deploy/k8s/migrate-job.yaml
+apply deploy/k8s/migrate-job.yaml
 $K 'kubectl -n gym wait --for=condition=complete job/gym-migrate --timeout=300s'
 $K 'kubectl -n gym logs job/gym-migrate --all-containers'
 
 # App
-$K 'kubectl apply -f -' < deploy/k8s/app.yaml
+apply deploy/k8s/app.yaml
 $K 'kubectl -n gym rollout status deploy/gym-api deploy/gym-web deploy/gym-worker'
 ```
 
 ## 3. Comprobar después de publicar
 
 ```bash
-curl -s https://gym.example.com/api/health          # {"status":"ok"}
+curl -s https://$DOMAIN/api/health          # {"status":"ok"}
 # Desde otro namespace la app NO debe responder (reglas de red):
 $K 'kubectl run -n default prueba-red --rm -i --restart=Never --image=curlimages/curl:8.10.1 -- curl -sS -m 5 http://gym.gym.svc.cluster.local/api/health/live'   # debe fallar por tiempo
 ```
 
-Y en el teléfono: abrir `https://gym.example.com`, instalar en la pantalla de inicio y abrirla en
+Y en el teléfono: abrir `https://$DOMAIN`, instalar en la pantalla de inicio y abrirla en
 modo avión.
 
 ## 4. Respaldos

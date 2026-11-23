@@ -78,11 +78,17 @@ Cada etapa se prueba además en vivo en el navegador; los resultados quedan en
 
 ## Despliegue
 
-Kubernetes del servidor (namespace `gym`), imágenes en Forgejo y publicación por el túnel de
-Cloudflare. Guía paso a paso: [`deploy/README.md`](deploy/README.md).
+Kubernetes (namespace `gym`), imágenes en un registro de contenedores y publicación por un túnel de
+Cloudflare. Los datos propios del servidor van en `deploy/site.env` (no versionado). Guía paso a
+paso: [`deploy/README.md`](deploy/README.md).
 
 Ramas: `main` = versión estable; `development` = integración; cada funcionalidad en su rama
 `NNN-nombre`.
+
+## Licencia
+
+El código está bajo [GNU AGPL-3.0](LICENSE): puedes usarlo, modificarlo y redistribuirlo, pero si
+ofreces una versión modificada como servicio en red debes publicar su código con la misma licencia.
 
 ## Licencias de contenido
 
