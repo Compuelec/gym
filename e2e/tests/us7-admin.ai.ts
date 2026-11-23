@@ -65,6 +65,7 @@ test.describe('US7 · administración de la IA', () => {
 
     // History shows what changed.
     await page.reload();
+    await page.getByRole('button', { name: 'Historial' }).click();
     await expect(page.getByRole('heading', { name: 'Historial de cambios' })).toBeVisible();
     await expect(page.getByText('Clave guardada', { exact: true }).first()).toBeVisible();
     await expect(page.getByText('IA activada', { exact: true }).first()).toBeVisible();
@@ -76,6 +77,7 @@ test.describe('US7 · administración de la IA', () => {
     await page.goto('/');
     await completeOnboarding(page);
     await page.goto('/admin');
+    await page.getByRole('button', { name: 'Invitaciones' }).click();
     await page.getByRole('button', { name: 'Crear invitación' }).click();
     const link = (await page.locator('code').textContent())!;
     expect(link).toMatch(/\/signup\?invite=/);

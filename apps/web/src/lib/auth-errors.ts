@@ -18,6 +18,8 @@ export function authErrorMessage(error: { code?: string; status?: number; messag
       return t('auth.errors.invalidEmail');
     case 'INVALID_TOKEN':
       return t('auth.errors.invalidToken');
+    case 'ACCOUNT_DISABLED':
+      return t('auth.errors.accountDisabled');
     default:
       return t('auth.errors.generic');
   }

@@ -96,6 +96,10 @@ $K 'kubectl -n gym exec deploy/gym-api -- node dist/admin.mjs invite --days 14' 
 $K 'kubectl -n gym exec deploy/gym-api -- node dist/admin.mjs promote <correo>'   # tras registrarse
 ```
 
+El servidor de correo y las invitaciones también se manejan desde la app (Perfil →
+Administración → Correo / Invitaciones / Usuarios). La regla de red sólo deja salir correo por los
+puertos 465 y 587.
+
 ## 4. Comprobar después de publicar
 
 ```bash
