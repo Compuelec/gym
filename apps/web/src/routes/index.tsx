@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
-import { Activity, Play, Sparkles } from 'lucide-react';
+import { Activity, MessageSquare, Play, Sparkles } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { SelectField } from '@/components/ui/field';
@@ -135,6 +135,10 @@ function TrainPage() {
         </>
       )}
 
+      <Link to="/coach" className="flex items-center gap-2 text-sm underline">
+        <MessageSquare className="size-4" aria-hidden />
+        {t('coach.link')}
+      </Link>
       <Link to="/recovery" className="flex items-center gap-2 text-sm underline">
         <Activity className="size-4" aria-hidden />
         {t('smart.recoveryLink')}

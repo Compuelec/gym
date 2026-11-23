@@ -1,11 +1,12 @@
 import { getDb } from './db/client';
 import { env } from './env';
+import { processNextCoachRequest } from './jobs/coach';
 import { createWebPushSender, pushEnabled, sendDuePushes } from './lib/push';
 import { logger } from './logger';
 
 /**
  * Background worker: polls for due rest-timer notifications every 2 s. A simple table poll keeps
- * the stack to Postgres only (no queue service); more jobs (coach) are added in later stories.
+ * the stack to Postgres only (no queue service). Jobs: rest-timer pushes and coach requests.
  */
 const config = env();
 const db = getDb();
@@ -15,6 +16,10 @@ async function tick() {
   if (pushEnabled(config)) {
     const result = await sendDuePushes(db, createWebPushSender(config));
     if (result.due > 0) logger.info(result, 'rest pushes processed');
+  }
+  // Coach: drain the queue one request at a time.
+  while (await processNextCoachRequest(db, config)) {
+    // keep going while there is work
   }
 }
 

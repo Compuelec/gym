@@ -23,13 +23,14 @@ async function readBody(req) {
 
 /** Picks a scripted reply: the test controls it through markers in the user's message. */
 export function reply(body) {
-  const text = JSON.stringify(body.messages ?? []);
-  const catalogIds = [...text.matchAll(/(fedb:[A-Za-z0-9_.-]+)/g)].map((m) => m[1]);
+  const text = JSON.stringify([body.system ?? [], body.messages ?? []]);
+  // Catalog lines look like «fedb:Id|Nombre|…»: take ids from there (sorted, deterministic).
+  const catalogIds = [...text.matchAll(/(fedb:[A-Za-z0-9_.-]+)\|/g)].map((m) => m[1]);
   const usage = { input_tokens: 4000, output_tokens: 1500, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 };
   if (text.includes('[[REFUSE]]')) return { stop_reason: 'refusal', content: [], usage };
   if (text.includes('[[SLOW]]')) return { delayMs: 200_000 };
   if (text.includes('[[ERROR500]]')) return { status: 500 };
-  const weekly = text.includes('revisión semanal') || text.includes('weekly_review');
+  const weekly = text.includes('revisión semanal');
   const pick = (n) => [...new Set(catalogIds)].slice(0, n);
   const out = weekly
     ? { highlightsEs: ['Entrenaste 3 días esta semana.'], concernsEs: [], adjustments: [] }

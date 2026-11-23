@@ -25,6 +25,8 @@ const EnvSchema = z.object({
   ANTHROPIC_API_KEY: z.string().optional(),
   // Test stacks point the SDK at a fake server.
   AI_BASE_URL: z.string().url().optional(),
+  // Directory with the built catalog (manifest.json + catalog-<v>.json), bundled in the API image.
+  CATALOG_DIR: z.string().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

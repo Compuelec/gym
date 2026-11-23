@@ -5,7 +5,6 @@ import { FAKE_AI_KEY, completeOnboarding, expect, promoteToAdmin, resetAiSetting
 const COMPOSE = fileURLToPath(new URL('../../infra/docker-compose.e2e.yml', import.meta.url));
 
 // The AI settings are global: these tests run one after another, in one browser project.
-test.describe.configure({ mode: 'serial' });
 
 test.describe('US7 · administración de la IA', () => {
   test.skip(({ browserName, isMobile }) => browserName !== 'chromium' || isMobile, 'global settings: run once');

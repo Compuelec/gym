@@ -9,3 +9,4 @@ export * from './exercise';
 export * from './catalog-filter';
 export * from './workout';
 export * from './measurement';
+export * from './coach';

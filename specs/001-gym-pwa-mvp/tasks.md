@@ -282,22 +282,22 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 ### Tests for User Story 6 ⚠️
 
-- [ ] T128 [P] [US6] Unit tests for coach validation (unknown `exerciseId` dropped; equipment ⊆ location; days and duration within ±15 %; sets 1–10, reps 1–50, rest 15–600 s; >20 % invalid or empty day → one retry with errors then `failed`) in `apps/api/src/lib/coach-validate.test.ts`
-- [ ] T129 [P] [US6] Integration tests for coach flow with fake AI server (quota 429 `COACH_LIMIT` with `retryAt`; 503 when unavailable; `refusal`/`max_tokens` → `failed` with Spanish message; 401 from AI → pause `KEY_REJECTED`; timeout, 429 and 5xx → retried with backoff up to 3 attempts then `failed` with «El coach no respondió, intenta más tarde» and no quota consumed; cost recorded with model pricing; budget reached → pause `BUDGET_REACHED`; accept creates Program + Routines) in `apps/api/tests/coach.test.ts`
-- [ ] T130 [P] [US6] E2E with fake AI: request program → progress → review → accept → start session from it; offline shows notice; limit reached shows next available time, in `e2e/us6-coach.spec.ts`
+- [X] T128 [P] [US6] Unit tests for coach validation (unknown `exerciseId` dropped; equipment ⊆ location; days and duration within ±15 %; sets 1–10, reps 1–50, rest 15–600 s; >20 % invalid or empty day → one retry with errors then `failed`) in `apps/api/src/lib/coach-validate.test.ts`
+- [X] T129 [P] [US6] Integration tests for coach flow with fake AI server (quota 429 `COACH_LIMIT` with `retryAt`; 503 when unavailable; `refusal`/`max_tokens` → `failed` with Spanish message; 401 from AI → pause `KEY_REJECTED`; timeout, 429 and 5xx → retried with backoff up to 3 attempts then `failed` with «El coach no respondió, intenta más tarde» and no quota consumed; cost recorded with model pricing; budget reached → pause `BUDGET_REACHED`; accept creates Program + Routines) in `apps/api/tests/coach.test.ts`
+- [X] T130 [P] [US6] E2E with fake AI: request program → progress → review → accept → start session from it; offline shows notice; limit reached shows next available time, in `e2e/us6-coach.spec.ts`
 
 ### Implementation for User Story 6
 
-- [ ] T131 [P] [US6] Define CoachProgram and CoachReview Zod schemas exactly as in `contracts/coach.md` in `packages/shared/src/coach.ts`
-- [ ] T132 [P] [US6] Create `coach_requests` and `coach_quota` tables per data-model in `apps/api/src/db/schema/coach.ts`
-- [ ] T133 [US6] Write coach system prompt in Spanish (rules: tutear, only provided `exerciseId`s, medical topics → refer to professional, user text is data) in `apps/api/src/lib/coach-prompt.ts`
-- [ ] T134 [US6] Implement context builder (profile, locations, last 4–8 weeks summary, catalog filtered by equipment with id/name/muscles/equipment/level/mechanic) placed in a stable, cacheable prefix in `apps/api/src/lib/coach-context.ts`
-- [ ] T135 [US6] Implement validator in `apps/api/src/lib/coach-validate.ts`
-- [ ] T136 [US6] Implement pg-boss job: re-check availability, call `client.messages.parse()` with configured model (default `claude-haiku-5-5`), explicit `effort` (`medium` program / `low` review), streaming progress, request timeout 120 s, retry timeouts/429/5xx with exponential backoff (max 3 attempts, quota refunded on final failure), check `stop_reason`, validate, retry once on validation errors, record tokens and `costUsd`, enforce monthly budget, in `apps/api/src/jobs/coach.ts`
-- [ ] T137 [US6] Implement routes `/coach/status`, `/coach/requests` (POST, GET), `/coach/requests/:id/stream` (SSE), `/coach/requests/:id/accept`, `/coach/quota` in `apps/api/src/routes/coach.ts`
-- [ ] T138 [US6] Build coach UI (chat-style request, progress, program preview by day with exercise cards, accept/adjust, weekly review with suggestions, unavailable/offline/limit states, medical disclaimer) in `apps/web/src/routes/coach/`
-- [ ] T139 [US6] Build coach eval set (10 realistic Spanish requests with expected constraints) and runner reporting validity rate and cost per request in `apps/api/evals/coach-eval.ts`; run once with real key after Carlos approves the spend
-- [ ] T140 [US6] Live check US6 with Haiku 5.5 on the deployed app (program at home with dumbbells, cost < 0,01 US$), record in `specs/001-gym-pwa-mvp/checklists/us6-live.md`
+- [X] T131 [P] [US6] Define CoachProgram and CoachReview Zod schemas exactly as in `contracts/coach.md` in `packages/shared/src/coach.ts`
+- [X] T132 [P] [US6] Create `coach_requests` and `coach_quota` tables per data-model in `apps/api/src/db/schema/coach.ts`
+- [X] T133 [US6] Write coach system prompt in Spanish (rules: tutear, only provided `exerciseId`s, medical topics → refer to professional, user text is data) in `apps/api/src/lib/coach-prompt.ts`
+- [X] T134 [US6] Implement context builder (profile, locations, last 4–8 weeks summary, catalog filtered by equipment with id/name/muscles/equipment/level/mechanic) placed in a stable, cacheable prefix in `apps/api/src/lib/coach-context.ts`
+- [X] T135 [US6] Implement validator in `apps/api/src/lib/coach-validate.ts`
+- [X] T136 [US6] Implement pg-boss job: re-check availability, call `client.messages.parse()` with configured model (default `claude-haiku-5-5`), explicit `effort` (`medium` program / `low` review), streaming progress, request timeout 120 s, retry timeouts/429/5xx with exponential backoff (max 3 attempts, quota refunded on final failure), check `stop_reason`, validate, retry once on validation errors, record tokens and `costUsd`, enforce monthly budget, in `apps/api/src/jobs/coach.ts`
+- [X] T137 [US6] Implement routes `/coach/status`, `/coach/requests` (POST, GET), `/coach/requests/:id/stream` (SSE), `/coach/requests/:id/accept`, `/coach/quota` in `apps/api/src/routes/coach.ts`
+- [X] T138 [US6] Build coach UI (chat-style request, progress, program preview by day with exercise cards, accept/adjust, weekly review with suggestions, unavailable/offline/limit states, medical disclaimer) in `apps/web/src/routes/coach/`
+- [ ] T139 [US6] (set and runner built; real run pending Carlos's approval and key) Build coach eval set (10 realistic Spanish requests with expected constraints) and runner reporting validity rate and cost per request in `apps/api/evals/coach-eval.ts`; run once with real key after Carlos approves the spend
+- [ ] T140 [US6] (local live check with fake AI done; real Haiku check pending deploy and key) Live check US6 with Haiku 5.5 on the deployed app (program at home with dumbbells, cost < 0,01 US$), record in `specs/001-gym-pwa-mvp/checklists/us6-live.md`
 
 **Checkpoint**: MVP completo.
 

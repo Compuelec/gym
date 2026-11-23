@@ -483,5 +483,48 @@
       "invite_created": "Invitación creada",
       "invite_revoked": "Invitación revocada"
     }
+  },
+  "coach": {
+    "title": "Coach",
+    "link": "Pídele un programa al coach",
+    "intro": "Cuéntale tu objetivo y te arma un programa con los ejercicios del catálogo y el equipo de tus lugares.",
+    "disclaimer": "El coach da sugerencias generales y no reemplaza el consejo de un médico ni de un profesional del ejercicio.",
+    "offline": "Necesitas conexión para usar el coach. El resto de la app sigue funcionando sin conexión.",
+    "unavailable": "El coach no está disponible por ahora.",
+    "kind": "¿Qué necesitas?",
+    "kindProgram": "Un programa nuevo",
+    "kindReview": "Una revisión de mi semana",
+    "message": "Cuéntale al coach",
+    "messagePlaceholder": "Por ejemplo: quiero ganar fuerza, 3 días por semana, en casa tengo mancuernas.",
+    "reviewPlaceholder": "Por ejemplo: me costó terminar las sentadillas, ¿qué ajusto?",
+    "locations": "Lugares",
+    "send": "Enviar al coach",
+    "working": "El coach está preparando tu respuesta…",
+    "quota": "Te quedan {left} de {limit} consultas hoy.",
+    "limit": "Alcanzaste el límite diario del coach. Podrás volver a usarlo el {date}.",
+    "busy": "Ya tienes una consulta en curso. Espera a que termine.",
+    "programTitle": "Programa propuesto",
+    "weeks": "{weeks} semanas",
+    "progression": "Progresión",
+    "safety": "Importante",
+    "day": "Día {day}: {title}",
+    "item": "{sets} × {reps} · descanso {rest} s",
+    "accept": "Aceptar y crear las rutinas",
+    "accepted": "Listo: se crearon las rutinas del programa.",
+    "reviewTitle": "Revisión de tu semana",
+    "highlights": "Lo que va bien",
+    "concerns": "A tener en cuenta",
+    "adjustments": "Ajustes sugeridos",
+    "noAdjustments": "Sin ajustes por ahora.",
+    "history": "Consultas anteriores",
+    "statuses": {
+      "queued": "En cola",
+      "running": "Preparando",
+      "done": "Lista",
+      "failed": "Falló",
+      "rejected": "Rechazada"
+    },
+    "failed": "No se pudo completar: {message}",
+    "newRequest": "Nueva consulta"
   }
 }

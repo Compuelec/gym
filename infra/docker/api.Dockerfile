@@ -8,6 +8,8 @@ COPY packages/shared/package.json packages/shared/
 RUN pnpm install --frozen-lockfile --prod=false --filter @gym/api... && pnpm store prune
 COPY packages/shared packages/shared
 COPY apps/api apps/api
+# The coach needs the catalog on the server (same file the PWA downloads).
+COPY packages/catalog/out/catalog packages/catalog/out/catalog
 ENV NODE_ENV=production PORT=3000
 USER 100:101
 WORKDIR /app/apps/api
