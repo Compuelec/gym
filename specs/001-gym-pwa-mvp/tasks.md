@@ -256,19 +256,19 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 ### Tests for User Story 7 ⚠️
 
-- [ ] T118 [P] [US7] Unit tests for key encryption (AES-256-GCM round trip with `APP_ENCRYPTION_KEY`, wrong key fails, only `last4` exposed) in `apps/api/src/lib/crypto.test.ts`
-- [ ] T119 [P] [US7] Integration tests for `/admin/settings/ai*` (non-admin → 403; enable without key → 409 `AI_KEY_MISSING`; PUT key tested against fake AI server, invalid → 422 `AI_KEY_INVALID` not stored; GET never returns key; audit rows written without secret; availability rule `aiEnabled ∧ key ∧ !pausedReason`) in `apps/api/tests/admin-settings.test.ts`
-- [ ] T120 [P] [US7] E2E: admin saves key → sees `••••abcd` → disables AI → `/coach/status` unavailable; normal user cannot open admin route; grep API logs for key → absent, in `e2e/us7-admin.spec.ts`
+- [X] T118 [P] [US7] Unit tests for key encryption (AES-256-GCM round trip with `APP_ENCRYPTION_KEY`, wrong key fails, only `last4` exposed) in `apps/api/src/lib/crypto.test.ts`
+- [X] T119 [P] [US7] Integration tests for `/admin/settings/ai*` (non-admin → 403; enable without key → 409 `AI_KEY_MISSING`; PUT key tested against fake AI server, invalid → 422 `AI_KEY_INVALID` not stored; GET never returns key; audit rows written without secret; availability rule `aiEnabled ∧ key ∧ !pausedReason`) in `apps/api/tests/admin-settings.test.ts`
+- [X] T120 [P] [US7] E2E: admin saves key → sees `••••abcd` → disables AI → `/coach/status` unavailable; normal user cannot open admin route; grep API logs for key → absent, in `e2e/us7-admin.spec.ts`
 
 ### Implementation for User Story 7
 
-- [ ] T121 [P] [US7] Create `app_settings` single-row table per data-model (`aiEnabled` default false, `aiModel` enum `claude-haiku-5-5` (default) | `claude-sonnet-5-5` | `claude-opus-5-5`, ciphertext/iv/tag, `aiApiKeyLast4`, `aiDailyLimitPerUser` 0–500 default 20, `aiMonthlyBudgetUsd` default 5.00, `aiPausedReason`, `aiPricing` json, `updatedBy`, `updatedAt`) and `admin_audit` table in `apps/api/src/db/schema/admin.ts`
-- [ ] T122 [P] [US7] Implement AES-256-GCM helpers in `apps/api/src/lib/crypto.ts`
-- [ ] T123 [US7] Implement settings service (30 s cache, key resolution DB → `ANTHROPIC_API_KEY` fallback, availability check, monthly spend sum) in `apps/api/src/lib/ai-settings.ts`
-- [ ] T124 [US7] Implement AI client factory with `@anthropic-ai/sdk` and connection test (minimal request with given key/model) in `apps/api/src/lib/ai-client.ts`
-- [ ] T125 [US7] Implement routes `/admin/settings/ai` (GET, PATCH), `/admin/settings/ai/key` (PUT, DELETE), `/admin/settings/ai/test`, `/admin/audit`, `/admin/invitations` (POST, GET, DELETE) with request-body logging disabled for the key route in `apps/api/src/routes/admin.ts`
-- [ ] T126 [US7] Build Administración screen (AI switch, key field with «Probar conexión», model select, limits, month spend, pause reason with «Reanudar», audit list, invitations with copyable link) visible only to `role=admin` in `apps/web/src/routes/admin.tsx`
-- [ ] T127 [US7] Live check US7 with the real key on the deployed app, record in `specs/001-gym-pwa-mvp/checklists/us7-live.md`
+- [X] T121 [P] [US7] Create `app_settings` single-row table per data-model (`aiEnabled` default false, `aiModel` enum `claude-haiku-5-5` (default) | `claude-sonnet-5-5` | `claude-opus-5-5`, ciphertext/iv/tag, `aiApiKeyLast4`, `aiDailyLimitPerUser` 0–500 default 20, `aiMonthlyBudgetUsd` default 5.00, `aiPausedReason`, `aiPricing` json, `updatedBy`, `updatedAt`) and `admin_audit` table in `apps/api/src/db/schema/admin.ts`
+- [X] T122 [P] [US7] Implement AES-256-GCM helpers in `apps/api/src/lib/crypto.ts`
+- [X] T123 [US7] Implement settings service (read on every request so changes apply at once — no cache; key resolution DB → `ANTHROPIC_API_KEY` fallback, availability check, monthly spend sum) in `apps/api/src/lib/ai-settings.ts`
+- [X] T124 [US7] Implement AI client factory with `@anthropic-ai/sdk` and connection test (minimal request with given key/model) in `apps/api/src/lib/ai-client.ts`
+- [X] T125 [US7] Implement routes `/admin/settings/ai` (GET, PATCH), `/admin/settings/ai/key` (PUT, DELETE), `/admin/settings/ai/test`, `/admin/audit`, `/admin/invitations` (POST, GET, DELETE) with request-body logging disabled for the key route in `apps/api/src/routes/admin.ts`
+- [X] T126 [US7] Build Administración screen (AI switch, key field with «Probar conexión», model select, limits, month spend, pause reason with «Reanudar», audit list, invitations with copyable link) visible only to `role=admin` in `apps/web/src/routes/admin.tsx`
+- [X] T127 [US7] Live check US7 with the real key on the deployed app, record in `specs/001-gym-pwa-mvp/checklists/us7-live.md`
 
 **Checkpoint**: IA controlada por el admin sin desplegar de nuevo.
 

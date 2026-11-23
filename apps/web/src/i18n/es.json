@@ -413,5 +413,75 @@
     "password": "Tu contraseña",
     "deleteButton": "Borrar mi cuenta para siempre",
     "needOnline": "Necesitas conexión para esto."
+  },
+  "admin": {
+    "title": "Administración",
+    "link": "Administración",
+    "forbidden": "Esta sección es sólo para administradores.",
+    "ai": "Coach con IA",
+    "status": "Estado",
+    "available": "Disponible para los usuarios",
+    "unavailable": "No disponible",
+    "reasons": {
+      "DISABLED": "Desactivado",
+      "NO_KEY": "Falta la clave",
+      "PAUSED": "Pausado"
+    },
+    "enabled": "Activar la IA para todos",
+    "model": "Modelo",
+    "models": {
+      "claude-haiku-5-5": "Claude Haiku 5.5 (económico, recomendado)",
+      "claude-sonnet-5-5": "Claude Sonnet 5.5",
+      "claude-opus-5-5": "Claude Opus 5.5 (más caro)"
+    },
+    "dailyLimit": "Consultas diarias por usuario",
+    "monthlyBudget": "Tope de gasto mensual (US$)",
+    "spent": "Gastado este mes: US$ {amount}",
+    "saveLimits": "Guardar límites",
+    "paused": "La IA está pausada: {reason}",
+    "pauseReasons": {
+      "BUDGET_REACHED": "se alcanzó el tope mensual",
+      "KEY_REJECTED": "el servicio rechazó la clave"
+    },
+    "resume": "Reanudar",
+    "key": "Clave del servicio de IA",
+    "keyConfigured": "Clave guardada: ••••{last4}",
+    "keyFromSecret": "Se usa la clave del servidor (Secret).",
+    "keyMissing": "Todavía no hay clave.",
+    "keyPlaceholder": "Pega aquí la clave (sk-ant-…)",
+    "saveKey": "Probar y guardar clave",
+    "testKey": "Probar conexión",
+    "deleteKey": "Borrar clave",
+    "keySaved": "Clave guardada y probada.",
+    "testOk": "Conexión correcta ({ms} ms).",
+    "testFail": "El servicio no respondió con esta clave.",
+    "encryptionMissing": "Falta configurar APP_ENCRYPTION_KEY en el servidor: no se pueden guardar claves.",
+    "invitations": "Invitaciones",
+    "inviteEmail": "Correo (opcional)",
+    "inviteDays": "Vence en (días)",
+    "createInvite": "Crear invitación",
+    "inviteCreated": "Invitación creada. Copia el enlace ahora: no se vuelve a mostrar.",
+    "copy": "Copiar enlace",
+    "copied": "Copiado",
+    "inviteStatus": {
+      "pending": "Pendiente",
+      "used": "Usada",
+      "revoked": "Revocada",
+      "expired": "Vencida"
+    },
+    "revoke": "Revocar",
+    "audit": "Historial de cambios",
+    "auditEmpty": "Sin cambios registrados.",
+    "actions": {
+      "ai_enabled": "IA activada",
+      "ai_disabled": "IA desactivada",
+      "ai_key_set": "Clave guardada",
+      "ai_key_deleted": "Clave borrada",
+      "ai_model_changed": "Modelo cambiado",
+      "limits_changed": "Límites cambiados",
+      "ai_resumed": "IA reanudada",
+      "invite_created": "Invitación creada",
+      "invite_revoked": "Invitación revocada"
+    }
   }
 }

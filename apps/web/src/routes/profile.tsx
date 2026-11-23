@@ -132,9 +132,19 @@ function ProfilePage() {
 
       <InstallPrompt />
 
-      <Link to="/credits" className="text-sm underline">
-        {t('profile.credits')}
-      </Link>
+      <div className="flex flex-col gap-2 text-sm">
+        {user.role === 'admin' && (
+          <Link to="/admin" className="font-medium underline">
+            {t('admin.link')}
+          </Link>
+        )}
+        <Link to="/data" className="underline">
+          {t('progress.dataLink')}
+        </Link>
+        <Link to="/credits" className="underline">
+          {t('profile.credits')}
+        </Link>
+      </div>
 
       <section className="flex flex-col gap-2">
         <FormError message={error} />

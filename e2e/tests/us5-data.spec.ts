@@ -50,7 +50,13 @@ test.describe('US5 · progreso y datos propios', () => {
       ...seededSession(30, [{ exerciseId: 'fedb:Hammer_Curls', sets: [{ weightKg: 12, reps: 10 }] }]),
       { entity: 'bodyMeasurement', id: crypto.randomUUID(), data: { measuredAt: new Date().toISOString(), weightKg: 79, bodyFatPct: null, waistCm: null, chestCm: null, armCm: null, thighCm: null, notes: null } },
     ]);
-    const before = (await (await context.request.get('/api/sync/pull')).json()) as { changes: Array<{ entity: string; deleted: boolean }> };
+    // Wait until the onboarding records (profile, location) reached the server.
+    let before = { changes: [] as Array<{ entity: string; deleted: boolean }> };
+    await expect(async () => {
+      before = (await (await context.request.get('/api/sync/pull')).json()) as typeof before;
+      expect(before.changes.some((c) => c.entity === 'profile')).toBe(true);
+      expect(before.changes.some((c) => c.entity === 'location')).toBe(true);
+    }).toPass({ timeout: 20_000 });
     const countByEntity = (changes: Array<{ entity: string; deleted: boolean }>) =>
       changes.filter((c) => !c.deleted).reduce<Record<string, number>>((acc, c) => ({ ...acc, [c.entity]: (acc[c.entity] ?? 0) + 1 }), {});
 

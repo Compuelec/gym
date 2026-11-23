@@ -19,6 +19,12 @@ const EnvSchema = z.object({
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
   VAPID_SUBJECT: z.string().default('mailto:admin@example.com'),
+  // 32 random bytes, base64. Encrypts the AI key stored from the admin screen.
+  APP_ENCRYPTION_KEY: z.string().optional(),
+  // Optional fallback for the first start; the admin screen key takes precedence.
+  ANTHROPIC_API_KEY: z.string().optional(),
+  // Test stacks point the SDK at a fake server.
+  AI_BASE_URL: z.string().url().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema>;

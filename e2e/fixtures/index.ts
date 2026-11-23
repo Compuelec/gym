@@ -110,4 +110,16 @@ export function seededSession(hoursAgo: number, exercises: Array<{ exerciseId: s
   return out;
 }
 
+/** Gives a user the admin role with the real admin CLI in the API container. */
+export function promoteToAdmin(email: string) {
+  execFileSync('docker', ['compose', '-f', COMPOSE, 'exec', '-T', 'api', 'node', '--import', 'tsx', 'src/cli/admin.ts', 'promote', email], { encoding: 'utf8' });
+}
+
+/** Resets the global AI settings (shared by every test of the stack) through SQL. */
+export function resetAiSettings() {
+  execFileSync('docker', ['compose', '-f', COMPOSE, 'exec', '-T', 'postgres', 'psql', '-U', 'gym', '-d', 'gym_e2e', '-c', 'delete from app_settings; delete from coach_requests;'], { encoding: 'utf8' });
+}
+
+export const FAKE_AI_KEY = 'sk-ant-fake-valid-key-for-e2e-tests-wxyz';
+
 export const test = base;

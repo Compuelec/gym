@@ -4,9 +4,12 @@ import type { Database } from './db/client';
 import type { Env } from './env';
 import { createAuth, type Auth } from './lib/auth';
 import { apiError } from './lib/errors';
-import { originCheck, requireSession, type AppVariables } from './lib/middleware';
+import { originCheck, requireAdmin, requireSession, type AppVariables } from './lib/middleware';
+import { createAiGateway, type AiGateway } from './lib/ai-client';
 import { SyncRegistry } from './lib/sync-registry';
 import { logger } from './logger';
+import { adminRoutes } from './routes/admin';
+import { coachRoutes } from './routes/coach';
 import { configRoutes } from './routes/config';
 import { invitationRoutes } from './routes/invitations';
 import { meRoutes } from './routes/me';
@@ -18,13 +21,14 @@ export interface AppDeps {
   config: Env;
   registry?: SyncRegistry;
   auth?: Auth;
+  ai?: AiGateway;
 }
 
 /**
  * HTTP application. Everything lives under /api so the PWA and the API share one origin
  * (Caddy in production, Vite proxy in development).
  */
-export function createApp({ db, config, registry = new SyncRegistry(), auth = createAuth(db, config) }: AppDeps) {
+export function createApp({ db, config, registry = new SyncRegistry(), auth = createAuth(db, config), ai = createAiGateway(config) }: AppDeps) {
   const allowedOrigin = new URL(config.BETTER_AUTH_URL).origin;
 
   const app = new Hono<{ Variables: AppVariables }>().basePath('/api');
@@ -60,6 +64,10 @@ export function createApp({ db, config, registry = new SyncRegistry(), auth = cr
   app.use('/me/*', requireSession(auth));
   app.use('/me', requireSession(auth));
   app.route('/me', meRoutes(db, registry, auth));
+  app.use('/admin/*', requireSession(auth), requireAdmin());
+  app.route('/admin', adminRoutes(db, config, ai));
+  app.use('/coach/*', requireSession(auth));
+  app.route('/coach', coachRoutes(db, config));
 
   return app;
 }

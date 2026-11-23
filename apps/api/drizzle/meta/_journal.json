@@ -43,6 +43,13 @@
       "when": 1795407769667,
       "tag": "0005_us5_measurements",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795408585700,
+      "tag": "0006_us7_admin",
+      "breakpoints": true
     }
   ]
 }

@@ -14,6 +14,7 @@
     "admin:promote": "tsx --env-file-if-exists=../../.env src/cli/admin.ts promote"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.12.0",
     "@gym/shared": "workspace:*",
     "@hono/node-server": "^2.1.11",
     "better-auth": "^1.7.27",

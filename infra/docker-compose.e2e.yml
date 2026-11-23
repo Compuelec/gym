@@ -34,6 +34,9 @@ services:
       VAPID_PUBLIC_KEY: BM-HQRzVUhOt1b7x_jKSl26HJALynvwmrWZpoTH9Bd_tKInYQdbR2I8dmClUXLB8SNWNBCgP-hJqxmkmzjhyOiw
       VAPID_PRIVATE_KEY: Fb_8vOYBZxWjT8ePRAjnw13JDpk4jMkqb6Wt7GJtAvg
       VAPID_SUBJECT: mailto:e2e@test.local
+      # Test-only master key and a fake Claude API (see infra/fake-ai).
+      APP_ENCRYPTION_KEY: dGVzdC1tYXN0ZXIta2V5LTMyLWJ5dGVzLWxvbmctMDE=
+      AI_BASE_URL: http://fake-ai:4010
     depends_on:
       postgres: { condition: service_healthy }
 
@@ -54,6 +57,14 @@ services:
     environment: *api-env
     depends_on:
       migrate: { condition: service_completed_successfully }
+
+  fake-ai:
+    image: node:24.22.2-alpine@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5
+    command: ['node', '/srv/server.mjs']
+    volumes:
+      - ./fake-ai/server.mjs:/srv/server.mjs:ro
+    ports:
+      - '54010:4010'
 
   mailpit:
     image: axllent/mailpit:v1.27
