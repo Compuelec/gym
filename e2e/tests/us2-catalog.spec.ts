@@ -29,6 +29,7 @@ test.describe('US2 · catálogo de ejercicios', () => {
     expect(manifest.exerciseCount).toBeGreaterThanOrEqual(800);
     await expect(page.getByText(`${manifest.exerciseCount} ejercicios`)).toBeVisible({ timeout: 15_000 });
 
+    await page.getByRole('button', { name: 'Filtros' }).click();
     await page.getByLabel('Lugar').selectOption({ label: 'Casa' });
     await page.getByLabel('Músculo').selectOption({ label: 'Pecho' });
     const home = ['dumbbell', 'band', 'mat'];
@@ -39,6 +40,20 @@ test.describe('US2 · catálogo de ejercicios', () => {
     await expect(page.getByText(`${expected.length} ejercicios`)).toBeVisible();
     // Nothing that needs a barbell or a machine.
     await expect(page.getByRole('link', { name: /Press de banca con agarre cerrado en multipower/ })).toHaveCount(0);
+
+    // Open one and come back: the filtered list is still there (filters live in the address).
+    await expect(page.getByRole('button', { name: 'Filtros (2)' })).toBeVisible();
+    const pushups = page.getByRole('link', { name: /^Flexiones Pecho/ });
+    await pushups.scrollIntoViewIfNeeded();
+    await page.evaluate(() => window.scrollBy(0, 200));
+    const y = await page.evaluate(() => window.scrollY);
+    await pushups.click();
+    await expect(page.getByRole('heading', { name: 'Flexiones' })).toBeVisible();
+    await page.getByRole('button', { name: 'Volver' }).click();
+    await expect(page.getByText(`${expected.length} ejercicios`)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Filtros (2)' })).toBeVisible();
+    // Same spot in the list, not back at the top.
+    if (y > 0) await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(y - 60);
   });
 
   test('search ignores accents and case; detail shows images, body map, steps and license', async ({ page }) => {
@@ -82,6 +97,7 @@ test.describe('US2 · catálogo de ejercicios', () => {
     const page2 = await other.newPage();
     await expect(async () => {
       await page2.goto('/exercises');
+      await page2.getByRole('button', { name: 'Filtros' }).click();
       await page2.getByLabel('Solo favoritos').check();
       await expect(page2.getByRole('link', { name: /^Curl martillo(?! (alterno|en|cruzado|predicador))/ })).toBeVisible({ timeout: 3_000 });
     }).toPass({ timeout: 30_000 });

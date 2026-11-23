@@ -3,6 +3,27 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según
 [SemVer](https://semver.org/lang/es/). `main` siempre es la última versión publicada.
 
+## [0.2.0] — 2026-11-23
+
+### Agregado
+- Botón «Volver» en todas las pantallas secundarias; al volver a Ejercicios se mantienen los
+  filtros y la posición en la lista.
+- Elegir varios ejercicios del catálogo para crear una rutina, agregarlos a una existente o
+  entrenar al tiro; «Agregar a una rutina» en la ficha de cada ejercicio.
+- «Rutina de hoy» editable: foto de cada ejercicio, series, repeticiones y descanso ajustables,
+  cambiar, quitar, reordenar y agregar ejercicios; duración en vivo frente al tiempo elegido con
+  «Ajustar al tiempo»; guardar como rutina.
+
+### Cambiado
+- La rutina de hoy prioriza piernas, espalda y pecho cuando todo está recuperado y aprovecha el
+  tiempo disponible.
+- Filtros de Ejercicios plegados en el celular; avisos de carga en vez de pantallas en blanco.
+- En el inicio, accesos para crear la primera rutina; el enlace del coach sólo aparece si la IA
+  está activa.
+
+### Corregido
+- «Cambiar» ya no ofrece un ejercicio que ya está en el plan o la sesión.
+
 ## [0.1.1] — 2026-11-23
 
 ### Cambiado
@@ -63,5 +84,6 @@ Primera versión.
 - Coach con el modelo real (las pruebas usan un servidor de IA simulado).
 - Traducción del catálogo hecha automáticamente, aún sin revisión humana.
 
+[0.2.0]: https://github.com/Compuelec/gym/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Compuelec/gym/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Compuelec/gym/releases/tag/v0.1.0

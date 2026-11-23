@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query';
+import { apiFetch } from '@/lib/api';
 import { useState } from 'react';
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Activity, MessageSquare, Play, Sparkles } from 'lucide-react';
@@ -23,6 +25,12 @@ export const Route = createFileRoute('/')({ component: TrainPage });
 
 function TrainPage() {
   const user = useUser();
+  const coachStatus = useQuery({
+    queryKey: ['coach-status'],
+    queryFn: () => apiFetch('/coach/status') as Promise<{ available: boolean }>,
+    staleTime: 5 * 60_000,
+    retry: false,
+  });
   const active = useActiveSession(user.id);
   const routines = useRoutines(user.id) ?? [];
   const locations = useLocations(user.id) ?? [];
@@ -119,7 +127,17 @@ function TrainPage() {
             ))}
           </ul>
           {routines.length === 0 && (
-            <p className="text-sm text-muted-foreground">{t('train.noRoutines')}</p>
+            <div className="flex flex-col gap-2 rounded-lg bg-muted/60 p-3 text-sm">
+              <p>{t('train.noRoutines')}</p>
+              <div className="flex flex-wrap gap-2">
+                <Link to="/routines/new" className={buttonVariants({ size: 'sm' })}>
+                  {t('train.createRoutine')}
+                </Link>
+                <Link to="/exercises" className={buttonVariants({ size: 'sm', variant: 'outline' })}>
+                  {t('train.browseExercises')}
+                </Link>
+              </div>
+            </div>
           )}
           <Link
             to="/today"
@@ -135,10 +153,13 @@ function TrainPage() {
         </>
       )}
 
-      <Link to="/coach" className="flex items-center gap-2 text-sm underline">
-        <MessageSquare className="size-4" aria-hidden />
-        {t('coach.link')}
-      </Link>
+      {/* Only when the administrator has the AI turned on: otherwise the link leads nowhere. */}
+      {coachStatus.data?.available && (
+        <Link to="/coach" className="flex items-center gap-2 text-sm underline">
+          <MessageSquare className="size-4" aria-hidden />
+          {t('coach.link')}
+        </Link>
+      )}
       <Link to="/recovery" className="flex items-center gap-2 text-sm underline">
         <Activity className="size-4" aria-hidden />
         {t('smart.recoveryLink')}

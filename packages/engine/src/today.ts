@@ -48,6 +48,49 @@ const CARDIO_PREFERENCE = ['treadmill', 'stationary_bike', 'elliptical', 'rower'
 const WORK_SECONDS = 45;
 const TRANSITION_SECONDS = 60;
 const LEVEL_ORDER = ['beginner', 'intermediate', 'expert'];
+/** When groups are equally fresh, big ones first: a balanced session, not «abs and arms». */
+const GROUP_PRIORITY = ['Piernas', 'Espalda', 'Pecho', 'Hombros', 'Brazos', 'Abdomen'];
+const groupRank = (g: string) => {
+  const i = GROUP_PRIORITY.indexOf(g);
+  return i === -1 ? GROUP_PRIORITY.length : i;
+};
+const MAX_SETS = 5;
+const MIN_SETS = 2;
+
+/** Minutes a plan takes: work plus rest per set, a transition per exercise; timed items as set. */
+export function estimateMinutes(items: ReadonlyArray<Pick<TodayItem, 'sets' | 'restSeconds' | 'seconds'>>): number {
+  const seconds = items.reduce(
+    (sum, i) => sum + (i.seconds && i.restSeconds === 0 ? i.seconds * i.sets : i.sets * ((i.seconds ?? WORK_SECONDS) + i.restSeconds) + TRANSITION_SECONDS),
+    0,
+  );
+  return Math.round(seconds / 60);
+}
+
+/**
+ * Fits a plan to the minutes available by adding or removing sets of the strength exercises
+ * (the first ones get extra sets first, the last ones lose them first). Cardio blocks keep their
+ * length. The plan never goes below 2 or above 5 sets per exercise.
+ */
+export function fitToTime<T extends Pick<TodayItem, 'sets' | 'restSeconds' | 'seconds'>>(items: readonly T[], minutes: number): T[] {
+  const plan = items.map((i) => ({ ...i }));
+  const strength = plan.map((i, n) => ({ i, n })).filter(({ i }) => !(i.seconds && i.restSeconds === 0));
+  if (strength.length === 0) return plan;
+  for (let guard = 0; guard < 100 && estimateMinutes(plan) > minutes; guard++) {
+    const victim = [...strength].reverse().find(({ i }) => i.sets > MIN_SETS);
+    if (!victim) break;
+    victim.i.sets -= 1;
+  }
+  for (let guard = 0; guard < 100; guard++) {
+    const candidate = strength.find(({ i }) => i.sets < MAX_SETS && i.sets === Math.min(...strength.map((s) => s.i.sets)));
+    if (!candidate) break;
+    candidate.i.sets += 1;
+    if (estimateMinutes(plan) > minutes) {
+      candidate.i.sets -= 1;
+      break;
+    }
+  }
+  return plan;
+}
 
 const muscleInfo = new Map<string, (typeof MUSCLES)[number]>(MUSCLES.map((m) => [m.slug, m]));
 
@@ -91,7 +134,7 @@ export function generateToday(opts: {
   const avoided = [...groups.entries()].filter(([, g]) => g.muscles.some((m) => m.status === 'fatigued')).map(([name]) => name);
   const ranked = [...groups.entries()]
     .filter(([name]) => !avoided.includes(name))
-    .sort(([a, ga], [b, gb]) => ga.fatigue - gb.fatigue || ga.weekly - gb.weekly || a.localeCompare(b, 'es'));
+    .sort(([a, ga], [b, gb]) => ga.fatigue - gb.fatigue || ga.weekly - gb.weekly || groupRank(a) - groupRank(b) || a.localeCompare(b, 'es'));
 
   const usable = opts.catalog.filter(
     (c) =>
@@ -165,9 +208,10 @@ export function generateToday(opts: {
     });
   }
 
-  const minutes = Math.round(
-    items.reduce((sum, i) => sum + (i.seconds ? i.seconds : i.sets * (WORK_SECONDS + i.restSeconds) + TRANSITION_SECONDS), 0) / 60,
-  );
+  // Use the time that is left: extra sets on the main exercises (or fewer when over).
+  const fitted = fitToTime(items, opts.minutes);
+  items.splice(0, items.length, ...fitted);
+  const minutes = estimateMinutes(items);
   const reason =
     `Foco: ${listEs(focus.map((f) => f.toLowerCase()))}, con el equipo de ${opts.locationName}.` +
     (cardio && cardioMinutes >= 5 ? ` Primero fuerza y al final ${cardioMinutes} minutos de cardio.` : '') +

@@ -69,7 +69,7 @@ test.describe('US4 · recomendaciones inteligentes sin conexión', () => {
     await expect(page.getByText(/con el equipo de Casa/)).toBeVisible();
     const items = page.getByRole('listitem');
     expect(await items.count()).toBeGreaterThanOrEqual(2);
-    await expect(page.getByText(/Duración estimada: \d+ min/)).toBeVisible();
+    await expect(page.getByText(/Duración estimada: \d+ de 30 min/)).toBeVisible();
     await page.getByRole('button', { name: 'Empezar esta rutina' }).click();
     await expect(page.getByRole('heading', { name: 'Rutina de hoy' })).toBeVisible();
     await expect(page.getByText(/^\d series × /).first()).toBeVisible();

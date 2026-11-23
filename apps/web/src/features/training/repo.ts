@@ -52,6 +52,20 @@ export async function duplicateRoutine(userId: string, routine: LocalRoutine, su
   return copy.id;
 }
 
+export const MAX_ROUTINE_ITEMS = 30;
+
+/**
+ * Appends exercises to a routine with default targets, skipping the ones already in it.
+ * Returns how many were added (the routine holds at most 30 exercises).
+ */
+export async function addExercisesToRoutine(userId: string, routine: LocalRoutine, exercises: Array<{ id: string; measure: string }>) {
+  const present = new Set(routine.items.map((i) => i.exerciseId));
+  const fresh = exercises.filter((e) => !present.has(e.id)).slice(0, Math.max(0, MAX_ROUTINE_ITEMS - routine.items.length));
+  if (fresh.length === 0) return 0;
+  await saveRoutine(userId, { ...routine, items: [...routine.items, ...fresh.map((e) => emptyItem(e.id, e.measure))] });
+  return fresh.length;
+}
+
 export function emptyItem(exerciseId: string, measure: string): RoutineItem {
   const timed = measure === 'time';
   return {

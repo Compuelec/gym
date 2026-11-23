@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { PageSpinner } from '@/components/Spinner';
 import { OwnExerciseForm } from '@/features/catalog/OwnExerciseForm';
 import { saveOwnExercise, useExercise } from '@/features/catalog/exercises';
 import { t } from '@/i18n';
@@ -11,7 +12,7 @@ function EditExercisePage() {
   const user = useUser();
   const navigate = useNavigate();
   const ex = useExercise(user.id, id);
-  if (ex === undefined) return null;
+  if (ex === undefined) return <PageSpinner />;
   if (!ex || !ex.own) return <p>{t('exercises.notFound')}</p>;
   const { own: _own, nameEn: _en, translated: _tr, media: _m, license: _l, authors: _a, sourceUrl: _s, retiredAt: _r, ...initial } = ex;
   return (
