@@ -19,7 +19,7 @@ services:
   migrate:
     image: gym-api:e2e
     build: { context: .., dockerfile: infra/docker/api.Dockerfile }
-    command: ['node', '--import', 'tsx', 'src/db/migrate.ts']
+    command: ['node', 'dist/migrate.mjs']
     environment: &api-env
       DATABASE_URL: postgres://gym:gym@postgres:5432/gym_e2e
       BETTER_AUTH_SECRET: e2e-secret-e2e-secret-e2e-secret-012345
@@ -53,7 +53,7 @@ services:
 
   worker:
     image: gym-api:e2e
-    command: ['node', '--import', 'tsx', 'src/worker.ts']
+    command: ['node', 'dist/worker.mjs']
     environment: *api-env
     depends_on:
       migrate: { condition: service_completed_successfully }

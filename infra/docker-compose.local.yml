@@ -21,7 +21,7 @@ services:
   migrate:
     image: gym-api:local
     build: { context: .., dockerfile: infra/docker/api.Dockerfile }
-    command: ['node', '--import', 'tsx', 'src/db/migrate.ts']
+    command: ['node', 'dist/migrate.mjs']
     env_file: ../.env.local
     environment: &api-env
       DATABASE_URL: postgres://gym:gym@postgres:5432/gym
@@ -48,7 +48,7 @@ services:
 
   worker:
     image: gym-api:local
-    command: ['node', '--import', 'tsx', 'src/worker.ts']
+    command: ['node', 'dist/worker.mjs']
     env_file: ../.env.local
     environment: *api-env
     depends_on:

@@ -3,6 +3,14 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según
 [SemVer](https://semver.org/lang/es/). `main` siempre es la última versión publicada.
 
+## [0.1.1] — 2026-11-23
+
+### Cambiado
+- La imagen del servidor se empaqueta en pocos archivos y ya no lleva dependencias de desarrollo:
+  pasa de 420 MB a 180 MB y se puede subir al registro detrás de Cloudflare. Los comandos del
+  contenedor cambian a `node dist/index.mjs`, `dist/worker.mjs`, `dist/migrate.mjs` y
+  `dist/admin.mjs`.
+
 ## [0.1.0] — 2026-11-23
 
 Primera versión.
@@ -55,4 +63,5 @@ Primera versión.
 - Coach con el modelo real (las pruebas usan un servidor de IA simulado).
 - Traducción del catálogo hecha automáticamente, aún sin revisión humana.
 
+[0.1.1]: https://github.com/Compuelec/gym/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Compuelec/gym/releases/tag/v0.1.0

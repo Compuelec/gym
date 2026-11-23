@@ -55,7 +55,7 @@ pnpm admin:promote <correo>       # da rol de administrador
 Para usar la app a mano con las imágenes de producción y datos que se conservan (sin IA):
 `docker compose -f infra/docker-compose.local.yml up -d --build --wait` → http://localhost:8090
 (correos en http://localhost:58030). Los secretos van en `.env.local` (no se sube); la invitación
-se crea con `docker compose -f infra/docker-compose.local.yml exec api node --import tsx src/cli/admin.ts invite`.
+se crea con `docker compose -f infra/docker-compose.local.yml exec api node dist/admin.mjs invite`.
 
 La clave de la IA se carga desde **Administración → Clave del servicio de IA** (se prueba antes
 de guardarla). `ANTHROPIC_API_KEY` en `.env` es sólo un respaldo opcional.
