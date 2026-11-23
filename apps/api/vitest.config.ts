@@ -12,6 +12,7 @@ export default defineConfig({
       BETTER_AUTH_URL: 'http://localhost:5173',
       LOG_LEVEL: 'silent',
       // Test-only master key (32 bytes).
+      PUSH_EXTRA_HOSTS: 'push.example',
       APP_ENCRYPTION_KEY: 'dGVzdC1tYXN0ZXIta2V5LTMyLWJ5dGVzLWxvbmctMDE=',
     },
     // Integration tests share one disposable database; keep files sequential for determinism.

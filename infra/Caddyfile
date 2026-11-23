@@ -18,10 +18,15 @@
 		X-Frame-Options DENY
 		Permissions-Policy "camera=(), microphone=(), geolocation=()"
 		Strict-Transport-Security "max-age=31536000"
+		# Everything comes from this origin; inline styles are needed by React style props and charts.
+		Content-Security-Policy "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
 		-Server
 	}
 
 	handle /api/* {
+		request_body {
+			max_size 25MB
+		}
 		reverse_proxy {$API_UPSTREAM:localhost:3000} {
 			header_up X-Real-IP {client_ip}
 		}

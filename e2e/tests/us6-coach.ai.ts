@@ -18,7 +18,6 @@ async function ask(page: Page, text: string) {
 }
 
 test.describe('US6 · coach con IA', () => {
-  test.skip(({ browserName, isMobile }) => browserName !== 'chromium' || isMobile, 'global settings: run once');
 
   test.beforeEach(async ({ playwright, baseURL }) => {
     resetAiSettings();

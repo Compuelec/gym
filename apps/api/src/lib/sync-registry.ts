@@ -21,7 +21,11 @@ export interface SyncEntityDef {
    */
   schema: z.ZodType<Record<string, unknown>>;
   /** Other records this one points to; they must exist for the same owner (same batch or DB). */
-  references?: (data: Record<string, unknown>) => Array<{ entity: string; id: string }>;
+  /**
+   * Rows this one points to; they must belong to the same owner. `allowDeleted` accepts a
+   * soft-deleted target (e.g. finishing offline a session whose location was deleted meanwhile).
+   */
+  references?: (data: Record<string, unknown>) => Array<{ entity: string; id: string; allowDeleted?: boolean }>;
   /** One record per user whose id must equal the user's id (e.g. profile). */
   idIsOwnerId?: boolean;
 }
@@ -49,6 +53,8 @@ export class SyncRegistry {
 
 /** Columns managed by the server and never accepted from the client. */
 export const SERVER_MANAGED_KEYS = new Set([
+  // Set only by the server when a coach program is accepted.
+  'coachRequestId',
   'id',
   'ownerId',
   'createdAt',

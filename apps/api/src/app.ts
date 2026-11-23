@@ -1,3 +1,5 @@
+import type { Context } from 'hono';
+import { bodyLimit } from 'hono/body-limit';
 import { Hono } from 'hono';
 import { sql } from 'drizzle-orm';
 import type { Database } from './db/client';
@@ -50,6 +52,12 @@ export function createApp({ db, config, registry = new SyncRegistry(), auth = cr
       return c.json({ status: 'unavailable' }, 503);
     }
   });
+
+  // Request size: small JSON everywhere, a larger limit only for importing a full export.
+  const tooLarge = (c: Context) => apiError(c, 413, 'VALIDATION', 'El archivo o los datos enviados son demasiado grandes.');
+  const smallBody = bodyLimit({ maxSize: 2 * 1024 * 1024, onError: tooLarge });
+  const importBody = bodyLimit({ maxSize: 20 * 1024 * 1024, onError: tooLarge });
+  app.use('*', (c, next) => (c.req.path === '/api/me/import' ? importBody(c, next) : smallBody(c, next)));
 
   app.use('*', originCheck(allowedOrigin));
 

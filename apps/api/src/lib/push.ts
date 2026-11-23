@@ -21,6 +21,23 @@ export function pushEnabled(config: Env) {
   return Boolean(config.VAPID_PUBLIC_KEY && config.VAPID_PRIVATE_KEY);
 }
 
+/** Browser push services (Chrome/Android, Firefox, Safari/iOS, Edge). Nothing else is ever called. */
+const PUSH_HOSTS = [/^fcm\.googleapis\.com$/, /(^|\.)push\.services\.mozilla\.com$/, /^web\.push\.apple\.com$/, /(^|\.)notify\.windows\.com$/];
+export const MAX_SUBSCRIPTIONS_PER_USER = 10;
+
+/** Only HTTPS endpoints of real push services: the worker must never be pointed at internal hosts. */
+export function isAllowedPushEndpoint(endpoint: string, config: Pick<Env, 'PUSH_EXTRA_HOSTS'>) {
+  let url: URL;
+  try {
+    url = new URL(endpoint);
+  } catch {
+    return false;
+  }
+  if (url.protocol !== 'https:' || url.port !== '' || url.username || url.password) return false;
+  const extra = (config.PUSH_EXTRA_HOSTS ?? '').split(',').map((h) => h.trim()).filter(Boolean);
+  return PUSH_HOSTS.some((re) => re.test(url.hostname)) || extra.includes(url.hostname);
+}
+
 export function createWebPushSender(config: Env): PushSender {
   webpush.setVapidDetails(config.VAPID_SUBJECT, config.VAPID_PUBLIC_KEY!, config.VAPID_PRIVATE_KEY!);
   return async (sub, message) => {
@@ -34,10 +51,16 @@ export const REST_END_MESSAGE: Omit<PushMessage, 'url'> = {
   tag: 'rest-timer',
 };
 
-/** Replaces any pending rest notification of the session with a new one at `fireAt`. */
+/**
+ * Replaces any pending rest notification of the user with a new one at `fireAt`: one person rests
+ * in one session at a time, so there is never more than one pending notification per user.
+ */
 export async function scheduleRestPush(db: Database, ownerId: string, sessionId: string, fireAt: Date) {
   await db.transaction(async (tx) => {
-    await cancelRestPushTx(tx, ownerId, sessionId);
+    await tx
+      .update(scheduledPushes)
+      .set({ cancelledAt: sql`now()` })
+      .where(and(eq(scheduledPushes.ownerId, ownerId), isNull(scheduledPushes.sentAt), isNull(scheduledPushes.cancelledAt)));
     await tx.insert(scheduledPushes).values({ ownerId, sessionId, kind: 'rest_end', fireAt });
   });
 }

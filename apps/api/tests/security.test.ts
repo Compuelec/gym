@@ -51,6 +51,19 @@ describe('security middleware', () => {
     expect(res.status).toBe(200);
   });
 
+  it('rejects oversized bodies (2 MB in general, 20 MB for importing)', async () => {
+    const { cookie } = await signUp(app);
+    const big = (mb: number) => JSON.stringify({ padding: 'x'.repeat(mb * 1024 * 1024) });
+    const post = (path: string, body: string) =>
+      app.request(path, { method: 'POST', headers: { cookie, origin: ORIGIN, 'content-type': 'application/json', 'content-length': String(body.length) }, body });
+    const sync = await post('/api/sync/push', big(3));
+    expect(sync.status).toBe(413);
+    expect(((await sync.json()) as { error: { message: string } }).error.message).toMatch(/demasiado grandes/);
+    // 3 MB passes the size check on import (then fails validation, 422), 21 MB does not.
+    expect((await post('/api/me/import', big(3))).status).not.toBe(413);
+    expect((await post('/api/me/import', big(21))).status).toBe(413);
+  });
+
   it('returns 404 in Spanish for unknown routes', async () => {
     const res = await call(app, '/api/nope');
     expect(res.status).toBe(404);

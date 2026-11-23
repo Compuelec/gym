@@ -63,15 +63,15 @@ const AnyRow = z.record(z.string(), z.unknown()).and(z.object({ id: z.string() }
 export const ImportFileSchema = z.object({
   formatVersion: z.literal(EXPORT_FORMAT_VERSION),
   profile: AnyRow.nullable(),
-  locations: z.array(AnyRow),
-  exercises: z.array(AnyRow),
-  favorites: z.array(AnyRow),
-  programs: z.array(AnyRow),
-  routines: z.array(AnyRow),
-  measurements: z.array(AnyRow),
+  locations: z.array(AnyRow).max(50),
+  exercises: z.array(AnyRow).max(2000),
+  favorites: z.array(AnyRow).max(5000),
+  programs: z.array(AnyRow).max(500),
+  routines: z.array(AnyRow).max(2000),
+  measurements: z.array(AnyRow).max(20000),
   sessions: z.array(
-    AnyRow.and(z.object({ exercises: z.array(AnyRow.and(z.object({ sets: z.array(AnyRow) }))) })),
-  ),
+    AnyRow.and(z.object({ exercises: z.array(AnyRow.and(z.object({ sets: z.array(AnyRow).max(100) }))).max(50) })),
+  ).max(20000),
 });
 
 export class ImportError extends Error {}
@@ -91,9 +91,9 @@ export async function importUserData(db: Database, registry: SyncRegistry, owner
     if (!ids.has(old)) ids.set(old, uuidv7());
     return ids.get(old)!;
   };
-  // Own exercise ids are remapped; catalog ids ("fedb:…") stay as they are.
-  const ownExercise = new Set(file.exercises.map((e) => String(e.id)));
-  const exRef = (id: unknown) => (typeof id === 'string' && ownExercise.has(id) ? newId(id) : id);
+  // Own exercise ids are remapped; catalog ids ("fedb:…") stay as they are. Any other id (not in
+  // the file) is remapped too, so it can never point at another user's row.
+  const exRef = (id: unknown) => (typeof id === 'string' && !id.includes(':') ? newId(id) : id);
   const ref = (id: unknown) => (id == null ? null : newId(id));
 
   const plan: Array<{ entity: string; id: string; data: Record<string, unknown> }> = [];
@@ -105,7 +105,7 @@ export async function importUserData(db: Database, registry: SyncRegistry, owner
   for (const r of file.locations) add('location', r, newId(r.id) as string);
   for (const r of file.exercises) add('exercise', r, newId(r.id) as string);
   for (const r of file.favorites) add('favorite', { ...r, exerciseId: exRef(r.exerciseId) }, newId(r.id) as string);
-  for (const r of file.programs) add('program', r, newId(r.id) as string);
+  for (const r of file.programs) add('program', { ...r, coachRequestId: null }, newId(r.id) as string);
   for (const r of file.routines) {
     const items = Array.isArray(r.items) ? r.items.map((i: Record<string, unknown>) => ({ ...i, exerciseId: exRef(i.exerciseId) })) : r.items;
     add('routine', { ...r, items, programId: ref(r.programId), locationId: ref(r.locationId) }, newId(r.id) as string);
@@ -131,7 +131,7 @@ export async function importUserData(db: Database, registry: SyncRegistry, owner
       await tx
         .insert(def.table)
         .values(values)
-        .onConflictDoUpdate({ target: def.table.id, set: { ...valid.data, deletedAt: null, updatedAt: sql`now()`, serverVersion: sql`nextval('sync_version_seq')` } });
+        .onConflictDoUpdate({ target: def.table.id, set: { ...valid.data, deletedAt: null, updatedAt: sql`now()`, serverVersion: sql`nextval('sync_version_seq')` }, setWhere: eq(def.table.ownerId, ownerId) });
     }
   });
   return { imported: plan.length };

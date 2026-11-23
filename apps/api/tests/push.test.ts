@@ -83,4 +83,31 @@ describe('push', () => {
     await call(app, '/api/push/subscriptions', { method: 'DELETE', cookie: b.cookie, body: { endpoint: s.endpoint } });
     expect(await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.endpoint, s.endpoint))).toHaveLength(1);
   });
+
+  it('only accepts HTTPS endpoints of real push services (never internal hosts)', async () => {
+    const u = await user();
+    const post = (endpoint: string) => call(app, '/api/push/subscriptions', { method: 'POST', cookie: u.cookie, body: { endpoint, keys: { p256dh: 'k', auth: 'a' } } });
+    for (const bad of [
+      'https://kubernetes.default.svc/api',
+      'http://fcm.googleapis.com/fcm/send/x',
+      'https://postgres:5432/x',
+      'https://169.254.169.254/latest',
+      'https://fcm.googleapis.com.evil.test/x',
+      'https://fcm.googleapis.com:8443/x',
+    ])
+      expect((await post(bad)).status, bad).toBe(400);
+    expect((await post(`https://fcm.googleapis.com/fcm/send/${uuidv7()}`)).status).toBe(200);
+    expect((await post(`https://web.push.apple.com/${uuidv7()}`)).status).toBe(200);
+    expect((await post(`https://updates.push.services.mozilla.com/wpush/v2/${uuidv7()}`)).status).toBe(200);
+  });
+
+  it('keeps at most one pending rest notification and ten devices per user', async () => {
+    const u = await user();
+    for (let i = 0; i < 12; i++) await call(app, '/api/push/subscriptions', { method: 'POST', cookie: u.cookie, body: sub(uuidv7()) });
+    expect(await db.select().from(pushSubscriptions).where(eq(pushSubscriptions.ownerId, u.id))).toHaveLength(10);
+    const fireAt = new Date(Date.now() + 60_000).toISOString();
+    for (let i = 0; i < 5; i++) await call(app, '/api/push/rest-timer', { method: 'POST', cookie: u.cookie, body: { sessionId: uuidv7(), fireAt } });
+    const pending = (await db.select().from(scheduledPushes).where(eq(scheduledPushes.ownerId, u.id))).filter((r) => !r.cancelledAt && !r.sentAt);
+    expect(pending).toHaveLength(1);
+  });
 });

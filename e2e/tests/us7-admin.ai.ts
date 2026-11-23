@@ -7,7 +7,6 @@ const COMPOSE = fileURLToPath(new URL('../../infra/docker-compose.e2e.yml', impo
 // The AI settings are global: these tests run one after another, in one browser project.
 
 test.describe('US7 · administración de la IA', () => {
-  test.skip(({ browserName, isMobile }) => browserName !== 'chromium' || isMobile, 'global settings: run once');
 
   test.beforeAll(() => resetAiSettings());
 

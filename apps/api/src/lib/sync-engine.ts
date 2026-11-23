@@ -104,7 +104,7 @@ async function applyMutation(
     const [row] = await tx
       .update(table)
       .set({ deletedAt: sql`now()`, updatedAt: sql`now()`, serverVersion: NEXT_VERSION })
-      .where(eq(table.id, m.id))
+      .where(and(eq(table.id, m.id), eq(table.ownerId, ownerId)))
       .returning({ serverVersion: table.serverVersion });
     return Number(row?.serverVersion);
   }
@@ -119,9 +119,13 @@ async function applyMutation(
     .onConflictDoUpdate({
       target: table.id,
       set: { ...data, updatedAt: sql`now()`, deletedAt: null, serverVersion: NEXT_VERSION },
+      // Repeat the owner check at write time: another user inserting the same id concurrently
+      // (the advisory lock is per owner) must never be overwritten.
+      setWhere: eq(table.ownerId, ownerId),
     })
     .returning({ serverVersion: table.serverVersion });
-  return Number(row?.serverVersion);
+  if (!row) throw new Rejection('NOT_FOUND');
+  return Number(row.serverVersion);
 }
 
 function validate(def: SyncEntityDef, raw: Record<string, unknown>) {
@@ -151,7 +155,7 @@ async function checkReferences(
     const [found] = await tx
       .select({ id: target.table.id })
       .from(target.table)
-      .where(and(eq(target.table.id, ref.id), eq(target.table.ownerId, ownerId), isNull(target.table.deletedAt)));
+      .where(and(eq(target.table.id, ref.id), eq(target.table.ownerId, ownerId), ref.allowDeleted ? undefined : isNull(target.table.deletedAt)));
     if (!found) throw new Rejection('REFERENCE');
   }
 }

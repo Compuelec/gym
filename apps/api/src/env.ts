@@ -18,6 +18,8 @@ const EnvSchema = z.object({
   // Web Push (rest timer). Without keys, push is disabled and the in-app timer still works.
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
+  // Extra hosts accepted as push endpoints (tests only); the known push services are always allowed.
+  PUSH_EXTRA_HOSTS: z.string().optional(),
   VAPID_SUBJECT: z.string().default('mailto:admin@example.com'),
   // 32 random bytes, base64. Encrypts the AI key stored from the admin screen.
   APP_ENCRYPTION_KEY: z.string().optional(),

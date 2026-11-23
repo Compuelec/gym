@@ -12,12 +12,16 @@ import {
 } from '../db/schema';
 import type { CatalogEntry } from './coach-validate';
 
+/** At most this many own exercises are offered to the coach (most recently edited first). */
+export const MAX_OWN_EXERCISES = 50;
+
 const muscleEs = new Map<string, string>(MUSCLES.map((m) => [m.slug, m.nameEs]));
 
 export interface CoachContext {
   profile: typeof profiles.$inferSelect;
   locations: Array<typeof locations.$inferSelect>;
-  catalogLines: string; // stable, cacheable block
+  catalogLines: string; // stable, cacheable block (base catalog only)
+  ownLines: string; // the user's own exercises (user turn)
   catalogMap: Map<string, CatalogEntry>;
   historyText: string;
   routineIds: Set<string>;
@@ -50,31 +54,28 @@ export async function buildContext(
     .from(exercises)
     .where(and(eq(exercises.ownerId, ownerId), isNull(exercises.deletedAt)));
 
-  const { catalogLines, catalogMap } = formatCatalog(
-    [
-      ...catalog.map((e) => ({
-        id: e.id,
-        nameEs: e.nameEs,
-        primary: e.primaryMuscles,
-        equipment: e.equipment,
-        level: e.level,
-        mechanic: e.mechanic,
-        category: e.category,
-        measure: e.measure,
-      })),
-      ...own.map((e) => ({
-        id: e.id,
-        nameEs: e.nameEs,
-        primary: e.primaryMuscles,
-        equipment: e.equipment,
-        level: e.level,
-        mechanic: e.mechanic,
-        category: e.category,
-        measure: e.measure,
-      })),
-    ],
-    chosen.map((l) => l.equipment),
+  const toCandidate = (e: (typeof own)[number] | CatalogExercise) => ({
+    id: e.id,
+    nameEs: e.nameEs,
+    primary: e.primaryMuscles,
+    equipment: e.equipment,
+    level: e.level,
+    mechanic: e.mechanic,
+    category: e.category,
+    measure: e.measure,
+  });
+  const equipment = chosen.map((l) => l.equipment);
+  // The base catalog is the same for everyone with the same equipment: a stable, cacheable block.
+  const base = formatCatalog(catalog.map(toCandidate), equipment);
+  // The user's own exercises are user text: they go in the user turn, capped, never in the
+  // instructions (keeps the cost bounded and the system prompt free of user content).
+  const mine = formatCatalog(
+    [...own].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()).slice(0, MAX_OWN_EXERCISES).map(toCandidate),
+    equipment,
   );
+  const catalogLines = base.catalogLines;
+  const ownLines = mine.catalogLines;
+  const catalogMap = new Map([...base.catalogMap, ...mine.catalogMap]);
 
   // Last 4 weeks, compact.
   const since = new Date(Date.now() - 28 * 86_400_000).toISOString();
@@ -123,6 +124,7 @@ export async function buildContext(
     profile,
     locations: chosen,
     catalogLines,
+    ownLines,
     catalogMap,
     historyText: [
       ...(lines.length ? lines : ['Sin entrenamientos en las últimas 4 semanas.']),
@@ -137,10 +139,11 @@ export function profileText(ctx: CoachContext) {
   const places = ctx.locations
     .map(
       (l) =>
-        `{"locationId":"${l.id}","nombre":"${l.name}","equipo":"${l.equipment.join(',') || 'sin equipo'}"}`,
+        JSON.stringify({ locationId: l.id, nombre: l.name, equipo: l.equipment.join(',') || 'sin equipo' }),
     )
     .join('\n');
-  return `Perfil: objetivo ${p.goal}, nivel ${p.level}, ${p.daysPerWeek} días por semana, ${p.sessionMinutes} minutos por sesión.\nLugares:\n${places}`;
+  const own = ctx.ownLines ? `\nEjercicios propios del usuario (mismo formato que el catálogo):\n${ctx.ownLines}` : '';
+  return `Perfil: objetivo ${p.goal}, nivel ${p.level}, ${p.daysPerWeek} días por semana, ${p.sessionMinutes} minutos por sesión.\nLugares:\n${places}${own}`;
 }
 
 export interface CatalogCandidate {

@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import { and, desc, eq, gte, inArray, ne, sql } from 'drizzle-orm';
+import { and, desc, eq, gte, inArray, isNull, ne, sql } from 'drizzle-orm';
 import { z } from 'zod';
 import { CoachRequestBodySchema, uuidv7, type CoachProgram } from '@gym/shared';
 import type { Database } from '../db/client';
@@ -63,11 +63,15 @@ export function coachRoutes(db: Database, config: Env) {
         const retryAt = new Date(startOfDayUtc().getTime() + 86_400_000).toISOString();
         return c.json({ error: { code: 'COACH_LIMIT', message: 'Alcanzaste el límite diario del coach.', retryAt } }, 429);
       }
+      const busyMessage = 'Ya tienes una consulta en curso. Espera a que termine.';
+      // The unique index on in-flight requests settles parallel POSTs: only one gets in.
       const [row] = await db
         .insert(coachRequests)
         .values({ ownerId: owner, kind: body.data.kind, messages: [{ role: 'user', content: body.data.message, locationIds: body.data.locationIds }], status: 'queued' })
+        .onConflictDoNothing()
         .returning({ id: coachRequests.id });
-      return c.json({ id: row!.id }, 202);
+      if (!row) return apiError(c, 409, 'CONFLICT', busyMessage);
+      return c.json({ id: row.id }, 202);
     })
     .get('/requests', async (c) => {
       const rows = await db.select().from(coachRequests).where(eq(coachRequests.ownerId, c.get('user').id)).orderBy(desc(coachRequests.createdAt)).limit(20);
@@ -90,7 +94,14 @@ export function coachRoutes(db: Database, config: Env) {
       const program = row.resultJson as CoachProgram;
       const programId = uuidv7();
       const next = sql`nextval('sync_version_seq')`;
-      await db.transaction(async (tx) => {
+      const created = await db.transaction(async (tx) => {
+        // Claim the request first: of two concurrent accepts only one finds it unaccepted.
+        const [claimed] = await tx
+          .update(coachRequests)
+          .set({ acceptedAt: sql`now()` })
+          .where(and(eq(coachRequests.id, row.id), isNull(coachRequests.acceptedAt)))
+          .returning({ id: coachRequests.id });
+        if (!claimed) return false;
         await tx.insert(programs).values({
           id: programId,
           ownerId: owner,
@@ -127,8 +138,9 @@ export function coachRoutes(db: Database, config: Env) {
             })),
           });
         }
-        await tx.update(coachRequests).set({ acceptedAt: sql`now()` }).where(eq(coachRequests.id, row.id));
+        return true;
       });
+      if (!created) return apiError(c, 409, 'CONFLICT', 'Este programa ya fue aceptado.');
       return c.json({ programId, routines: program.days.length });
     });
 }

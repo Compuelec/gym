@@ -1,12 +1,12 @@
 import { Hono } from 'hono';
-import { and, eq } from 'drizzle-orm';
+import { and, desc, eq, notInArray } from 'drizzle-orm';
 import { z } from 'zod';
 import type { Database } from '../db/client';
 import { pushSubscriptions } from '../db/schema';
 import type { Env } from '../env';
 import { apiError } from '../lib/errors';
 import type { AppVariables } from '../lib/middleware';
-import { cancelRestPush, pushEnabled, scheduleRestPush } from '../lib/push';
+import { MAX_SUBSCRIPTIONS_PER_USER, cancelRestPush, isAllowedPushEndpoint, pushEnabled, scheduleRestPush } from '../lib/push';
 
 const SubscriptionSchema = z.object({
   endpoint: z.url().max(2000),
@@ -21,13 +21,21 @@ export function pushRoutes(db: Database, config: Env) {
     .post('/subscriptions', async (c) => {
       if (!pushEnabled(config)) return apiError(c, 404, 'NOT_FOUND');
       const body = SubscriptionSchema.safeParse(await c.req.json().catch(() => null));
-      if (!body.success) return apiError(c, 400, 'VALIDATION');
+      if (!body.success || !isAllowedPushEndpoint(body.data.endpoint, config)) return apiError(c, 400, 'VALIDATION');
       const owner = c.get('user').id;
       await db
         .insert(pushSubscriptions)
         .values({ ownerId: owner, endpoint: body.data.endpoint, p256dh: body.data.keys.p256dh, auth: body.data.keys.auth, userAgent: c.req.header('user-agent') ?? null })
         // An endpoint moves to whoever registers it last on that browser.
         .onConflictDoUpdate({ target: pushSubscriptions.endpoint, set: { ownerId: owner, p256dh: body.data.keys.p256dh, auth: body.data.keys.auth } });
+      // Keep only the newest devices of the user.
+      const keep = db
+        .select({ id: pushSubscriptions.id })
+        .from(pushSubscriptions)
+        .where(eq(pushSubscriptions.ownerId, owner))
+        .orderBy(desc(pushSubscriptions.createdAt))
+        .limit(MAX_SUBSCRIPTIONS_PER_USER);
+      await db.delete(pushSubscriptions).where(and(eq(pushSubscriptions.ownerId, owner), notInArray(pushSubscriptions.id, keep)));
       return c.json({ ok: true });
     })
     .delete('/subscriptions', async (c) => {

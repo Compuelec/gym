@@ -19,8 +19,10 @@ export default defineConfig({
   },
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
-    { name: 'webkit', use: { ...devices['Desktop Safari'] } },
-    { name: 'mobile-android', use: { ...devices['Pixel 7'] } },
-    { name: 'mobile-ios', use: { ...devices['iPhone 15'] } },
+    // The AI settings are global: those tests run once, in Chromium only. Ignoring the file (not
+    // just skipping its tests) also keeps its hooks from resetting the settings mid-test.
+    { name: 'webkit', use: { ...devices['Desktop Safari'] }, testIgnore: /ai-settings\.spec\.ts/ },
+    { name: 'mobile-android', use: { ...devices['Pixel 7'] }, testIgnore: /ai-settings\.spec\.ts/ },
+    { name: 'mobile-ios', use: { ...devices['iPhone 15'] }, testIgnore: /ai-settings\.spec\.ts/ },
   ],
 });

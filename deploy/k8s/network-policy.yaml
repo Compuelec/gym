@@ -45,3 +45,35 @@ spec:
     - from:
         - podSelector: {}
       ports: [{ port: 5432, protocol: TCP }]
+---
+# Outgoing traffic of the API and the worker: DNS, the database, and the internet on HTTPS and mail
+# ports only — never other services inside the cluster or the local network (push endpoints and the
+# AI service are external; this blocks using them to probe internal hosts).
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: gym-app-egress
+  namespace: gym
+spec:
+  podSelector:
+    matchExpressions:
+      - { key: app, operator: In, values: [gym-api, gym-worker] }
+  policyTypes: [Egress]
+  egress:
+    - ports:
+        - { port: 53, protocol: UDP }
+        - { port: 53, protocol: TCP }
+    - to:
+        - podSelector:
+            matchLabels: { app: postgres }
+      ports: [{ port: 5432, protocol: TCP }]
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+            except: ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.0.0/16']
+      ports:
+        - { port: 443, protocol: TCP }
+        # Outgoing mail: STARTTLS, SSL/TLS and the alternate port some providers offer.
+        - { port: 587, protocol: TCP }
+        - { port: 465, protocol: TCP }
+        - { port: 2525, protocol: TCP }
