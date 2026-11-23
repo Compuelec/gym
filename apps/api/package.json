@@ -10,8 +10,8 @@
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "tsx --env-file-if-exists=../../.env src/db/migrate.ts",
-    "admin:invite": "echo 'Implemented in User Story 1 (T052)' && exit 1",
-    "admin:promote": "echo 'Implemented in User Story 1 (T052)' && exit 1"
+    "admin:invite": "tsx --env-file-if-exists=../../.env src/cli/admin.ts invite",
+    "admin:promote": "tsx --env-file-if-exists=../../.env src/cli/admin.ts promote"
   },
   "dependencies": {
     "@gym/shared": "workspace:*",
@@ -19,11 +19,13 @@
     "better-auth": "^1.7.27",
     "drizzle-orm": "^0.45.4",
     "hono": "^4.13.20",
+    "nodemailer": "^10.6.1",
     "pg": "^8.23.1",
     "pino": "^10.4.0",
     "zod": "^4.6.7"
   },
   "devDependencies": {
+    "@types/nodemailer": "^8.0.2",
     "@types/pg": "^8.23.1",
     "drizzle-kit": "^0.31.11",
     "tsx": "^4.23.15"

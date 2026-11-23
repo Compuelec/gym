@@ -1,8 +1,8 @@
 import { afterAll, describe, expect, it } from 'vitest';
-import { createTestApp, createTestDb } from './helpers/test-app';
+import { createTestApp, createTestAppWithDb, createTestDb } from './helpers/test-app';
 
 const { db, pool } = createTestDb();
-const app = createTestApp(db);
+const app = createTestAppWithDb(db);
 
 afterAll(() => pool.end());
 

@@ -1,10 +1,14 @@
-import { expect, signUpViaApi, test, uniqueEmail, waitForServiceWorker } from '../fixtures';
+import { completeOnboarding, createInvite, expect, signUpViaApi, test, uniqueEmail, waitForServiceWorker } from '../fixtures';
 
 test.describe('app shell', () => {
+  test.beforeEach(async ({ page, baseURL }) => {
+    await signUpViaApi(page.context().request, baseURL!);
+  });
+
   test('renders in Spanish with the five sections and navigates between them', async ({ page }) => {
     await page.goto('/');
+    await completeOnboarding(page);
     await expect(page.locator('html')).toHaveAttribute('lang', 'es');
-    await expect(page.getByRole('heading', { name: 'Gym' })).toBeVisible();
     const nav = page.getByRole('navigation');
     for (const label of ['Entrenar', 'Rutinas', 'Ejercicios', 'Progreso', 'Perfil']) {
       await expect(nav.getByRole('link', { name: label })).toBeVisible();
@@ -14,7 +18,18 @@ test.describe('app shell', () => {
     await expect(page.getByRole('heading', { name: 'Ejercicios' })).toBeVisible();
   });
 
+  test('unknown pages show a Spanish 404', async ({ page }) => {
+    await page.goto('/');
+    await completeOnboarding(page);
+    await page.goto('/no-existe');
+    await expect(page.getByRole('heading', { name: 'No encontramos esta página' })).toBeVisible();
+    await page.getByRole('link', { name: 'Volver al inicio' }).click();
+    await expect(page.getByRole('heading', { name: /Hola/ })).toBeVisible();
+  });
+
   test('deep links work (SPA fallback through Caddy)', async ({ page }) => {
+    await page.goto('/');
+    await completeOnboarding(page);
     await page.goto('/progress');
     await expect(page.getByRole('heading', { name: 'Progreso' })).toBeVisible();
   });
@@ -33,13 +48,16 @@ test.describe('PWA', () => {
     for (const icon of manifest.icons) expect((await request.get(`/${icon.src}`)).status()).toBe(200);
   });
 
-  test('opens offline after the first visit and tells the user it is offline', async ({ page, context, browserName }) => {
+  test('opens offline after the first visit and tells the user it is offline', async ({ page, context, browserName, baseURL }) => {
     test.skip(browserName === 'webkit', 'Playwright WebKit does not run service workers');
+    await signUpViaApi(context.request, baseURL!);
     await page.goto('/');
+    await completeOnboarding(page);
     await waitForServiceWorker(page);
     await context.setOffline(true);
     await page.reload();
-    await expect(page.getByRole('heading', { name: 'Gym' })).toBeVisible();
+    // Signed in offline: the cached session keeps the user in the app, not on the login screen.
+    await expect(page.getByRole('heading', { name: /Hola/ })).toBeVisible();
     await expect(page.getByRole('status')).toContainText('Sin conexión');
     await page.goto('/routines');
     await expect(page.getByRole('heading', { name: 'Rutinas' })).toBeVisible();
@@ -75,16 +93,16 @@ test.describe('API over real HTTP', () => {
   });
 
   test('a real browser POST from the page passes the Origin check and gets a session', async ({ page }) => {
-    await page.goto('/');
-    const status = await page.evaluate(async (email) => {
+    await page.goto('/login');
+    const status = await page.evaluate(async ({ email, inviteCode }) => {
       const res = await fetch('/api/auth/sign-up/email', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ email, password: 'una-clave-segura', name: 'Navegador' }),
+        body: JSON.stringify({ email, password: 'una-clave-segura', name: 'Navegador', inviteCode }),
       });
       const pull = await fetch('/api/sync/pull');
       return [res.status, pull.status];
-    }, uniqueEmail('browser'));
+    }, { email: uniqueEmail('browser'), inviteCode: createInvite() });
     expect(status).toEqual([200, 200]);
     const cookies = await page.context().cookies();
     const sessionCookie = cookies.find((c) => c.name.includes('session_token'));
@@ -101,3 +119,4 @@ test.describe('API over real HTTP', () => {
     await a.dispose();
   });
 });
+

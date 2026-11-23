@@ -3,9 +3,9 @@ import { t } from '@/i18n';
 import { useOnline, useSyncState } from '@/lib/sync-client';
 
 /** Thin bar that tells the user whether their changes are safe on the server. */
-export function StatusBar() {
+export function StatusBar({ userId }: { userId: string }) {
   const online = useOnline();
-  const sync = useSyncState();
+  const sync = useSyncState(userId);
 
   if (!online) {
     return (
@@ -29,6 +29,14 @@ export function StatusBar() {
       <div role="status" className="flex items-center gap-2 bg-muted px-4 py-2 text-sm">
         <RefreshCw className="size-4 animate-spin" aria-hidden />
         <span>{t('status.syncing')}</span>
+      </div>
+    );
+  }
+  if (sync.rejected > 0) {
+    return (
+      <div role="status" className="flex items-center gap-2 bg-red-50 px-4 py-2 text-sm text-red-800">
+        <TriangleAlert className="size-4" aria-hidden />
+        <span>{t('status.rejected')}</span>
       </div>
     );
   }

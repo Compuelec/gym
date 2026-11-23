@@ -1,10 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { uuidv7, type SyncPullResponse, type SyncPushResponse } from '@gym/shared';
-import { call, createTestApp, createTestDb, signUp } from './helpers/test-app';
+import { call, createTestAppWithDb, createTestDb, signUp } from './helpers/test-app';
 import { createTestEntityTables, testEntities } from './helpers/test-entity';
 
 const { db, pool } = createTestDb();
-const app = createTestApp(db, testEntities);
+const app = createTestAppWithDb(db, testEntities);
 
 beforeAll(() => createTestEntityTables(db));
 afterAll(() => pool.end());

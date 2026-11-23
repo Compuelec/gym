@@ -29,7 +29,9 @@ export interface SyncedRecord {
  * Dexie version (never edit an old one). Entity stores are keyed by `id`.
  */
 export const ENTITY_STORES: Record<string, string> = {
-  // Added by user stories, e.g. location: 'id, serverVersion'
+  // US1
+  profile: 'id',
+  location: 'id, serverVersion',
 };
 
 export class GymDB extends Dexie {
@@ -54,8 +56,21 @@ export class GymDB extends Dexie {
   }
 }
 
-let instance: GymDB | undefined;
-export function getDB(): GymDB {
-  instance ??= new GymDB();
-  return instance;
+/** One local database per user, so two people sharing a device never see each other's data. */
+const instances = new Map<string, GymDB>();
+export function getDB(userId: string): GymDB {
+  let db = instances.get(userId);
+  if (!db) {
+    db = new GymDB(`gym-${userId}`);
+    instances.set(userId, db);
+  }
+  return db;
+}
+
+/** Deletes a user's local database (on explicit sign-out, after syncing). */
+export async function deleteLocalData(userId: string) {
+  const db = instances.get(userId) ?? new GymDB(`gym-${userId}`);
+  instances.delete(userId);
+  db.close();
+  await db.delete();
 }

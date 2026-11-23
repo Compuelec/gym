@@ -1,4 +1,4 @@
-import { and, asc, eq, gt, isNull, sql } from 'drizzle-orm';
+import { and, asc, eq, getTableColumns, gt, isNull, sql } from 'drizzle-orm';
 import type {
   ErrorCode} from '@gym/shared';
 import {
@@ -172,7 +172,8 @@ export async function pullChanges(
         .where(and(eq(def.table.ownerId, ownerId), gt(def.table.serverVersion, cursor)))
         .orderBy(asc(def.table.serverVersion))
         .limit(limit + 1);
-      return rows.map((row) => toChange(def.name, row as Record<string, unknown>));
+      const timestampKeys = timestampColumns(def);
+      return rows.map((row) => toChange(def.name, row as Record<string, unknown>, timestampKeys));
     }),
   );
   const all = perEntity.flat().sort((a, b) => a.serverVersion - b.serverVersion);
@@ -181,10 +182,29 @@ export async function pullChanges(
   return { changes, cursor: last ? last.serverVersion : cursor, hasMore: all.length > limit };
 }
 
-function toChange(entity: string, row: Record<string, unknown>): SyncChange {
+/** Keys of timestamp columns; Postgres returns them as "2026-11-23 03:16:11+00", not ISO. */
+const timestampCache = new WeakMap<SyncEntityDef, Set<string>>();
+function timestampColumns(def: SyncEntityDef) {
+  let keys = timestampCache.get(def);
+  if (!keys) {
+    keys = new Set(
+      Object.entries(getTableColumns(def.table))
+        .filter(([, col]) => col.columnType.startsWith('PgTimestamp'))
+        .map(([key]) => key),
+    );
+    timestampCache.set(def, keys);
+  }
+  return keys;
+}
+
+function toChange(entity: string, row: Record<string, unknown>, timestampKeys: Set<string>): SyncChange {
   const { id, ownerId: _owner, serverVersion, deletedAt, ...rest } = row;
+  // Always send ISO 8601 so the client can push the same record back unchanged.
   const data = Object.fromEntries(
-    Object.entries(rest).map(([k, v]) => [k, v instanceof Date ? v.toISOString() : v]),
+    Object.entries(rest).map(([k, v]) => [
+      k,
+      v instanceof Date ? v.toISOString() : timestampKeys.has(k) && typeof v === 'string' ? new Date(v).toISOString() : v,
+    ]),
   );
   return { entity, id: String(id), serverVersion: Number(serverVersion), deleted: deletedAt != null, data };
 }

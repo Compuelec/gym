@@ -28,6 +28,8 @@ services:
       LOG_LEVEL: warn
       # Tests sign up many users from one IP; rate limiting is verified separately.
       AUTH_RATE_LIMIT: 'off'
+      SMTP_URL: smtp://mailpit:1025
+      MAIL_FROM: 'Gym <no-reply@test.local>'
     depends_on:
       postgres: { condition: service_healthy }
 
@@ -41,6 +43,11 @@ services:
       interval: 2s
       timeout: 3s
       retries: 30
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - '58026:8025'
 
   web:
     image: gym-web:e2e

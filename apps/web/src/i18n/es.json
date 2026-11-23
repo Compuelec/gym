@@ -1,7 +1,8 @@
 {
   "app": {
     "name": "Gym",
-    "tagline": "Entrena en casa o en el gimnasio."
+    "tagline": "Entrena en casa o en el gimnasio.",
+    "greeting": "Hola, {name}"
   },
   "nav": {
     "train": "Entrenar",
@@ -17,7 +18,8 @@
     "synced": "Todo sincronizado",
     "error": "No se pudo sincronizar. Reintentaremos.",
     "authRequired": "Vuelve a iniciar sesión para sincronizar.",
-    "storageFull": "Tu teléfono no tiene espacio. Liberamos imágenes guardadas."
+    "storageFull": "Tu teléfono no tiene espacio. Liberamos imágenes guardadas.",
+    "rejected": "Algunos cambios no se pudieron guardar en el servidor. Revisa los datos e intenta de nuevo."
   },
   "update": {
     "available": "Hay una versión nueva.",
@@ -26,6 +28,114 @@
     "afterSession": "Se instalará al terminar tu entrenamiento."
   },
   "common": {
-    "comingSoon": "Próximamente."
+    "comingSoon": "Próximamente.",
+    "loading": "Cargando…",
+    "save": "Guardar",
+    "saving": "Guardando…",
+    "cancel": "Cancelar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "add": "Agregar",
+    "or": "o",
+    "notFoundTitle": "No encontramos esta página",
+    "notFoundBack": "Volver al inicio"
+  },
+  "auth": {
+    "email": "Correo",
+    "password": "Contraseña",
+    "name": "Tu nombre",
+    "passwordHint": "Mínimo 8 caracteres.",
+    "login": {
+      "title": "Entrar",
+      "submit": "Entrar",
+      "google": "Entrar con Google",
+      "noAccount": "¿Tienes una invitación?",
+      "toSignup": "Crea tu cuenta",
+      "forgot": "¿Olvidaste tu contraseña?"
+    },
+    "signup": {
+      "title": "Crear cuenta",
+      "inviteCode": "Código de invitación",
+      "inviteHint": "Te lo envía quien te invitó, por ejemplo ABCD-EFGH-JKLM-NPQR.",
+      "checkInvite": "Validar invitación",
+      "inviteValid": "Invitación válida.",
+      "inviteInvalid": "La invitación no es válida o ya se usó.",
+      "submit": "Crear cuenta",
+      "google": "Continuar con Google",
+      "haveAccount": "¿Ya tienes cuenta?",
+      "toLogin": "Entra aquí"
+    },
+    "forgot": {
+      "title": "Recuperar contraseña",
+      "intro": "Te enviaremos un enlace para elegir una contraseña nueva.",
+      "submit": "Enviar enlace",
+      "sent": "Si el correo está registrado, te llegará un enlace en unos minutos.",
+      "toLogin": "Volver a entrar"
+    },
+    "reset": {
+      "title": "Nueva contraseña",
+      "newPassword": "Contraseña nueva",
+      "submit": "Guardar contraseña",
+      "done": "Listo. Ya puedes entrar con tu contraseña nueva.",
+      "missingToken": "El enlace no es válido. Pide uno nuevo."
+    },
+    "signOut": "Cerrar sesión",
+    "signingOut": "Guardando tus cambios antes de salir…",
+    "errors": {
+      "generic": "No pudimos completar la acción. Intenta de nuevo.",
+      "rateLimited": "Demasiados intentos. Espera un minuto e intenta de nuevo.",
+      "inviteRequired": "Necesitas una invitación válida para crear una cuenta.",
+      "userExists": "Ya existe una cuenta con ese correo. Entra con ella.",
+      "invalidCredentials": "Correo o contraseña incorrectos.",
+      "passwordTooShort": "La contraseña debe tener al menos 8 caracteres.",
+      "invalidEmail": "Revisa el correo: no parece válido.",
+      "invalidToken": "El enlace venció o ya se usó. Pide uno nuevo.",
+      "offline": "Necesitas conexión a internet para esto."
+    }
+  },
+  "onboarding": {
+    "title": "Cuéntanos de ti",
+    "step": "Paso {current} de {total}",
+    "goal": "¿Cuál es tu objetivo principal?",
+    "level": "¿Cuánta experiencia tienes?",
+    "days": "Días por semana",
+    "minutes": "Minutos por sesión",
+    "units": "Unidades de peso",
+    "unitsKg": "Kilos (kg)",
+    "unitsLb": "Libras (lb)",
+    "locations": "¿Dónde vas a entrenar?",
+    "locationsHint": "Marca el equipo que tienes en cada lugar. Lo puedes cambiar después.",
+    "home": "Casa",
+    "gym": "Gimnasio",
+    "useLocation": "Entreno aquí",
+    "medicalTitle": "Antes de empezar",
+    "medicalText": "Esta app da sugerencias generales de entrenamiento y no reemplaza el consejo de un médico ni de un profesional del ejercicio. Si tienes dolor, una lesión, estás embarazada o tienes una condición de salud, consulta antes de entrenar.",
+    "medicalAccept": "Entiendo y acepto",
+    "finish": "Comenzar",
+    "needLocation": "Elige al menos un lugar."
+  },
+  "profile": {
+    "title": "Perfil",
+    "account": "Cuenta",
+    "training": "Entrenamiento",
+    "locations": "Mis lugares",
+    "default": "Principal",
+    "makeDefault": "Usar como principal",
+    "newLocation": "Lugar nuevo",
+    "locationName": "Nombre del lugar",
+    "equipment": "Equipo disponible",
+    "noEquipment": "Sin equipo (peso corporal)",
+    "saved": "Guardado.",
+    "deleteLocationConfirm": "¿Eliminar este lugar?",
+    "pendingChanges": "Tienes {count} cambios sin sincronizar. Conéctate antes de cerrar sesión para no perderlos."
+  },
+  "install": {
+    "title": "Instala la app",
+    "text": "Ábrela desde tu pantalla de inicio, a pantalla completa y sin conexión.",
+    "button": "Instalar",
+    "iosText": "En iPhone: toca Compartir y luego «Agregar a pantalla de inicio».",
+    "dismiss": "Ahora no"
   }
 }

@@ -3,3 +3,5 @@ export const APP_LOCALE = 'es' as const;
 export * from './common';
 export * from './uuid';
 export * from './sync';
+export * from './vocabulary';
+export * from './profile';

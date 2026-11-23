@@ -7,6 +7,8 @@ import { apiError } from './lib/errors';
 import { originCheck, requireSession, type AppVariables } from './lib/middleware';
 import { SyncRegistry } from './lib/sync-registry';
 import { logger } from './logger';
+import { configRoutes } from './routes/config';
+import { invitationRoutes } from './routes/invitations';
 import { syncRoutes } from './routes/sync';
 
 export interface AppDeps {
@@ -46,6 +48,8 @@ export function createApp({ db, config, registry = new SyncRegistry(), auth = cr
   app.use('*', originCheck(allowedOrigin));
 
   app.on(['GET', 'POST'], '/auth/*', (c) => auth.handler(c.req.raw));
+  app.route('/invitations', invitationRoutes(db, config));
+  app.route('/config', configRoutes(config));
 
   app.use('/sync/*', requireSession(auth));
   app.route('/sync', syncRoutes(db, registry));

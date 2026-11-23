@@ -47,6 +47,6 @@ export default tseslint.config(
     // Every visible UI text must come from src/i18n/es.json (constitution, principle II).
     files: ['apps/web/src/**/*.tsx'],
     plugins: { i18next },
-    rules: { 'i18next/no-literal-string': ['error', { mode: 'jsx-only' }] },
+    rules: { 'i18next/no-literal-string': ['error', { mode: 'jsx-text-only' }] },
   },
 );

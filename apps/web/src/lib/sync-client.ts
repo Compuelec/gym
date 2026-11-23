@@ -3,22 +3,34 @@ import { getDB } from '@/db/database';
 import { SyncEngine, type SyncState } from '@/db/sync';
 import { syncTransport } from './api';
 
-let engine: SyncEngine | undefined;
+const engines = new Map<string, SyncEngine>();
 
-export function getSyncEngine(): SyncEngine {
-  engine ??= new SyncEngine(getDB(), syncTransport);
+export function getSyncEngine(userId: string): SyncEngine {
+  let engine = engines.get(userId);
+  if (!engine) {
+    engine = new SyncEngine(getDB(userId), syncTransport);
+    engines.set(userId, engine);
+  }
   return engine;
 }
 
-export function useSyncState(): SyncState {
-  const [state, setState] = useState(() => getSyncEngine().getState());
+export function forgetSyncEngine(userId: string) {
+  engines.get(userId)?.stop();
+  engines.delete(userId);
+}
+
+const IDLE: SyncState = { status: 'idle', pending: 0, lastSyncedAt: null, rejected: 0 };
+
+export function useSyncState(userId: string | null): SyncState {
+  const [state, setState] = useState<SyncState>(() => (userId ? getSyncEngine(userId).getState() : IDLE));
   useEffect(() => {
-    const unsubscribe = getSyncEngine().subscribe(setState);
+    if (!userId) return;
+    const unsubscribe = getSyncEngine(userId).subscribe(setState);
     return () => {
       unsubscribe();
     };
-  }, []);
-  return state;
+  }, [userId]);
+  return userId ? state : IDLE;
 }
 
 function subscribeOnline(cb: () => void) {

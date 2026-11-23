@@ -1,10 +1,11 @@
 import { afterAll, describe, expect, it } from 'vitest';
 import { createApp } from '../src/app';
 import { env } from '../src/env';
-import { ORIGIN, call, createTestApp, createTestDb, signUp } from './helpers/test-app';
+import { createInvitation } from '../src/lib/invitations';
+import { ORIGIN, call, createTestAppWithDb, createTestDb, signUp } from './helpers/test-app';
 
 const { db, pool } = createTestDb();
-const app = createTestApp(db);
+const app = createTestAppWithDb(db);
 
 afterAll(() => pool.end());
 
@@ -61,7 +62,13 @@ describe('security middleware', () => {
   it('never lets sign-up set the role', async () => {
     const res = await call(app, '/api/auth/sign-up/email', {
       method: 'POST',
-      body: { email: `admin${Date.now()}@test.local`, password: 'una-clave-segura', name: 'X', role: 'admin' },
+      body: {
+        email: `admin${Date.now()}@test.local`,
+        password: 'una-clave-segura',
+        name: 'X',
+        role: 'admin',
+        inviteCode: (await createInvitation(db)).code,
+      },
     });
     // Better Auth rejects input fields marked `input: false`.
     if (res.status === 200) {

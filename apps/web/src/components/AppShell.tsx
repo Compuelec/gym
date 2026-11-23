@@ -13,10 +13,10 @@ const NAV = [
   { to: '/profile', label: 'nav.profile', icon: User },
 ] as const;
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({ children, userId }: { children: ReactNode; userId: string }) {
   return (
     <div className="flex min-h-dvh flex-col">
-      <StatusBar />
+      <StatusBar userId={userId} />
       <UpdatePrompt />
       <main className="mx-auto w-full max-w-md flex-1 px-4 pt-4 pb-24">{children}</main>
       <nav

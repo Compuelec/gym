@@ -98,27 +98,27 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T040 [P] [US1] Integration tests for invitations (sign-up without code → 403 `INVITE_REQUIRED`; used or expired code → 403; valid code marks `usedBy/usedAt`; only SHA-256 hash stored) in `apps/api/tests/invitations.test.ts`
-- [ ] T041 [P] [US1] Integration tests for profile/location sync entities (validation ranges, owner isolation, `role` cannot be changed via sync, profile `id` must equal the session user id so two devices onboarding offline converge on one profile — last write wins) in `apps/api/tests/profile-sync.test.ts`
-- [ ] T042 [P] [US1] E2E: sign-up with invite → onboarding wizard → locations «Casa» (mancuernas, banda) and «Gimnasio» (completo) → sign out → sign in in a second context sees same data; measure sign-up + onboarding duration and assert < 3 min of interaction (SC-007), in `e2e/us1-account.spec.ts`
-- [ ] T043 [P] [US1] E2E negative: sign-up without/used invite rejected; user B cannot read/edit A's profile or locations via API (404, no DB change); POST without Origin → 403, in `e2e/us1-security.spec.ts`
-- [ ] T044 [P] [US1] E2E password reset: email arrives in Mailpit and link sets new password, in `e2e/us1-password-reset.spec.ts`
+- [X] T040 [P] [US1] Integration tests for invitations (sign-up without code → 403 `INVITE_REQUIRED`; used or expired code → 403; valid code marks `usedBy/usedAt`; only SHA-256 hash stored) in `apps/api/tests/invitations.test.ts`
+- [X] T041 [P] [US1] Integration tests for profile/location sync entities (validation ranges, owner isolation, `role` cannot be changed via sync, profile `id` must equal the session user id so two devices onboarding offline converge on one profile — last write wins) in `apps/api/tests/profile-sync.test.ts`
+- [X] T042 [P] [US1] E2E: sign-up with invite → onboarding wizard → locations «Casa» (mancuernas, banda) and «Gimnasio» (completo) → sign out → sign in in a second context sees same data; measure sign-up + onboarding duration and assert < 3 min of interaction (SC-007), in `e2e/us1-account.spec.ts`
+- [X] T043 [P] [US1] E2E negative: sign-up without/used invite rejected; user B cannot read/edit A's profile or locations via API (404, no DB change); POST without Origin → 403, in `e2e/us1-security.spec.ts`
+- [X] T044 [P] [US1] E2E password reset: email arrives in Mailpit and link sets new password, in `e2e/us1-password-reset.spec.ts`
 
 ### Implementation for User Story 1
 
-- [ ] T045 [P] [US1] Create `invitations` table (`id`, `codeHash`, `createdBy`, `email?`, `expiresAt`, `usedBy?`, `usedAt?`) in `apps/api/src/db/schema/invitations.ts`
-- [ ] T046 [P] [US1] Create `profiles` table per data-model (`id` = user id, not a client UUID; `goal` enum fuerza|hipertrofia|resistencia|salud|perdida_grasa, `level`, `daysPerWeek` 1–7, `sessionMinutes`, `units` kg|lb, `bodyweightKg?`, `birthYear?`, `sex?`, `medicalAckAt`) in `apps/api/src/db/schema/profiles.ts`
-- [ ] T047 [P] [US1] Create `locations` table (`name`, `equipment[]` of Equipment.slug, `isDefault`) in `apps/api/src/db/schema/locations.ts`
-- [ ] T048 [P] [US1] Define Zod schemas Profile and Location in `packages/shared/src/profile.ts`
-- [ ] T049 [US1] Enforce invitation in Better Auth `databaseHooks.user.create.before` (email sign-up requires `inviteCode`; Google sign-up of a new user requires a pending invite stored in a short-lived cookie) and consume invite after create in `apps/api/src/lib/invitations.ts`
-- [ ] T050 [US1] Configure password reset and email verification emails (Spanish templates) via SMTP in `apps/api/src/lib/mailer.ts`
-- [ ] T051 [US1] Register `profile` and `location` in the sync registry in `apps/api/src/lib/sync-registry.ts`
-- [ ] T052 [US1] Implement CLI scripts `admin:invite` (prints one-time code) and `admin:promote <email>` (sets `role=admin`) in `apps/api/src/cli/admin.ts`
-- [ ] T053 [P] [US1] Build sign-up (with invite code field, prefilled from `?invite=` link), sign-in (email + Google), forgot/reset password screens in `apps/web/src/routes/auth/`
-- [ ] T054 [US1] Build onboarding wizard (goal, level, days/week, minutes, units, locations with equipment checklist from vocabulary, medical disclaimer acceptance) in `apps/web/src/features/onboarding/`
-- [ ] T055 [P] [US1] Build Perfil/Ajustes screen (edit profile, manage locations, sign out) in `apps/web/src/routes/profile.tsx`
-- [ ] T056 [P] [US1] Build install prompt (Android `beforeinstallprompt`, iOS instructions «Compartir → Agregar a inicio») in `apps/web/src/features/install/InstallPrompt.tsx`
-- [ ] T057 [US1] Live check US1 on phone and desktop (install, sign in, second device), record in `specs/001-gym-pwa-mvp/checklists/us1-live.md`
+- [X] T045 [P] [US1] Create `invitations` table (`id`, `codeHash`, `createdBy`, `email?`, `expiresAt`, `usedBy?`, `usedAt?`) in `apps/api/src/db/schema/invitations.ts`
+- [X] T046 [P] [US1] Create `profiles` table per data-model (`id` = user id, not a client UUID; `goal` enum fuerza|hipertrofia|resistencia|salud|perdida_grasa, `level`, `daysPerWeek` 1–7, `sessionMinutes`, `units` kg|lb, `bodyweightKg?`, `birthYear?`, `sex?`, `medicalAckAt`) in `apps/api/src/db/schema/profiles.ts`
+- [X] T047 [P] [US1] Create `locations` table (`name`, `equipment[]` of Equipment.slug, `isDefault`) in `apps/api/src/db/schema/locations.ts`
+- [X] T048 [P] [US1] Define Zod schemas Profile and Location in `packages/shared/src/profile.ts`
+- [X] T049 [US1] Enforce invitation in Better Auth `databaseHooks.user.create.before` (email sign-up requires `inviteCode`; Google sign-up of a new user requires a pending invite stored in a short-lived cookie) and consume invite after create in `apps/api/src/lib/invitations.ts`
+- [X] T050 [US1] Configure password reset and email verification emails (Spanish templates) via SMTP in `apps/api/src/lib/mailer.ts`
+- [X] T051 [US1] Register `profile` and `location` in the sync registry in `apps/api/src/lib/sync-registry.ts`
+- [X] T052 [US1] Implement CLI scripts `admin:invite` (prints one-time code) and `admin:promote <email>` (sets `role=admin`) in `apps/api/src/cli/admin.ts`
+- [X] T053 [P] [US1] Build sign-up (with invite code field, prefilled from `?invite=` link), sign-in (email + Google), forgot/reset password screens in `apps/web/src/routes/auth/`
+- [X] T054 [US1] Build onboarding wizard (goal, level, days/week, minutes, units, locations with equipment checklist from vocabulary, medical disclaimer acceptance) in `apps/web/src/features/onboarding/`
+- [X] T055 [P] [US1] Build Perfil/Ajustes screen (edit profile, manage locations, sign out) in `apps/web/src/routes/profile.tsx`
+- [X] T056 [P] [US1] Build install prompt (Android `beforeinstallprompt`, iOS instructions «Compartir → Agregar a inicio») in `apps/web/src/features/install/InstallPrompt.tsx`
+- [X] T057 [US1] Live check US1 on phone and desktop (install, sign in, second device), record in `specs/001-gym-pwa-mvp/checklists/us1-live.md`
 
 **Checkpoint**: US1 funcional y probada en los tres niveles.
 

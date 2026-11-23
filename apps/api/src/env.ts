@@ -12,6 +12,9 @@ const EnvSchema = z.object({
   AUTH_IP_HEADER: z.string().default('cf-connecting-ip'),
   // Login/sign-up rate limiting. On by default in production; only test stacks turn it off.
   AUTH_RATE_LIMIT: z.enum(['on', 'off']).optional(),
+  // smtp://user:pass@host:587 — without it, emails are logged (development) and not sent.
+  SMTP_URL: z.string().optional(),
+  MAIL_FROM: z.string().default('Gym <no-reply@example.com>'),
 });
 
 export type Env = z.infer<typeof EnvSchema>;
