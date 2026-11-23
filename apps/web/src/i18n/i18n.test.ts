@@ -30,3 +30,12 @@ describe('i18n', () => {
     expect(missing).toEqual([]);
   });
 });
+
+describe('tn (Spanish plurals)', () => {
+  it('uses the singular key for one', async () => {
+    const { tn } = await import('./index');
+    expect(tn('status.pending', 1)).toBe('1 cambio por sincronizar');
+    expect(tn('status.pending', 3)).toBe('3 cambios por sincronizar');
+    expect(tn('exercises.results', 1)).toBe('1 ejercicio');
+  });
+});

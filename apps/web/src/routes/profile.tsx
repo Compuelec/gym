@@ -7,7 +7,7 @@ import { deleteLocalData } from '@/db/database';
 import { InstallPrompt } from '@/features/install/InstallPrompt';
 import { LocationEditor } from '@/features/profile/LocationEditor';
 import { TrainingFields } from '@/features/profile/TrainingFields';
-import { t } from '@/i18n';
+import { t, tn } from '@/i18n';
 import { authClient } from '@/lib/auth-client';
 import { useUser } from '@/lib/auth-context';
 import { removeLocation, saveLocation, saveProfile, useLocations, useProfile, type LocalLocation } from '@/lib/repos';
@@ -142,7 +142,7 @@ function ProfilePage() {
           {signingOut ? t('auth.signingOut') : t('auth.signOut')}
         </Button>
         {sync.pending > 0 && (
-          <p className="text-sm text-muted-foreground">{t('status.pending', { count: sync.pending })}</p>
+          <p className="text-sm text-muted-foreground">{tn('status.pending', sync.pending)}</p>
         )}
       </section>
     </div>

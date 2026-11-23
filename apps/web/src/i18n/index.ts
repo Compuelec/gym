@@ -20,3 +20,8 @@ export function t(key: string, params: Record<string, string | number> = {}): st
 export function hasKey(key: string): boolean {
   return t(key) !== key;
 }
+
+/** Picks `${key}One` when count is 1 (Spanish singular), else `key` with {count}. */
+export function tn(key: string, count: number, params: Record<string, string | number> = {}): string {
+  return count === 1 && hasKey(`${key}One`) ? t(`${key}One`, params) : t(key, { ...params, count });
+}

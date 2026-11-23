@@ -81,7 +81,7 @@ test.describe('US1 · cuenta e instalación', () => {
     await page.getByRole('navigation').getByRole('link', { name: 'Perfil' }).click();
     // Offline edits are kept and synced later.
     await page.getByLabel('Días por semana').selectOption('6');
-    await expect(page.getByText('1 cambios por sincronizar').first()).toBeVisible();
+    await expect(page.getByText('1 cambio por sincronizar').first()).toBeVisible();
     await context.setOffline(false);
     await expect(page.getByText(/cambios por sincronizar/)).toHaveCount(0);
   });

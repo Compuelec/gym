@@ -17,27 +17,21 @@ spec:
       initContainers:
         - name: pre-migration-backup
           image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
-          command:
-            - sh
-            - -c
-            - |
-              set -eu
-              file="/backups/gym-premigrate-$(date +%Y%m%d-%H%M%S).dump"
-              pg_dump --format=custom --file="$file.tmp"
-              pg_restore --list "$file.tmp" > /dev/null
-              mv "$file.tmp" "$file"
-              echo "pre-migration backup: $file ($(du -h "$file" | cut -f1))"
+          command: ["sh", "/scripts/backup.sh"]
           env:
             - { name: PGHOST, value: postgres }
             - { name: PGUSER, value: gym }
             - { name: PGDATABASE, value: gym }
             - name: PGPASSWORD
               valueFrom: { secretKeyRef: { name: gym-secrets, key: POSTGRES_PASSWORD } }
+            - { name: BACKUP_DIR, value: /backups }
+            - { name: PREFIX, value: gym-premigrate }
           resources:
             requests: { cpu: 50m, memory: 64Mi }
             limits: { memory: 256Mi }
           volumeMounts:
             - { name: backups, mountPath: /backups }
+            - { name: scripts, mountPath: /scripts, readOnly: true }
       containers:
         - name: migrate
           # Same image as deployment/gym-api (pin the same version@sha256).
@@ -57,3 +51,5 @@ spec:
       volumes:
         - name: backups
           persistentVolumeClaim: { claimName: gym-backups }
+        - name: scripts
+          configMap: { name: gym-backup-scripts }

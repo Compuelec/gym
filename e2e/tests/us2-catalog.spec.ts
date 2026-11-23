@@ -43,7 +43,7 @@ test.describe('US2 · catálogo de ejercicios', () => {
 
   test('search ignores accents and case; detail shows images, body map, steps and license', async ({ page }) => {
     await page.getByLabel('Buscar ejercicio').fill('SENTADILLA AL CAJON');
-    await expect(page.getByText('1 ejercicios')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText('1 ejercicio')).toBeVisible({ timeout: 15_000 });
     await page.getByRole('link', { name: /Sentadilla al Cajón/ }).click();
     await expect(page.getByRole('heading', { name: 'Sentadilla al Cajón' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'Sentadilla al Cajón' })).toBeVisible();

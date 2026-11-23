@@ -1,4 +1,5 @@
 import {
+  BodyMeasurementSchema,
   FavoriteSchema,
   LocationSchema,
   OwnExerciseSchema,
@@ -10,6 +11,7 @@ import {
   WorkoutSessionSchema,
 } from '@gym/shared';
 import {
+  bodyMeasurements,
   exercises,
   favorites,
   locations,
@@ -51,6 +53,8 @@ export const ENTITIES: SyncEntityDef[] = [
     schema: SetEntrySchema,
     references: (d) => [{ entity: 'sessionExercise', id: String(d.sessionExerciseId) }],
   },
+  // US5
+  { name: 'bodyMeasurement', table: bodyMeasurements as unknown as SyncTable, schema: BodyMeasurementSchema },
 ];
 
 export function createSyncRegistry() {

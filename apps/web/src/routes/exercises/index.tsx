@@ -15,7 +15,7 @@ import { SelectField, TextField } from '@/components/ui/field';
 import { Thumbnail } from '@/features/catalog/ExerciseImages';
 import { useExercises, useFavoriteIds } from '@/features/catalog/exercises';
 import { muscleName, names } from '@/features/catalog/labels';
-import { t } from '@/i18n';
+import { t, tn } from '@/i18n';
 import { useUser } from '@/lib/auth-context';
 import { useLocations } from '@/lib/repos';
 
@@ -147,7 +147,7 @@ function ExercisesPage() {
       ) : (
         <>
           <p role="status" className="text-sm text-muted-foreground">
-            {t('exercises.results', { count: results.length })}
+            {tn('exercises.results', results.length)}
           </p>
           {results.length === 0 && <p>{t('exercises.noResults')}</p>}
           <ul className="flex flex-col divide-y divide-border">

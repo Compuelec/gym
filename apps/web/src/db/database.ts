@@ -41,6 +41,8 @@ export const ENTITY_STORES: Record<string, string> = {
   workoutSession: 'id, status, startedAt',
   sessionExercise: 'id, sessionId, exerciseId',
   setEntry: 'id, sessionExerciseId',
+  // US5
+  bodyMeasurement: 'id, measuredAt',
 };
 
 /** Local-only stores (not synced): the base exercise catalog. */

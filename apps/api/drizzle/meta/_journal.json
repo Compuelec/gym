@@ -36,6 +36,13 @@
       "when": 1795406860037,
       "tag": "0004_us4_session_targets",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795407769667,
+      "tag": "0005_us5_measurements",
+      "breakpoints": true
     }
   ]
 }

@@ -6,3 +6,4 @@ export * from './progression';
 export * from './records';
 export * from './recovery';
 export * from './today';
+export * from './progress';

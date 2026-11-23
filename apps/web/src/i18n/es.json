@@ -19,7 +19,8 @@
     "error": "No se pudo sincronizar. Reintentaremos.",
     "authRequired": "Vuelve a iniciar sesión para sincronizar.",
     "storageFull": "Tu teléfono no tiene espacio. Liberamos imágenes guardadas.",
-    "rejected": "Algunos cambios no se pudieron guardar en el servidor. Revisa los datos e intenta de nuevo."
+    "rejected": "Algunos cambios no se pudieron guardar en el servidor. Revisa los datos e intenta de nuevo.",
+    "pendingOne": "1 cambio por sincronizar"
   },
   "update": {
     "available": "Hay una versión nueva.",
@@ -208,7 +209,8 @@
     "creditsTitle": "Créditos",
     "creditsIntro": "Los ejercicios, textos e imágenes provienen de estas fuentes abiertas. Gracias a sus autores.",
     "exercisesCount": "{count} ejercicios",
-    "showMore": "Ver más"
+    "showMore": "Ver más",
+    "resultsOne": "1 ejercicio"
   },
   "routines": {
     "title": "Rutinas",
@@ -352,5 +354,64 @@
     "itemTarget": "{sets} × {reps}",
     "lastTrainedRecent": "Última vez: hace menos de 1 h",
     "weeklySet": "{sets} serie esta semana"
+  },
+  "progress": {
+    "title": "Progreso",
+    "streak": "Racha",
+    "streakValue": "{weeks} semanas seguidas",
+    "streakOne": "1 semana seguida",
+    "thisWeek": "Esta semana",
+    "sessionsValue": "{count} entrenamientos",
+    "frequency": "Entrenamientos por semana",
+    "volume": "Series por grupo (últimos 7 días)",
+    "byExercise": "Progreso por ejercicio",
+    "chooseExercise": "Elige un ejercicio",
+    "est1rm": "1RM estimado",
+    "topWeight": "Peso máximo",
+    "reps": "Repeticiones",
+    "noData": "Todavía no hay entrenamientos terminados.",
+    "history": "Historial",
+    "historyEmpty": "Sin entrenamientos aún.",
+    "measurementsLink": "Medidas corporales",
+    "dataLink": "Mis datos (exportar, importar, borrar)",
+    "weekOf": "Semana del {date}",
+    "sets": "Series",
+    "sessionsOne": "1 entrenamiento"
+  },
+  "measurements": {
+    "title": "Medidas corporales",
+    "add": "Agregar medida",
+    "date": "Fecha",
+    "weight": "Peso ({unit})",
+    "bodyFat": "Grasa corporal (%)",
+    "waist": "Cintura (cm)",
+    "chest": "Pecho (cm)",
+    "arm": "Brazo (cm)",
+    "thigh": "Muslo (cm)",
+    "notes": "Notas",
+    "save": "Guardar medida",
+    "needOne": "Indica al menos una medida.",
+    "empty": "Aún no registras medidas.",
+    "chart": "Peso en el tiempo",
+    "delete": "Borrar",
+    "privacy": "Tus medidas son privadas: sólo tú las ves."
+  },
+  "data": {
+    "title": "Mis datos",
+    "exportTitle": "Exportar",
+    "exportText": "Descarga todos tus datos en un archivo JSON (formato abierto).",
+    "exportButton": "Descargar mis datos",
+    "importTitle": "Importar",
+    "importText": "Agrega a esta cuenta los datos de un archivo exportado. No borra lo que ya tienes.",
+    "importButton": "Importar archivo",
+    "importConfirm": "Importar {file}",
+    "imported": "Listo: se importaron {count} registros.",
+    "importFailed": "No se pudo importar: {message}",
+    "deleteTitle": "Borrar mi cuenta",
+    "deleteText": "Se borran para siempre tu cuenta y todos tus datos en el servidor y en este dispositivo. No se puede deshacer.",
+    "typeDelete": "Escribe BORRAR para confirmar",
+    "password": "Tu contraseña",
+    "deleteButton": "Borrar mi cuenta para siempre",
+    "needOnline": "Necesitas conexión para esto."
   }
 }

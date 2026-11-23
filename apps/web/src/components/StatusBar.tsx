@@ -1,5 +1,5 @@
 import { CloudOff, RefreshCw, TriangleAlert } from 'lucide-react';
-import { t } from '@/i18n';
+import { t, tn } from '@/i18n';
 import { useOnline, useSyncState } from '@/lib/sync-client';
 
 /** Thin bar that tells the user whether their changes are safe on the server. */
@@ -12,7 +12,7 @@ export function StatusBar({ userId }: { userId: string }) {
       <div role="status" className="flex items-center gap-2 bg-amber-100 px-4 py-2 text-sm text-amber-900">
         <CloudOff className="size-4" aria-hidden />
         <span>{t('status.offline')}</span>
-        {sync.pending > 0 && <span className="ml-auto">{t('status.pending', { count: sync.pending })}</span>}
+        {sync.pending > 0 && <span className="ml-auto">{tn('status.pending', sync.pending)}</span>}
       </div>
     );
   }

@@ -228,21 +228,21 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T106 [P] [US5] Unit tests for progress aggregations (weekly frequency, volume per muscle, streak, est-1RM series) in `packages/engine/src/progress.test.ts`
-- [ ] T107 [P] [US5] Integration tests for export/import (format `formatVersion: 1`; unknown version or invalid file → 422 and no changes; transactional all-or-nothing) and account deletion (`{confirm:"BORRAR"}` + recent re-auth; cascade removes all user rows) in `apps/api/tests/user-data.test.ts`
-- [ ] T108 [P] [US5] E2E: export → delete account → new account → import → same routines, sessions, measurements, own exercises (SC-008) in `e2e/us5-data.spec.ts`
-- [ ] T109 [P] [US5] Integration tests for backups in `deploy/backup/backup.test.sh`: daily script produces a restorable dump; migrate Job writes a pre-migration dump before applying migrations; a forced backup failure stops the migration and leaves the schema unchanged
+- [X] T106 [P] [US5] Unit tests for progress aggregations (weekly frequency, volume per muscle, streak, est-1RM series) in `packages/engine/src/progress.test.ts`
+- [X] T107 [P] [US5] Integration tests for export/import (format `formatVersion: 1`; unknown version or invalid file → 422 and no changes; transactional all-or-nothing) and account deletion (`{confirm:"BORRAR"}` + recent re-auth; cascade removes all user rows) in `apps/api/tests/user-data.test.ts`
+- [X] T108 [P] [US5] E2E: export → delete account → new account → import → same routines, sessions, measurements, own exercises (SC-008) in `e2e/us5-data.spec.ts`
+- [X] T109 [P] [US5] Integration tests for backups in `deploy/backup/backup.test.sh`: daily script produces a restorable dump; migrate Job writes a pre-migration dump before applying migrations; a forced backup failure stops the migration and leaves the schema unchanged
 
 ### Implementation for User Story 5
 
-- [ ] T110 [P] [US5] Define BodyMeasurement schema and table (`measuredAt`, `weightKg?`, `bodyFatPct?`, `waistCm?`, `chestCm?`, `armCm?`, `thighCm?`, `notes?`; excluded from logs) in `packages/shared/src/measurement.ts` and `apps/api/src/db/schema/measurements.ts`; register in sync
-- [ ] T111 [P] [US5] Implement progress aggregations in `packages/engine/src/progress.ts`
-- [ ] T112 [US5] Implement `/me/export`, `/me/import`, `DELETE /me` in `apps/api/src/routes/me.ts`
-- [ ] T113 [P] [US5] Build Progreso screens (per-exercise charts, weekly frequency, volume per muscle, streak) with Recharts in `apps/web/src/routes/progress/`
-- [ ] T114 [P] [US5] Build body measurements screen and chart in `apps/web/src/features/progress/Measurements.tsx`
-- [ ] T115 [US5] Build data screen (export, import with confirmation, delete account flow) in `apps/web/src/routes/profile.data.tsx`
-- [ ] T116 [US5] Implement backups like `../finanzas/deploy/`: scripts `deploy/backup/backup.sh` (daily dump verified on creation, keep 30 days and at least 7) and `deploy/backup/verify.sh` (monthly restore into a scratch DB), ConfigMap `deploy/k8s/backup-scripts.yaml`, CronJobs in `deploy/k8s/backup.yaml` (03:30 and day 1 05:00, `timeZone: America/Santiago`, Longhorn PVC `gym-backups` 5 GiB), and restore procedure in `deploy/README.md`
-- [ ] T117 [US5] Live check US5 including a restore drill into a scratch DB, record in `specs/001-gym-pwa-mvp/checklists/us5-live.md`
+- [X] T110 [P] [US5] Define BodyMeasurement schema and table (`measuredAt`, `weightKg?`, `bodyFatPct?`, `waistCm?`, `chestCm?`, `armCm?`, `thighCm?`, `notes?`; excluded from logs) in `packages/shared/src/measurement.ts` and `apps/api/src/db/schema/measurements.ts`; register in sync
+- [X] T111 [P] [US5] Implement progress aggregations in `packages/engine/src/progress.ts`
+- [X] T112 [US5] Implement `/me/export`, `/me/import`, `DELETE /me` in `apps/api/src/routes/me.ts`
+- [X] T113 [P] [US5] Build Progreso screens (per-exercise charts, weekly frequency, volume per muscle, streak) with Recharts in `apps/web/src/routes/progress/`
+- [X] T114 [P] [US5] Build body measurements screen and chart in `apps/web/src/features/progress/Measurements.tsx`
+- [X] T115 [US5] Build data screen (export, import with confirmation, delete account flow) in `apps/web/src/routes/profile.data.tsx`
+- [X] T116 [US5] Implement backups like `../finanzas/deploy/`: scripts `deploy/backup/backup.sh` (daily dump verified on creation, keep 30 days and at least 7) and `deploy/backup/verify.sh` (monthly restore into a scratch DB), ConfigMap `deploy/k8s/backup-scripts.yaml`, CronJobs in `deploy/k8s/backup.yaml` (03:30 and day 1 05:00, `timeZone: America/Santiago`, Longhorn PVC `gym-backups` 5 GiB), and restore procedure in `deploy/README.md`
+- [X] T117 [US5] Live check US5 including a restore drill into a scratch DB, record in `specs/001-gym-pwa-mvp/checklists/us5-live.md`
 
 **Checkpoint**: progreso y control total de los datos.
 

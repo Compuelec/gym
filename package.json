@@ -19,7 +19,8 @@
     "db:migrate": "pnpm --filter @gym/api db:migrate",
     "catalog:build": "pnpm --filter @gym/catalog build:catalog",
     "admin:invite": "pnpm --filter @gym/api admin:invite",
-    "admin:promote": "pnpm --filter @gym/api admin:promote"
+    "admin:promote": "pnpm --filter @gym/api admin:promote",
+    "test:backup": "sh deploy/backup/backup.test.sh"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.0",

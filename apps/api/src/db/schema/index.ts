@@ -6,3 +6,4 @@ export * from './profiles';
 export * from './exercises';
 export * from './workout';
 export * from './push';
+export * from './measurements';
