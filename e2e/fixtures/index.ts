@@ -14,7 +14,7 @@ export function createInvite(): string {
   if (invitePool.length === 0) {
     const out = execFileSync(
       'docker',
-      ['compose', '-f', COMPOSE, 'exec', '-T', 'api', 'node', '--import', 'tsx', 'src/cli/admin.ts', 'invite', '--count', '25'],
+      ['compose', '-f', COMPOSE, 'exec', '-T', 'api', 'node', 'dist/admin.mjs', 'invite', '--count', '25'],
       { encoding: 'utf8' },
     );
     for (const line of out.trim().split('\n')) invitePool.push((JSON.parse(line) as { code: string }).code);
@@ -112,7 +112,7 @@ export function seededSession(hoursAgo: number, exercises: Array<{ exerciseId: s
 
 /** Gives a user the admin role with the real admin CLI in the API container. */
 export function promoteToAdmin(email: string) {
-  execFileSync('docker', ['compose', '-f', COMPOSE, 'exec', '-T', 'api', 'node', '--import', 'tsx', 'src/cli/admin.ts', 'promote', email], { encoding: 'utf8' });
+  execFileSync('docker', ['compose', '-f', COMPOSE, 'exec', '-T', 'api', 'node', 'dist/admin.mjs', 'promote', email], { encoding: 'utf8' });
 }
 
 /** Resets the global AI settings (shared by every test of the stack) through SQL. */

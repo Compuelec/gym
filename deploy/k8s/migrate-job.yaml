@@ -35,8 +35,8 @@ spec:
       containers:
         - name: migrate
           # Same image as deployment/gym-api (pin the same version@sha256).
-          image: registry.example.com/owner/gym-api:0.1.0
-          command: ["node", "--import", "tsx", "src/db/migrate.ts"]
+          image: registry.example.com/owner/gym-api:0.1.1
+          command: ["node", "dist/migrate.mjs"]
           envFrom: [{ secretRef: { name: gym-secrets } }]
           resources:
             requests: { cpu: 50m, memory: 128Mi }
