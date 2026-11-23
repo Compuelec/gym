@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "coach_requests_one_in_flight" ON "coach_requests" USING btree ("owner_id") WHERE status in ('queued', 'running');

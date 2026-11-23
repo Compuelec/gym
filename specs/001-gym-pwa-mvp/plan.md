@@ -57,7 +57,7 @@ usuario.
 | IV. Inteligencia acotada | Motor determinista con `reason`; IA con salida estructurada validada contra IDs del catálogo; límite y costo por usuario; aviso médico; interruptor de IA del admin sin desplegar; clave cifrada con llave maestra en `Secret`; Haiku 5.5 por defecto | ✅ |
 | V. Datos del usuario | Exportar/importar JSON versionado; borrado de cuenta en cascada; toda consulta filtra por `userId`; datos de salud fuera de logs | ✅ |
 | VI. Simplicidad | Un repo, un lenguaje, una base; sin Redis ni servicio de sync externo; servicios extra justificados abajo | ✅ (con justificación) |
-| Restricciones | TypeScript; manifiestos Kubernetes portables (Kustomize); HTTPS sólo por Cloudflare Tunnel; licencias guardadas por ejercicio + página de créditos; secretos en `Secret` de Kubernetes / `.env` local, fuera del repo | ✅ |
+| Restricciones | TypeScript; manifiestos Kubernetes portables (mismo patrón que finanzas/agendas); HTTPS sólo por Cloudflare Tunnel; licencias guardadas por ejercicio + página de créditos; secretos en `Secret` de Kubernetes / `.env` local, fuera del repo | ✅ |
 
 **Re-check post-diseño (Fase 1)**: el modelo de datos ([data-model.md](./data-model.md)) incluye
 `ownerId` en toda entidad de usuario, campos de licencia en contenido y borrado lógico para sync;
@@ -108,13 +108,14 @@ packages/
 e2e/                         # Playwright (punta a punta y en vivo)
 infra/
 ├── docker/                  # Dockerfiles de web (Caddy + PWA) y api/worker
-├── k8s/
-│   ├── base/                # namespace, deployments web/api/worker, postgres, job migrate,
-│   │                        # cronjob backup, services, secret de ejemplo (sin valores)
-│   └── overlays/prod/       # dominio, réplicas, recursos, ruta del Cloudflare Tunnel
 ├── docker-compose.dev.yml   # desarrollo local (postgres + mailpit)
 ├── docker-compose.test.yml  # entorno de pruebas desechable
 └── Caddyfile
+deploy/                      # mismo patrón que ../finanzas/deploy
+├── k8s/                     # namespace, postgres, app (web/api/worker), migrate-job,
+│                            # network-policy, backup + backup-scripts, secret.example (sin valores)
+├── backup/                  # backup.sh y verify.sh
+└── README.md                # guía de despliegue en español
 docs/
 ```
 

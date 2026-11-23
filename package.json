@@ -1,0 +1,37 @@
+{
+  "name": "gym",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter @gym/api --filter @gym/web dev",
+    "build": "pnpm -r build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "e2e": "pnpm --filter @gym/e2e test",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "typecheck": "pnpm -r typecheck",
+    "check": "sh scripts/check.sh",
+    "db:migrate": "pnpm --filter @gym/api db:migrate",
+    "catalog:build": "pnpm --filter @gym/catalog build:catalog",
+    "admin:invite": "pnpm --filter @gym/api admin:invite",
+    "admin:promote": "pnpm --filter @gym/api admin:promote",
+    "test:backup": "sh deploy/backup/backup.test.sh"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.0",
+    "@types/node": "^24.19.2",
+    "eslint": "^10.15.0",
+    "eslint-plugin-i18next": "^6.1.5",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "globals": "^17.14.0",
+    "prettier": "^3.10.1",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.73.0",
+    "vitest": "^5.1.1"
+  }
+}
