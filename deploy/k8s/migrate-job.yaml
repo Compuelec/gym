@@ -35,7 +35,7 @@ spec:
       containers:
         - name: migrate
           # Same image as deployment/gym-api (pin the same version@sha256).
-          image: registry.example.com/owner/gym-api:0.3.0
+          image: registry.example.com/owner/gym-api:0.3.0@sha256:cd508812a451416be8d54a41eff81a9938baf537d290d05503d2e45c80271c16
           command: ["node", "dist/migrate.mjs"]
           envFrom: [{ secretRef: { name: gym-secrets } }]
           resources:
