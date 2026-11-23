@@ -103,7 +103,7 @@ function TrainPage() {
         </span>
         <span className="flex min-w-0 flex-col">
           <span className="text-sm font-semibold">{t('goal.title')}</span>
-          <span className="truncate text-xs text-muted-foreground">
+          <span className="line-clamp-2 text-xs text-muted-foreground">
             {profile?.targetWeightKg
               ? goalPlan({ weightKg: currentWeight, targetWeightKg: profile.targetWeightKg, targetDate: profile.targetDate, now }).message
               : t('home.goalEmpty')}
