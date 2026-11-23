@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { t } from '@/i18n';
-import { canApplyUpdateNow, whenUpdateAllowed } from '@/lib/update-guard';
+import { canApplyUpdateNow, watchForUpdates, whenUpdateAllowed } from '@/lib/update-guard';
 
 /**
  * Shows «Hay una versión nueva» when a new service worker is waiting. It never reloads by itself:
@@ -12,7 +12,12 @@ export function UpdatePrompt() {
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
-  } = useRegisterSW();
+  } = useRegisterSW({
+    // Look for new versions while the app stays open (it lives for days as an installed app).
+    onRegisteredSW: (_url, registration) => {
+      if (registration) watchForUpdates(registration);
+    },
+  });
   const [deferred, setDeferred] = useState(false);
 
   // Accepted during a workout: install as soon as the workout is finished or discarded.

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { canApplyUpdateNow, registerUpdateBlocker, whenUpdateAllowed } from './update-guard';
+import { canApplyUpdateNow, registerUpdateBlocker, watchForUpdates, whenUpdateAllowed } from './update-guard';
 
 describe('update guard', () => {
   it('allows updates when nothing blocks them', async () => {
@@ -28,6 +28,21 @@ describe('update guard', () => {
     await vi.advanceTimersByTimeAsync(1000);
     expect(applied).toBe(true);
     unregister();
+    vi.useRealTimers();
+  });
+
+  it('looks for a new version periodically and when the app comes back to the foreground', () => {
+    vi.useFakeTimers();
+    const registration = { update: vi.fn(() => Promise.resolve()) };
+    const stop = watchForUpdates(registration, { intervalMs: 60_000 });
+    expect(registration.update).not.toHaveBeenCalled();
+    vi.advanceTimersByTime(60_000);
+    expect(registration.update).toHaveBeenCalledTimes(1);
+    document.dispatchEvent(new Event('visibilitychange'));
+    expect(registration.update).toHaveBeenCalledTimes(2);
+    stop();
+    vi.advanceTimersByTime(120_000);
+    expect(registration.update).toHaveBeenCalledTimes(2);
     vi.useRealTimers();
   });
 });

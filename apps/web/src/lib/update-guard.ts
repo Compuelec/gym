@@ -41,3 +41,22 @@ export function whenUpdateAllowed(intervalMs = 5000): { done: Promise<void>; sto
     },
   };
 }
+
+/**
+ * The browser only looks for a new version on a full page load, and an installed app can stay
+ * open for days. Check now and then, and whenever the app comes back to the foreground.
+ */
+export function watchForUpdates(
+  registration: { update: () => Promise<unknown> },
+  { intervalMs = 15 * 60_000, doc = document }: { intervalMs?: number; doc?: Document } = {},
+): () => void {
+  const check = () => {
+    if (doc.visibilityState === 'visible' && navigator.onLine !== false) void registration.update().catch(() => {});
+  };
+  const timer = setInterval(check, intervalMs);
+  doc.addEventListener('visibilitychange', check);
+  return () => {
+    clearInterval(timer);
+    doc.removeEventListener('visibilitychange', check);
+  };
+}
