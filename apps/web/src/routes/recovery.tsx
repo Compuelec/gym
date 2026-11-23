@@ -25,7 +25,7 @@ function RecoveryPage() {
   return (
     <div className="flex flex-col gap-4">
       <header>
-        <h1 className="text-2xl font-semibold">{t('smart.recoveryTitle')}</h1>
+        <h1 className="text-3xl font-bold">{t('smart.recoveryTitle')}</h1>
         <p className="text-sm text-muted-foreground">{t('smart.recoveryIntro')}</p>
       </header>
       <RecoveryMap recovery={recovery} />
@@ -39,7 +39,7 @@ function RecoveryPage() {
               </span>
             </span>
             <span
-              className={`rounded-full px-2 py-0.5 text-xs ${r.status === 'fatigued' ? 'bg-red-100 text-red-800' : r.status === 'partial' ? 'bg-amber-100 text-amber-900' : 'bg-muted'}`}
+              className={`rounded-full px-2 py-0.5 text-xs ${r.status === 'fatigued' ? 'bg-danger-soft text-danger' : r.status === 'partial' ? 'bg-warning-soft text-warning' : 'bg-muted'}`}
             >
               {t(`smart.status.${r.status}`)}
             </span>

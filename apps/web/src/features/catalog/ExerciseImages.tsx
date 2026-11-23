@@ -42,12 +42,12 @@ export function Thumbnail({ media }: { media: Media[] }) {
   const first = media.find((m) => m.type === 'image');
   if (!first) {
     return (
-      <div className="flex size-16 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
+      <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-muted text-muted-foreground">
         <Dumbbell className="size-6" aria-hidden />
       </div>
     );
   }
-  return <img src={first.url} alt="" loading="lazy" className="size-16 shrink-0 rounded-md bg-muted object-cover" />;
+  return <img src={first.url} alt="" loading="lazy" className="size-16 shrink-0 rounded-xl bg-muted object-cover" />;
 }
 
 /** Small animated preview for training cards; decorative (the name is next to it). */
@@ -61,7 +61,7 @@ export function AnimatedThumbnail({ media }: { media: Media[] }) {
     );
   }
   return (
-    <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-white">
+    <div className="relative size-20 shrink-0 overflow-hidden rounded-xl bg-white">
       {images.map((img, i) => (
         <img
           key={img.url}

@@ -40,7 +40,7 @@ function ExerciseDetailPage() {
     <article className="flex flex-col gap-5">
       <header className="flex items-start justify-between gap-3">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold">{ex.nameEs}</h1>
+          <h1 className="text-3xl font-bold">{ex.nameEs}</h1>
           <p className="text-sm text-muted-foreground">
             {t(`exercises.levels.${ex.level}`)} · {categoryName.get(ex.category) ?? ex.category}
             {ex.mechanic && <> · {t(`exercises.mechanics.${ex.mechanic}`)}</>}
@@ -102,7 +102,7 @@ function ExerciseDetailPage() {
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-semibold">{t('exercises.steps')}</h2>
         {!ex.translated && (
-          <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+          <p className="rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
             {t('exercises.pendingTranslation')}
           </p>
         )}

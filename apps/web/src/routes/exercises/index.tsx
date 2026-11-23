@@ -100,7 +100,7 @@ function ExercisesPage() {
   return (
     <div className={`flex flex-col gap-4 ${selected ? 'pb-24' : ''}`}>
       <header className="flex items-center justify-between gap-2">
-        <h1 className="text-2xl font-semibold">{t('exercises.title')}</h1>
+        <h1 className="text-3xl font-bold">{t('exercises.title')}</h1>
         <div className="flex gap-2">
           {selected ? (
             <Button size="sm" variant="ghost" onClick={() => setSelected(null)}>
@@ -199,7 +199,7 @@ function ExercisesPage() {
             {selected ? t('exercises.selectHint') : tn('exercises.results', results.length)}
           </p>
           {results.length === 0 && <p>{t('exercises.noResults')}</p>}
-          <ul className="flex flex-col divide-y divide-border">
+          <ul className="flex flex-col gap-2">
             {results.slice(0, limit).map((ex) => {
               const content = (
                 <>
@@ -212,18 +212,18 @@ function ExercisesPage() {
                       {favorites.has(ex.id) && <Star className="size-4 fill-current" aria-label={t('exercises.favorite')} />}
                       {ex.own && <span className="rounded-full bg-muted px-2 text-xs">{t('exercises.mine')}</span>}
                     </span>
-                    <span className="truncate text-sm text-muted-foreground">{names(ex.primaryMuscles, muscleName)}</span>
+                    <span className="w-fit max-w-full truncate rounded-full bg-info-soft px-2 py-0.5 text-xs font-medium text-info">{names(ex.primaryMuscles, muscleName)}</span>
                   </span>
                 </>
               );
               return (
                 <li key={ex.id}>
                   {selected ? (
-                    <button type="button" aria-pressed={selected.has(ex.id)} className="flex w-full items-center gap-3 py-3 text-left" onClick={() => toggle(ex.id)}>
+                    <button type="button" aria-pressed={selected.has(ex.id)} className={`flex w-full items-center gap-3 rounded-2xl border bg-card p-2 text-left shadow-card ${selected.has(ex.id) ? 'border-primary' : 'border-border'}`} onClick={() => toggle(ex.id)}>
                       {content}
                     </button>
                   ) : (
-                    <Link to="/exercises/$id" params={{ id: ex.id }} className="flex items-center gap-3 py-3" onClick={() => saveScroll(scrollKey, window.scrollY)}>
+                    <Link to="/exercises/$id" params={{ id: ex.id }} className="flex items-center gap-3 rounded-2xl border border-border bg-card p-2 shadow-card" onClick={() => saveScroll(scrollKey, window.scrollY)}>
                       {content}
                     </Link>
                   )}
@@ -240,8 +240,8 @@ function ExercisesPage() {
       )}
 
       {selected && (
-        <div className="fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-40 border-t border-border bg-background">
-          <div className="mx-auto flex max-w-md flex-col gap-2 px-4 py-2">
+        <div className="fixed inset-x-0 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] z-40 px-3">
+          <div className="mx-auto flex max-w-md flex-col gap-2 rounded-2xl border border-border bg-card p-3 shadow-card">
             <span className="text-sm font-medium">{tn('exercises.selected', chosen.length)}</span>
             <div className="grid grid-cols-2 gap-2">
               <Button disabled={chosen.length === 0} onClick={() => setAdding(true)}>

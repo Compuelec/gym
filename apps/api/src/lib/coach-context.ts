@@ -1,7 +1,9 @@
 import { and, desc, eq, gte, isNull } from 'drizzle-orm';
 import { MUSCLES, fitsEquipment, type CatalogExercise } from '@gym/shared';
 import type { Database } from '../db/client';
+import { goalPlan } from '@gym/engine';
 import {
+  bodyMeasurements,
   exercises,
   locations,
   profiles,
@@ -24,6 +26,7 @@ export interface CoachContext {
   ownLines: string; // the user's own exercises (user turn)
   catalogMap: Map<string, CatalogEntry>;
   historyText: string;
+  bodyText: string; // goal + weight trend (health data: sent to the AI, never logged)
   routineIds: Set<string>;
 }
 
@@ -130,8 +133,43 @@ export async function buildContext(
       ...(lines.length ? lines : ['Sin entrenamientos en las últimas 4 semanas.']),
       ...(routineText.length ? ['Rutinas:', ...routineText] : []),
     ].join('\n'),
+    bodyText: await bodyTextOf(db, ownerId, profile),
     routineIds: new Set(userRoutines.map((r) => r.id)),
   };
+}
+
+const ACTIVITY_ES: Record<string, string> = { sedentary: 'sedentaria', light: 'ligera', moderate: 'moderada', high: 'alta' };
+const SEX_ES: Record<string, string> = { female: 'mujer', male: 'hombre', other: 'otro' };
+
+/** Body data and goal, plus the weight entries of the last 12 weeks (oldest first). */
+async function bodyTextOf(db: Database, ownerId: string, p: typeof profiles.$inferSelect, now = new Date()) {
+  const since = new Date(now.getTime() - 84 * 86_400_000).toISOString();
+  const rows = await db
+    .select({ at: bodyMeasurements.measuredAt, kg: bodyMeasurements.weightKg, waist: bodyMeasurements.waistCm, fat: bodyMeasurements.bodyFatPct })
+    .from(bodyMeasurements)
+    .where(and(eq(bodyMeasurements.ownerId, ownerId), isNull(bodyMeasurements.deletedAt), gte(bodyMeasurements.measuredAt, since)))
+    .orderBy(bodyMeasurements.measuredAt);
+  const weights = rows.filter((r) => r.kg != null);
+  const current = weights.at(-1)?.kg ?? p.bodyweightKg ?? null;
+  const age = p.birthYear ? now.getUTCFullYear() - p.birthYear : null;
+  const facts = [
+    age ? `${age} años` : null,
+    p.sex ? SEX_ES[p.sex] : null,
+    p.heightCm ? `${p.heightCm} cm` : null,
+    current ? `${current} kg` : null,
+    p.activityLevel ? `actividad diaria ${ACTIVITY_ES[p.activityLevel]}` : null,
+  ].filter(Boolean);
+  const out: string[] = [];
+  if (facts.length) out.push(`Datos corporales: ${facts.join(', ')}.`);
+  if (p.injuries) out.push(`Lesiones o limitaciones (texto del usuario): ${p.injuries}`);
+  if (p.targetWeightKg) {
+    const plan = goalPlan({ weightKg: current, heightCm: p.heightCm, targetWeightKg: p.targetWeightKg, targetDate: p.targetDate, now: now.getTime() });
+    out.push(`Objetivo de peso: ${p.targetWeightKg} kg${p.targetDate ? ` para el ${p.targetDate}` : ''}. ${plan.message}`);
+  }
+  if (weights.length) {
+    out.push(`Registros de peso (12 semanas): ${weights.map((w) => `${w.at.slice(0, 10)} ${w.kg} kg${w.waist ? ` cintura ${w.waist} cm` : ''}`).join('; ')}`);
+  }
+  return out.join('\n');
 }
 
 export function profileText(ctx: CoachContext) {
@@ -143,7 +181,8 @@ export function profileText(ctx: CoachContext) {
     )
     .join('\n');
   const own = ctx.ownLines ? `\nEjercicios propios del usuario (mismo formato que el catálogo):\n${ctx.ownLines}` : '';
-  return `Perfil: objetivo ${p.goal}, nivel ${p.level}, ${p.daysPerWeek} días por semana, ${p.sessionMinutes} minutos por sesión.\nLugares:\n${places}${own}`;
+  const body = ctx.bodyText ? `\n${ctx.bodyText}` : '';
+  return `Perfil: objetivo ${p.goal}, nivel ${p.level}, ${p.daysPerWeek} días por semana, ${p.sessionMinutes} minutos por sesión.${body}\nLugares:\n${places}${own}`;
 }
 
 export interface CatalogCandidate {

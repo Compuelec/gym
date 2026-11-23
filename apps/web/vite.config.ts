@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import { VitePWA } from 'vite-plugin-pwa';
 import { fileURLToPath, URL } from 'node:url';
-import { createReadStream, existsSync, statSync } from 'node:fs';
+import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { extname, join, normalize } from 'node:path';
 import type { Connect, Plugin } from 'vite';
 
@@ -28,9 +28,13 @@ function serveCatalog(): Plugin {
   };
 }
 
+// The released version (root package.json), shown at the foot of the app.
+const APP_VERSION = (JSON.parse(readFileSync(fileURLToPath(new URL('../../package.json', import.meta.url)), 'utf8')) as { version: string }).version;
+
 const apiProxy = { '/api': process.env.API_PROXY_TARGET ?? 'http://localhost:3000' };
 
 export default defineConfig({
+  define: { __APP_VERSION__: JSON.stringify(APP_VERSION) },
   plugins: [
     // Router plugin must run before the React plugin.
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
@@ -55,8 +59,8 @@ export default defineConfig({
         scope: '/',
         display: 'standalone',
         orientation: 'portrait',
-        background_color: '#0f172a',
-        theme_color: '#0f172a',
+        background_color: '#0a0e1f',
+        theme_color: '#0a0e1f',
         categories: ['health', 'fitness', 'sports'],
         icons: [
           { src: 'pwa-64x64.png', sizes: '64x64', type: 'image/png' },
@@ -65,7 +69,7 @@ export default defineConfig({
           { src: 'maskable-icon-512x512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
       },
-      injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest}'] },
+      injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,ico,webmanifest,woff2}'] },
       devOptions: { enabled: false },
     }),
   ],

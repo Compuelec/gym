@@ -1,4 +1,4 @@
-import { and, eq, isNull, lte, sql } from 'drizzle-orm';
+import { and, eq, inArray, isNull, lte, sql } from 'drizzle-orm';
 import webpush from 'web-push';
 import type { Database } from '../db/client';
 import { pushSubscriptions, scheduledPushes } from '../db/schema';
@@ -41,7 +41,7 @@ export function isAllowedPushEndpoint(endpoint: string, config: Pick<Env, 'PUSH_
 export function createWebPushSender(config: Env): PushSender {
   webpush.setVapidDetails(config.VAPID_SUBJECT, config.VAPID_PUBLIC_KEY!, config.VAPID_PRIVATE_KEY!);
   return async (sub, message) => {
-    await webpush.sendNotification(sub, JSON.stringify(message), { TTL: 60, urgency: 'high' });
+    await webpush.sendNotification(sub, JSON.stringify(message), { TTL: message.tag === 'rest-timer' ? 60 : 3600, urgency: message.tag === 'rest-timer' ? 'high' : 'normal' });
   };
 }
 
@@ -55,13 +55,35 @@ export const REST_END_MESSAGE: Omit<PushMessage, 'url'> = {
  * Replaces any pending rest notification of the user with a new one at `fireAt`: one person rests
  * in one session at a time, so there is never more than one pending notification per user.
  */
-export async function scheduleRestPush(db: Database, ownerId: string, sessionId: string, fireAt: Date) {
+export const REST_WARNING_SECONDS = 10;
+
+/**
+ * Replaces any pending rest notification of the user with new ones: a «get ready» 10 s before the
+ * end (when the rest is long enough) and the end itself, both naming what comes next. One person
+ * rests in one session at a time, so pending rest rows never pile up.
+ */
+export async function scheduleRestPush(db: Database, ownerId: string, sessionId: string, fireAt: Date, next?: string, now = new Date()) {
   await db.transaction(async (tx) => {
     await tx
       .update(scheduledPushes)
       .set({ cancelledAt: sql`now()` })
-      .where(and(eq(scheduledPushes.ownerId, ownerId), isNull(scheduledPushes.sentAt), isNull(scheduledPushes.cancelledAt)));
-    await tx.insert(scheduledPushes).values({ ownerId, sessionId, kind: 'rest_end', fireAt });
+      .where(
+        and(
+          eq(scheduledPushes.ownerId, ownerId),
+          inArray(scheduledPushes.kind, ['rest_end', 'rest_warning']),
+          isNull(scheduledPushes.sentAt),
+          isNull(scheduledPushes.cancelledAt),
+        ),
+      );
+    const url = `/session/${sessionId}`;
+    const rows: Array<typeof scheduledPushes.$inferInsert> = [
+      { ownerId, sessionId, kind: 'rest_end', fireAt, title: REST_END_MESSAGE.title, body: next ?? REST_END_MESSAGE.body, url },
+    ];
+    const warnAt = new Date(fireAt.getTime() - REST_WARNING_SECONDS * 1000);
+    if (warnAt.getTime() - now.getTime() >= 2000) {
+      rows.unshift({ ownerId, sessionId, kind: 'rest_warning', fireAt: warnAt, title: `Quedan ${REST_WARNING_SECONDS} s de descanso`, body: next ? `Prepárate: ${next}` : 'Prepárate para la siguiente serie.', url });
+    }
+    await tx.insert(scheduledPushes).values(rows);
   });
 }
 
@@ -104,7 +126,13 @@ export async function sendDuePushes(db: Database, send: PushSender, now = new Da
         try {
           await send(
             { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-            { ...REST_END_MESSAGE, url: `/session/${push.sessionId}` },
+            {
+              title: push.title ?? REST_END_MESSAGE.title,
+              body: push.body ?? REST_END_MESSAGE.body,
+              // Same tag: the end replaces the «get ready» on the lock screen.
+              tag: push.kind.startsWith('rest') ? 'rest-timer' : push.kind,
+              url: push.url ?? `/session/${push.sessionId}`,
+            },
           );
           sent += 1;
         } catch (err) {

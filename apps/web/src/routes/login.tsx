@@ -1,3 +1,5 @@
+import { BrandMark } from '@/components/BrandMark';
+import { Credits } from '@/components/Credits';
 import { useState, type FormEvent } from 'react';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
@@ -28,7 +30,8 @@ function LoginPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">{t('auth.login.title')}</h1>
+        <BrandMark />
+        <h1 className="text-3xl font-bold">{t('auth.login.title')}</h1>
         <p className="text-muted-foreground">{t('app.tagline')}</p>
       </header>
       <form onSubmit={onSubmit} className="flex flex-col gap-4" noValidate>
@@ -55,6 +58,7 @@ function LoginPage() {
           </Link>
         </p>
       </div>
+      <Credits />
     </div>
   );
 }

@@ -10,7 +10,7 @@ import { RestBar, useRest } from '@/features/training/RestBar';
 import { SessionExerciseCard } from '@/features/training/SessionExerciseCard';
 import { SubstituteSheet } from '@/features/training/SubstituteSheet';
 import { enableRestAlerts, hasPushSubscription, pushSupported, useWakeLock } from '@/features/training/device';
-import { formatClock } from '@/features/training/rest-timer';
+import { formatClock, nextUp } from '@/features/training/rest-timer';
 import {
   addSessionExercise,
   discardSession,
@@ -72,7 +72,7 @@ function SessionPage() {
           <h1 className="text-xl font-semibold">{session.name}</h1>
           <p className="text-sm tabular-nums text-muted-foreground">{t('train.elapsed', { time: formatClock(elapsed) })}</p>
         </div>
-        <Button onClick={() => setFinishing(true)}>{t('session.finish')}</Button>
+        <Button variant="outline" onClick={() => setFinishing(true)}>{t('session.finish')}</Button>
       </header>
 
       {pushSupported() && alerts === 'off' && (
@@ -100,7 +100,21 @@ function SessionPage() {
           exercise={byId.get(se.exerciseId)}
           target={targets.get(se.exerciseId)}
           units={units}
-          onLogged={(secs) => rest.start(secs)}
+          onLogged={(secs) =>
+            rest.start(
+              secs,
+              nextUp(
+                detail.exercises.map((x) => ({
+                  id: x.id,
+                  name: byId.get(x.exerciseId)?.nameEs ?? '',
+                  targetSets: x.targetSets ?? null,
+                  // The set just logged is not in `x.sets` yet.
+                  done: x.sets.filter((st) => st.type !== 'warmup').length + (x.id === se.id ? 1 : 0),
+                })),
+                se.id,
+              ),
+            )
+          }
           onSwap={() => setSwapping(se)}
         />
       ))}
@@ -192,7 +206,7 @@ function Summary({
   const volume = units === 'kg' ? Math.round(volumeKg) : Math.round(volumeKg / 0.45359237);
   return (
     <section className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{session.status === 'completed' ? t('session.summaryTitle') : t('session.discardedTitle')}</h1>
+      <h1 className="text-3xl font-bold">{session.status === 'completed' ? t('session.summaryTitle') : t('session.discardedTitle')}</h1>
       <dl className="grid grid-cols-3 gap-3 text-center">
         <div className="rounded-lg bg-muted p-3">
           <dt className="text-xs text-muted-foreground">{t('session.duration')}</dt>

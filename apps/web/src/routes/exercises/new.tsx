@@ -14,7 +14,7 @@ function NewExercisePage() {
   const [initial] = useState(() => emptyOwnExercise(uuidv7()));
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold">{t('exercises.own.newTitle')}</h1>
+      <h1 className="text-3xl font-bold">{t('exercises.own.newTitle')}</h1>
       <OwnExerciseForm
         initial={initial}
         onSave={async (ex) => {

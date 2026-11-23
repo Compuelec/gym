@@ -10,7 +10,7 @@ export function parentOf(path: string): string {
   if (path.startsWith('/exercises/')) return '/exercises';
   if (path.startsWith('/routines/')) return '/routines';
   if (['/measurements', '/data'].includes(path)) return '/progress';
-  if (['/credits', '/admin'].includes(path)) return '/profile';
+  if (['/credits', '/admin', '/goal', '/notifications'].includes(path)) return '/profile';
   return '/';
 }
 

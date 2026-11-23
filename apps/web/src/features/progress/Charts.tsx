@@ -1,10 +1,16 @@
+import { useDark } from '@/lib/use-dark';
 import { Bar, BarChart, CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 
 // Single-series charts: one hue, no legend (the title names the series), thin marks,
 // recessive grid, hover tooltip, and a table view for screen readers and exact values.
-const SERIES = '#2563eb';
-const GRID = '#e5e7eb';
-const AXIS = { fontSize: 12, fill: '#6b7280' };
+// Per theme: electric blue series, recessive grid and axis text that pass contrast.
+const PALETTE = {
+  light: { series: '#2a5fe8', grid: '#dde2f2', axis: '#525b7d', cursor: '#e9edf7', tooltipBg: '#ffffff', tooltipText: '#0a0e1f' },
+  dark: { series: '#7fa6ff', grid: '#232c58', axis: '#9aa3c7', cursor: '#1a2142', tooltipBg: '#121831', tooltipText: '#eef1ff' },
+};
+function usePalette() {
+  return PALETTE[useDark() ? 'dark' : 'light'];
+}
 
 interface Point {
   label: string;
@@ -36,12 +42,14 @@ function DataTable({ title, data, unit }: { title: string; data: Point[]; unit: 
 const fmt = (v: number) => v.toLocaleString('es', { maximumFractionDigits: 1 });
 
 export function BarSeries({ data, unit, tableTitle, horizontal = false }: { data: Point[]; unit: string; tableTitle: string; horizontal?: boolean }) {
+  const c = usePalette();
+  const AXIS = { fontSize: 12, fill: c.axis };
   return (
     <figure className="flex flex-col gap-2">
       <div className={horizontal ? 'h-64' : 'h-48'} aria-hidden>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout={horizontal ? 'vertical' : 'horizontal'} margin={{ top: 8, right: 8, bottom: 0, left: horizontal ? 8 : -16 }} barCategoryGap={2}>
-            <CartesianGrid stroke={GRID} vertical={horizontal} horizontal={!horizontal} />
+            <CartesianGrid stroke={c.grid} vertical={horizontal} horizontal={!horizontal} />
             {horizontal ? (
               <>
                 <XAxis type="number" tick={AXIS} tickFormatter={fmt} axisLine={false} tickLine={false} allowDecimals={false} />
@@ -53,8 +61,8 @@ export function BarSeries({ data, unit, tableTitle, horizontal = false }: { data
                 <YAxis tick={AXIS} tickFormatter={fmt} axisLine={false} tickLine={false} allowDecimals={false} />
               </>
             )}
-            <Tooltip formatter={(v) => [`${fmt(Number(v))} ${unit}`, '']} separator="" cursor={{ fill: '#f3f4f6' }} />
-            <Bar dataKey="value" fill={SERIES} radius={horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]} maxBarSize={28} />
+            <Tooltip formatter={(v) => [`${fmt(Number(v))} ${unit}`, '']} separator="" cursor={{ fill: c.cursor }} contentStyle={{ background: c.tooltipBg, color: c.tooltipText, border: 'none', borderRadius: 12 }} />
+            <Bar dataKey="value" fill={c.series} radius={horizontal ? [0, 4, 4, 0] : [4, 4, 0, 0]} maxBarSize={28} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -64,16 +72,18 @@ export function BarSeries({ data, unit, tableTitle, horizontal = false }: { data
 }
 
 export function LineSeries({ data, unit, tableTitle }: { data: Point[]; unit: string; tableTitle: string }) {
+  const c = usePalette();
+  const AXIS = { fontSize: 12, fill: c.axis };
   return (
     <figure className="flex flex-col gap-2">
       <div className="h-52" aria-hidden>
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -12 }}>
-            <CartesianGrid stroke={GRID} vertical={false} />
+            <CartesianGrid stroke={c.grid} vertical={false} />
             <XAxis dataKey="label" tick={AXIS} axisLine={false} tickLine={false} interval="preserveStartEnd" />
             <YAxis tick={AXIS} tickFormatter={fmt} axisLine={false} tickLine={false} domain={['auto', 'auto']} />
-            <Tooltip formatter={(v) => [`${fmt(Number(v))} ${unit}`, '']} separator="" />
-            <Line type="monotone" dataKey="value" stroke={SERIES} strokeWidth={2} dot={{ r: 4, strokeWidth: 2, fill: '#fff' }} activeDot={{ r: 5 }} />
+            <Tooltip formatter={(v) => [`${fmt(Number(v))} ${unit}`, '']} separator="" contentStyle={{ background: c.tooltipBg, color: c.tooltipText, border: 'none', borderRadius: 12 }} />
+            <Line type="monotone" dataKey="value" stroke={c.series} strokeWidth={2} dot={{ r: 4, strokeWidth: 2, fill: c.tooltipBg }} activeDot={{ r: 5 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

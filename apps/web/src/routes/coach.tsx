@@ -13,7 +13,11 @@ import { useUser } from '@/lib/auth-context';
 import { useLocations } from '@/lib/repos';
 import { getSyncEngine, useOnline } from '@/lib/sync-client';
 
-export const Route = createFileRoute('/coach')({ component: CoachPage });
+export const Route = createFileRoute('/coach')({
+  component: CoachPage,
+  // «?mode=goal» / «?mode=review»: arrive with the request already written (from Mi objetivo or a notification).
+  validateSearch: (s: Record<string, unknown>): { mode?: 'goal' | 'review' } => (s.mode === 'goal' || s.mode === 'review' ? { mode: s.mode } : {}),
+});
 
 interface CoachRequest {
   id: string;
@@ -47,8 +51,9 @@ function CoachPage() {
     queryFn: () => apiFetch('/coach/requests') as Promise<{ requests: CoachRequest[] }>,
     enabled: online,
   });
-  const [kind, setKind] = useState<'program' | 'weekly_review'>('program');
-  const [message, setMessage] = useState('');
+  const { mode } = Route.useSearch();
+  const [kind, setKind] = useState<'program' | 'weekly_review'>(mode === 'review' ? 'weekly_review' : 'program');
+  const [message, setMessage] = useState(mode === 'goal' ? t('coach.goalMessage') : mode === 'review' ? t('coach.reviewMessage') : '');
   const [chosen, setChosen] = useState<string[] | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -93,13 +98,13 @@ function CoachPage() {
   return (
     <div className="flex flex-col gap-5">
       <header className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold">{t('coach.title')}</h1>
+        <h1 className="text-3xl font-bold">{t('coach.title')}</h1>
         <p className="text-muted-foreground">{t('coach.intro')}</p>
       </header>
       <p className="rounded-lg bg-muted px-3 py-2 text-xs text-muted-foreground">{t('coach.disclaimer')}</p>
 
       {!online ? (
-        <p role="status" className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900">
+        <p role="status" className="rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
           {t('coach.offline')}
         </p>
       ) : status.data && !status.data.available ? (
@@ -121,6 +126,14 @@ function CoachPage() {
             />
           ) : (
             <section className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" className="h-auto py-3" onClick={() => { setKind('program'); setMessage(t('coach.goalMessage')); }}>
+                  {t('coach.goalShortcut')}
+                </Button>
+                <Button variant="outline" className="h-auto py-3" onClick={() => { setKind('weekly_review'); setMessage(t('coach.reviewMessage')); }}>
+                  {t('coach.reviewShortcut')}
+                </Button>
+              </div>
               <fieldset className="flex flex-col gap-2">
                 <legend className="mb-1 text-sm font-medium">{t('coach.kind')}</legend>
                 <Choice name="kind" checked={kind === 'program'} onChange={() => setKind('program')} label={t('coach.kindProgram')} />
@@ -134,7 +147,7 @@ function CoachPage() {
                   value={message}
                   placeholder={kind === 'program' ? t('coach.messagePlaceholder') : t('coach.reviewPlaceholder')}
                   onChange={(e) => setMessage(e.target.value)}
-                  className="rounded-lg border border-border bg-background p-3 text-base font-normal"
+                  className="rounded-xl border border-border bg-card p-3 text-base font-normal"
                 />
               </label>
               {kind === 'program' && locations.length > 1 && (
@@ -186,7 +199,7 @@ function RequestView({
   const names = useMemo(() => new Map((exercises ?? []).map((e) => [e.id, e.nameEs])), [exercises]);
   if (request.status === 'queued' || request.status === 'running') {
     return (
-      <p role="status" aria-live="polite" className="rounded-lg bg-blue-50 px-3 py-3 text-blue-900">
+      <p role="status" aria-live="polite" className="rounded-lg bg-info-soft px-3 py-3 text-info">
         {t('coach.working')}
       </p>
     );
@@ -243,7 +256,7 @@ function RequestView({
       </div>
       <p className="text-sm">{p.summaryEs}</p>
       {p.safetyNoteEs && (
-        <p role="note" className="rounded-lg bg-amber-100 px-3 py-2 text-sm text-amber-900">
+        <p role="note" className="rounded-lg bg-warning-soft px-3 py-2 text-sm text-warning">
           <strong>{t('coach.safety')}:</strong> {p.safetyNoteEs}
         </p>
       )}
@@ -251,7 +264,7 @@ function RequestView({
         <strong>{t('coach.progression')}:</strong> {p.progressionNoteEs}
       </p>
       {p.days.map((d) => (
-        <article key={d.dayIndex} className="flex flex-col gap-1 rounded-lg border border-border p-3">
+        <article key={d.dayIndex} className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-3 shadow-card">
           <h3 className="font-medium">{t('coach.day', { day: d.dayIndex, title: d.title })}</h3>
           <ol className="flex flex-col gap-1 text-sm">
             {d.items.map((i, n) => (

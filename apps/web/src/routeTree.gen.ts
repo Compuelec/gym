@@ -15,8 +15,10 @@ import { Route as CoachRouteImport } from './routes/coach'
 import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as DataRouteImport } from './routes/data'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as GoalRouteImport } from './routes/goal'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as MeasurementsRouteImport } from './routes/measurements'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProgressRouteImport } from './routes/progress'
@@ -63,6 +65,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GoalRoute = GoalRouteImport.update({
+  id: '/goal',
+  path: '/goal',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -71,6 +78,11 @@ const LoginRoute = LoginRouteImport.update({
 const MeasurementsRoute = MeasurementsRouteImport.update({
   id: '/measurements',
   path: '/measurements',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -156,8 +168,10 @@ export interface FileRoutesByFullPath {
   '/credits': typeof CreditsRoute
   '/data': typeof DataRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/goal': typeof GoalRoute
   '/login': typeof LoginRoute
   '/measurements': typeof MeasurementsRoute
+  '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
@@ -181,8 +195,10 @@ export interface FileRoutesByTo {
   '/credits': typeof CreditsRoute
   '/data': typeof DataRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/goal': typeof GoalRoute
   '/login': typeof LoginRoute
   '/measurements': typeof MeasurementsRoute
+  '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
@@ -207,8 +223,10 @@ export interface FileRoutesById {
   '/credits': typeof CreditsRoute
   '/data': typeof DataRoute
   '/forgot-password': typeof ForgotPasswordRoute
+  '/goal': typeof GoalRoute
   '/login': typeof LoginRoute
   '/measurements': typeof MeasurementsRoute
+  '/notifications': typeof NotificationsRoute
   '/onboarding': typeof OnboardingRoute
   '/profile': typeof ProfileRoute
   '/progress': typeof ProgressRoute
@@ -234,8 +252,10 @@ export interface FileRouteTypes {
     | '/credits'
     | '/data'
     | '/forgot-password'
+    | '/goal'
     | '/login'
     | '/measurements'
+    | '/notifications'
     | '/onboarding'
     | '/profile'
     | '/progress'
@@ -259,8 +279,10 @@ export interface FileRouteTypes {
     | '/credits'
     | '/data'
     | '/forgot-password'
+    | '/goal'
     | '/login'
     | '/measurements'
+    | '/notifications'
     | '/onboarding'
     | '/profile'
     | '/progress'
@@ -284,8 +306,10 @@ export interface FileRouteTypes {
     | '/credits'
     | '/data'
     | '/forgot-password'
+    | '/goal'
     | '/login'
     | '/measurements'
+    | '/notifications'
     | '/onboarding'
     | '/profile'
     | '/progress'
@@ -310,8 +334,10 @@ export interface RootRouteChildren {
   CreditsRoute: typeof CreditsRoute
   DataRoute: typeof DataRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
+  GoalRoute: typeof GoalRoute
   LoginRoute: typeof LoginRoute
   MeasurementsRoute: typeof MeasurementsRoute
+  NotificationsRoute: typeof NotificationsRoute
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   ProgressRoute: typeof ProgressRoute
@@ -373,6 +399,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/goal': {
+      id: '/goal'
+      path: '/goal'
+      fullPath: '/goal'
+      preLoaderRoute: typeof GoalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -385,6 +418,13 @@ declare module '@tanstack/react-router' {
       path: '/measurements'
       fullPath: '/measurements'
       preLoaderRoute: typeof MeasurementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -502,8 +542,10 @@ const rootRouteChildren: RootRouteChildren = {
   CreditsRoute: CreditsRoute,
   DataRoute: DataRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
+  GoalRoute: GoalRoute,
   LoginRoute: LoginRoute,
   MeasurementsRoute: MeasurementsRoute,
+  NotificationsRoute: NotificationsRoute,
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   ProgressRoute: ProgressRoute,

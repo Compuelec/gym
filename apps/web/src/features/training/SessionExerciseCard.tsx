@@ -105,7 +105,7 @@ export function SessionExerciseCard({
   const timed = measure === 'time';
   const done = se.sets.length >= goal.targetSets;
   return (
-    <section aria-label={name} className={`flex flex-col gap-3 rounded-xl border p-4 ${done ? 'border-green-600/50 bg-green-50/40' : 'border-border'}`}>
+    <section aria-label={name} className={`flex flex-col gap-3 rounded-2xl border p-4 shadow-card ${done ? 'border-success/50 bg-success-soft' : 'border-border bg-card'}`}>
       <header className="flex items-start gap-3">
         {/* Tapping the picture opens the same guide as the «Cómo» button (which keyboard users get). */}
         <button type="button" className="shrink-0 rounded-lg" tabIndex={-1} aria-hidden onClick={() => toggle('howTo')}>
@@ -116,7 +116,7 @@ export function SessionExerciseCard({
             {name}
           </Link>
           {exercise && <p className="text-sm text-muted-foreground">{names(exercise.primaryMuscles, muscleName)}</p>}
-          <p className="text-sm font-medium">
+          <p className="text-sm font-semibold text-info">
             {goalLine(goal.targetSets, timed ? formatDuration(goal.targetSeconds ?? 30) : `${repRange(goal.repMin, goal.repMax)} ${t('session.repsShort')}`, se.restSeconds)}
           </p>
           <p className="text-xs text-muted-foreground">
@@ -174,7 +174,7 @@ export function SessionExerciseCard({
         <ol className="flex flex-col gap-1">
           {se.sets.map((s, i) => (
             <li key={s.id} className="flex items-center gap-2 rounded-lg bg-muted/60 px-2 text-sm">
-              <Check className="size-4 text-green-700" aria-hidden />
+              <Check className="size-4 text-success" aria-hidden />
               <span className="w-14 text-muted-foreground">
                 {t('session.set')} {i + 1}
               </span>
@@ -189,7 +189,7 @@ export function SessionExerciseCard({
       )}
 
       {suggestion && index === 0 && (
-        <div className="flex flex-col gap-1 rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-900">
+        <div className="flex flex-col gap-1 rounded-lg bg-info-soft px-3 py-2 text-sm text-info">
           <div className="flex items-center justify-between gap-2">
             <span>
               {t('smart.suggestion')}: <strong>{describeSuggestion(suggestion, units)}</strong>
@@ -202,7 +202,7 @@ export function SessionExerciseCard({
         </div>
       )}
       {records.length > 0 && (
-        <p role="status" className="rounded-lg bg-amber-100 px-3 py-2 text-sm font-medium text-amber-900">
+        <p role="status" className="rounded-lg bg-warning-soft px-3 py-2 text-sm font-medium text-warning">
           {t('smart.newRecord', { kinds: records.map((k) => t(`smart.records.${k}`)).join(', ') })}
         </p>
       )}
@@ -304,12 +304,12 @@ function NextSetRow({
           ))}
         {measure === 'distance' && <Stepper label={t('session.meters')} value={meters} onChange={setMeters} step={50} decimal />}
       </div>
-      <Button size="lg" aria-label={`${t('session.log')}: ${label}`} onClick={() => void log()}>
+      <Button size="lg" variant="brand" aria-label={`${t('session.log')}: ${label}`} onClick={() => void log()}>
         <Check className="size-5" aria-hidden />
         {t('session.log')}
       </Button>
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}
@@ -369,7 +369,7 @@ function TargetsForm({ timed, initial, onSave, onCancel }: { timed: boolean; ini
         )}
         <label className="flex flex-col gap-1 text-xs">
           {t('session.restBetween')}
-          <select className="h-12 rounded-lg border border-border bg-background px-2 text-base" value={rest} onChange={(e) => setRest(Number(e.target.value))}>
+          <select className="h-12 rounded-xl border border-border bg-card px-2 text-base" value={rest} onChange={(e) => setRest(Number(e.target.value))}>
             {restOptions.map((r) => (
               <option key={r} value={r}>
                 {r === 0 ? t('session.noRest') : formatClock(r)}
@@ -379,7 +379,7 @@ function TargetsForm({ timed, initial, onSave, onCancel }: { timed: boolean; ini
         </label>
       </div>
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}

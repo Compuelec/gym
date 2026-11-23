@@ -69,7 +69,7 @@ function DataPage() {
 
   return (
     <div className="flex flex-col gap-8">
-      <h1 className="text-2xl font-semibold">{t('data.title')}</h1>
+      <h1 className="text-3xl font-bold">{t('data.title')}</h1>
       {!online && <FormError message={t('data.needOnline')} />}
 
       <section className="flex flex-col gap-2">
@@ -104,8 +104,8 @@ function DataPage() {
         <FormError message={importErr} />
       </section>
 
-      <section className="flex flex-col gap-3 rounded-lg border border-red-300 p-4">
-        <h2 className="text-lg font-semibold text-red-700">{t('data.deleteTitle')}</h2>
+      <section className="flex flex-col gap-3 rounded-lg border border-danger/40 p-4">
+        <h2 className="text-lg font-semibold text-danger">{t('data.deleteTitle')}</h2>
         <p className="text-sm">{t('data.deleteText')}</p>
         <TextField label={t('data.typeDelete')} value={confirm} autoComplete="off" onChange={(e) => setConfirm(e.target.value)} />
         <TextField label={t('data.password')} type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} />

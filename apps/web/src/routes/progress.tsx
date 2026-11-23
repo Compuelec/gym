@@ -58,7 +58,7 @@ function ProgressPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <h1 className="text-2xl font-semibold">{t('progress.title')}</h1>
+      <h1 className="text-3xl font-bold">{t('progress.title')}</h1>
 
       <dl className="grid grid-cols-2 gap-3">
         <div className="rounded-lg bg-muted p-3">

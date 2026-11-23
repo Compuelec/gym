@@ -4,6 +4,8 @@ import { parentOf, TOP_LEVEL } from './BackButton';
 describe('«Volver» without history', () => {
   it('goes up to the section the screen belongs to', () => {
     expect(parentOf('/exercises/fedb:Pushups')).toBe('/exercises');
+    expect(parentOf('/goal')).toBe('/profile');
+    expect(parentOf('/notifications')).toBe('/profile');
     expect(parentOf('/routines/abc/edit')).toBe('/routines');
     expect(parentOf('/measurements')).toBe('/progress');
     expect(parentOf('/admin')).toBe('/profile');
