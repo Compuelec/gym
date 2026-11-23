@@ -41,7 +41,8 @@
     "add": "Agregar",
     "or": "o",
     "notFoundTitle": "No encontramos esta página",
-    "notFoundBack": "Volver al inicio"
+    "notFoundBack": "Volver al inicio",
+    "goBack": "Volver"
   },
   "auth": {
     "email": "Correo",
@@ -210,7 +211,16 @@
     "creditsIntro": "Los ejercicios, textos e imágenes provienen de estas fuentes abiertas. Gracias a sus autores.",
     "exercisesCount": "{count} ejercicios",
     "showMore": "Ver más",
-    "resultsOne": "1 ejercicio"
+    "resultsOne": "1 ejercicio",
+    "select": "Elegir",
+    "filters": "Filtros",
+    "filtersCount": "Filtros ({count})",
+    "clearFilters": "Quitar filtros",
+    "selectHint": "Toca los ejercicios que quieras y elige qué hacer con ellos.",
+    "selected": "{count} elegidos",
+    "selectedOne": "1 elegido",
+    "toRoutine": "A una rutina",
+    "trainNow": "Entrenar ahora"
   },
   "routines": {
     "title": "Rutinas",
@@ -262,7 +272,9 @@
     "stale": "Este entrenamiento empezó hace más de 6 horas. ¿Lo terminamos?",
     "finishIt": "Terminarlo",
     "discardIt": "Descartarlo",
-    "noRoutines": "Crea una rutina para empezar más rápido."
+    "noRoutines": "Arma una rutina con tus ejercicios para empezar más rápido.",
+    "createRoutine": "Crear rutina",
+    "browseExercises": "Ver ejercicios"
   },
   "session": {
     "finish": "Terminar",
@@ -375,7 +387,16 @@
     "noExercises": "No encontramos ejercicios para hoy con ese equipo. Prueba otro lugar o más tiempo.",
     "itemTarget": "{sets} × {reps}",
     "lastTrainedRecent": "Última vez: hace menos de 1 h",
-    "weeklySet": "{sets} serie esta semana"
+    "weeklySet": "{sets} serie esta semana",
+    "regenerate": "Proponer otra",
+    "estimatedOf": "Duración estimada: {minutes} de {total} min",
+    "fitTime": "Ajustar al tiempo",
+    "savedAsRoutine": "Guardada en Rutinas: la encuentras ahí para repetirla.",
+    "saveAsRoutine": "Guardar como rutina",
+    "swapped": "Cambiado por ti.",
+    "addedByYou": "Agregado por ti.",
+    "remove": "Quitar",
+    "saved": "Guardada"
   },
   "progress": {
     "title": "Progreso",
@@ -556,5 +577,18 @@
     "cardio": "Cardio",
     "accessories": "Accesorios",
     "other": "Poco común"
+  },
+  "addToRoutine": {
+    "title": "Agregar a una rutina",
+    "heading": "Agregar {count} ejercicios a…",
+    "headingOne": "Agregar a una rutina",
+    "newRoutine": "Crear rutina nueva",
+    "orExisting": "O agrégalos a una rutina que ya tienes:",
+    "added": "Agregamos {count} ejercicios a «{name}».",
+    "addedOne": "Agregamos el ejercicio a «{name}».",
+    "already": "Ya estaban en «{name}».",
+    "open": "Ver rutina",
+    "keepBrowsing": "Seguir viendo",
+    "full": "Llena (30)"
   }
 }

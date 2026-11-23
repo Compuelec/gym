@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { PageSpinner } from '@/components/Spinner';
 import { RoutineEditor } from '@/features/training/RoutineEditor';
 import { saveRoutine, useRoutine } from '@/features/training/repo';
 import { t } from '@/i18n';
@@ -13,7 +14,7 @@ function EditRoutinePage() {
   const routine = useRoutine(user.id, id);
   const locations = useLocations(user.id);
   const navigate = useNavigate();
-  if (routine === undefined || !locations) return null;
+  if (routine === undefined || !locations) return <PageSpinner />;
   if (routine === null) return <p>{t('common.notFoundTitle')}</p>;
   return (
     <div className="flex flex-col gap-4">

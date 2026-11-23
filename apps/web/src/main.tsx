@@ -6,7 +6,8 @@ import { routeTree } from './routeTree.gen';
 import './styles.css';
 
 const queryClient = new QueryClient();
-const router = createRouter({ routeTree, context: {} });
+// Back returns to the same place in long lists (exercises, history).
+const router = createRouter({ routeTree, context: {}, scrollRestoration: true });
 
 declare module '@tanstack/react-router' {
   interface Register {

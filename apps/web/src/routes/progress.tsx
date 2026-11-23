@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { PageSpinner } from '@/components/Spinner';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { exerciseSeries, volumeByGroup, weeklyFrequency, weeklyStreak } from '@gym/engine';
 import { kgToDisplay } from '@gym/shared';
@@ -47,7 +48,7 @@ function ProgressPage() {
     };
   }, [sessions, byId, now]);
 
-  if (!sessions || !stats) return null;
+  if (!sessions || !stats) return <PageSpinner />;
   const selected = exerciseId || stats.exercisesDone[0] || '';
   const series = exerciseSeries(
     sessions.flatMap((s) => s.exercises.filter((e) => e.exerciseId === selected).map((e) => ({ date: s.startedAt, sets: e.sets }))),

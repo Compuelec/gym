@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { PageSpinner } from '@/components/Spinner';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { EQUIPMENT, uuidv7 } from '@gym/shared';
 import { Button } from '@/components/ui/button';
@@ -29,7 +30,7 @@ function ProfilePage() {
   const [signingOut, setSigningOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  if (!profile) return null;
+  if (!profile) return <PageSpinner />;
 
   async function signOut() {
     setError(null);

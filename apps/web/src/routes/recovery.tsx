@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { PageSpinner } from '@/components/Spinner';
 import { createFileRoute } from '@tanstack/react-router';
 import { useExercises } from '@/features/catalog/exercises';
 import { muscleName } from '@/features/catalog/labels';
@@ -19,7 +20,7 @@ function RecoveryPage() {
   const byId = useMemo(() => new Map((all ?? []).map((e) => [e.id, e])), [all]);
   const recovery = useRecovery(user.id, byId);
   const now = useNow(60_000);
-  if (!recovery) return null;
+  if (!recovery) return <PageSpinner />;
   const list = recovery.filter((r) => r.muscle !== 'neck').sort((a, b) => ORDER[a.status] - ORDER[b.status] || b.fatigue - a.fatigue);
   return (
     <div className="flex flex-col gap-4">

@@ -2,7 +2,7 @@ import 'fake-indexeddb/auto';
 import { describe, expect, it } from 'vitest';
 import { uuidv7 } from '@gym/shared';
 import { getDB } from '@/db/database';
-import { addSessionExercise, hasActiveSession, startSession, swapSessionExercise, updateSessionTargets, type LocalSessionExercise } from './repo';
+import { addExercisesToRoutine, addSessionExercise, hasActiveSession, saveRoutine, startSession, swapSessionExercise, updateSessionTargets, type LocalRoutine, type LocalSessionExercise } from './repo';
 
 async function setup() {
   const userId = uuidv7();
@@ -40,5 +40,26 @@ describe('active session (holds app updates back)', () => {
     await startSession(userId, { name: 'Libre', locationId: null });
     expect(await hasActiveSession(userId)).toBe(true);
     expect(await hasActiveSession(userId, Date.now() + 7 * 60 * 60 * 1000)).toBe(false);
+  });
+});
+
+describe('add exercises to a routine (from the catalog)', () => {
+  it('appends with default targets, skips the ones already there and never passes 30', async () => {
+    const userId = uuidv7();
+    const routine: LocalRoutine = { id: uuidv7(), name: 'Tren superior', programId: null, weekIndex: null, dayIndex: null, locationId: null, notes: null, items: [] };
+    await saveRoutine(userId, routine);
+    expect(await addExercisesToRoutine(userId, routine, [{ id: 'fedb:Pushups', measure: 'reps' }, { id: 'fedb:Plank', measure: 'time' }])).toBe(2);
+    const db = getDB(userId);
+    const saved = (await db.entityTable('routine').get(routine.id)) as unknown as LocalRoutine;
+    expect(saved.items.map((i) => [i.exerciseId, i.position, i.targetSets])).toEqual([
+      ['fedb:Pushups', 0, 3],
+      ['fedb:Plank', 1, 3],
+    ]);
+    expect(saved.items[1]!.targetSeconds).not.toBeNull();
+    // Already there: nothing changes.
+    expect(await addExercisesToRoutine(userId, saved, [{ id: 'fedb:Pushups', measure: 'reps' }])).toBe(0);
+    // Room for 28 more only.
+    const many = Array.from({ length: 40 }, (_, i) => ({ id: `own-${i}`, measure: 'reps' }));
+    expect(await addExercisesToRoutine(userId, saved, many)).toBe(28);
   });
 });

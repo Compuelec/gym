@@ -1,4 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router';
+import { PageSpinner } from '@/components/Spinner';
 import { Plus } from 'lucide-react';
 import { Button, buttonVariants } from '@/components/ui/button';
 import {
@@ -18,7 +19,7 @@ function RoutinesPage() {
   const routines = useRoutines(user.id);
   const locations = new Map((useLocations(user.id) ?? []).map((l) => [l.id, l.name]));
   const navigate = useNavigate();
-  if (!routines) return null;
+  if (!routines) return <PageSpinner />;
   return (
     <div className="flex flex-col gap-4">
       <header className="flex items-center justify-between">
