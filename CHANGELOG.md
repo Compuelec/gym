@@ -3,6 +3,16 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según
 [SemVer](https://semver.org/lang/es/). `main` siempre es la última versión publicada.
 
+## [0.3.0] — 2026-11-23
+
+### Agregado
+- Administración por pestañas: IA, Correo, Invitaciones, Usuarios e Historial.
+- Correo: el servidor (SMTP) se configura desde la app, con la contraseña cifrada y un botón
+  para enviar un correo de prueba; se usa al tiro, sin reinstalar.
+- Invitaciones por correo: si escribes el correo de la persona, se le envía el enlace.
+- Usuarios: lista con último uso; hacer o quitar administrador; desactivar y reactivar cuentas
+  (una cuenta desactivada no puede entrar y se le cierran las sesiones).
+
 ## [0.2.0] — 2026-11-23
 
 ### Agregado
@@ -84,6 +94,7 @@ Primera versión.
 - Coach con el modelo real (las pruebas usan un servidor de IA simulado).
 - Traducción del catálogo hecha automáticamente, aún sin revisión humana.
 
+[0.3.0]: https://github.com/Compuelec/gym/releases/tag/v0.3.0
 [0.2.0]: https://github.com/Compuelec/gym/releases/tag/v0.2.0
 [0.1.1]: https://github.com/Compuelec/gym/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Compuelec/gym/releases/tag/v0.1.0
