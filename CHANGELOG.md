@@ -3,6 +3,25 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según
 [SemVer](https://semver.org/lang/es/). `main` siempre es la última versión publicada.
 
+## [0.4.0] — 2026-11-23
+
+### Agregado
+- Diseño nuevo «Eléctrico»: azul noche, azul eléctrico y degradado a magenta, títulos en Oswald,
+  tarjetas redondeadas y barra de navegación flotante; logo e íconos nuevos.
+- Modo claro y oscuro: «Automático» sigue al teléfono, o se elige en Perfil → Apariencia.
+- Inicio con el avance de la semana, la racha y la tarjeta «Rutina de hoy».
+- Mi objetivo: peso, estatura, edad, sexo, actividad diaria, lesiones, peso objetivo y fecha
+  meta; calcula el índice de masa corporal y el ritmo semanal, y avisa si no es saludable.
+- Coach con objetivos (si la IA está activa): usa tu meta, tus lesiones y la evolución de tu peso;
+  accesos «Plan para lograr mi objetivo» y «Analizar mi progreso».
+- Avisos: 10 segundos antes de que termine el descanso y al terminar, diciendo la serie o el
+  ejercicio que sigue; recordatorio de entrenar en los días y la hora que elijas (no avisa si ya
+  entrenaste); resumen semanal el domingo, con análisis del coach si la IA está activa.
+- Versión de la app y «Creado y diseñado por Compuelec Soporte» en el ingreso y el perfil.
+
+### Corregido
+- Un entrenamiento de más de una hora mostraba «320:19» en vez de «5:20:19».
+
 ## [0.3.0] — 2026-11-23
 
 ### Agregado
