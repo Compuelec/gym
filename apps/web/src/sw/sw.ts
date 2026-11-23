@@ -38,10 +38,13 @@ self.addEventListener('push', (event) => {
     self.registration.showNotification(data.title ?? 'Gym', {
       body: data.body,
       tag: data.tag ?? 'gym',
+      // The rest end replaces the «get ready» alert: buzz again instead of swapping it silently.
+      renotify: data.tag === 'rest-timer',
       icon: '/pwa-192x192.png',
       badge: '/pwa-64x64.png',
       data: { url: data.url ?? '/' },
-    }),
+      // `renotify` is supported by browsers but missing from TypeScript's DOM types.
+    } as NotificationOptions),
   );
 });
 

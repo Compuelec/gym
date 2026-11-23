@@ -1,4 +1,4 @@
-import { ChevronRight, Download, Info, Shield } from 'lucide-react';
+import { Bell, ChevronRight, Download, Info, Shield, Target } from 'lucide-react';
 import { ThemePicker } from '@/components/ThemePicker';
 import { Credits } from '@/components/Credits';
 import { useState } from 'react';
@@ -144,6 +144,8 @@ function ProfilePage() {
       <ThemePicker />
 
       <nav aria-label={t('profile.more')} className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+        <MenuLink to="/goal" icon={Target} tone="accent" label={t('goal.link')} />
+        <MenuLink to="/notifications" icon={Bell} tone="info" label={t('notify.link')} />
         {user.role === 'admin' && <MenuLink to="/admin" icon={Shield} tone="accent" label={t('admin.link')} />}
         <MenuLink to="/data" icon={Download} tone="info" label={t('progress.dataLink')} />
         <MenuLink to="/credits" icon={Info} tone="info" label={t('profile.credits')} />
@@ -172,7 +174,7 @@ function initials(name: string) {
     .join('');
 }
 
-function MenuLink({ to, icon: Icon, tone, label }: { to: '/admin' | '/data' | '/credits'; icon: typeof Info; tone: 'info' | 'accent'; label: string }) {
+function MenuLink({ to, icon: Icon, tone, label }: { to: '/admin' | '/data' | '/credits' | '/goal' | '/notifications'; icon: typeof Info; tone: 'info' | 'accent'; label: string }) {
   return (
     <Link to={to} className="flex items-center gap-3 border-b border-border px-4 py-3.5 text-sm font-medium last:border-b-0 hover:bg-muted">
       <span className={`grid size-8 place-items-center rounded-lg ${tone === 'accent' ? 'bg-accent-soft text-accent' : 'bg-info-soft text-info'}`}>

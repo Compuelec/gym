@@ -7,3 +7,4 @@ export * from './records';
 export * from './recovery';
 export * from './today';
 export * from './progress';
+export * from './goals';

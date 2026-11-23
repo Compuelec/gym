@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addRest, formatClock, loadRest, overtimeSeconds, remainingSeconds, saveRest, startRest } from './rest-timer';
+import { addRest, formatClock, loadRest, overtimeSeconds, remainingSeconds, saveRest, startRest, nextUp } from './rest-timer';
 
 describe('rest timer', () => {
   it('counts down from an absolute end time', () => {
@@ -42,5 +42,23 @@ describe('rest timer', () => {
     expect(formatClock(95)).toBe('1:35');
     expect(formatClock(3909)).toBe('1:05:09');
     expect(formatClock(19219)).toBe('5:20:19');
+  });
+});
+
+describe('next up after a set', () => {
+  const items = [
+    { id: 'a', name: 'Sentadilla', targetSets: 3, done: 1 },
+    { id: 'b', name: 'Remo', targetSets: 3, done: 0 },
+  ];
+  it('the next set of the same exercise first', () => {
+    expect(nextUp(items, 'a')).toBe('Serie 2 de 3 · Sentadilla');
+  });
+  it('then the next pending exercise', () => {
+    expect(nextUp([{ ...items[0]!, done: 3 }, items[1]!], 'a')).toBe('Siguiente ejercicio: Remo');
+    expect(nextUp([{ ...items[0]!, done: 3 }, { ...items[1]!, done: 3 }], 'b')).toBe('Última serie hecha: termina cuando quieras');
+  });
+  it('keeps the next text when time is added', () => {
+    const r = startRest(60, 0, 'Serie 2 de 3 · Remo');
+    expect(addRest(r, 15, 0).next).toBe('Serie 2 de 3 · Remo');
   });
 });
