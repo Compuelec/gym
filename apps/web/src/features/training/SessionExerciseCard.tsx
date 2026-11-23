@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { AnimatedThumbnail, ExerciseImages } from '@/features/catalog/ExerciseImages';
 import type { ExerciseView } from '@/features/catalog/exercises';
 import { muscleName, names } from '@/features/catalog/labels';
-import { t } from '@/i18n';
-import { formatNumber } from '@/lib/format';
+import { t, tn } from '@/i18n';
+import { formatDuration, formatNumber } from '@/lib/format';
 import { newRecords, suggestNext, type RecordKind, type Suggestion } from '@gym/engine';
 import { deleteSet, exerciseHistory, logSet, updateSessionTargets, type HistorySession, type LocalSessionExercise, type LocalSet, type SessionTargets } from './repo';
 import { formatClock } from './rest-timer';
@@ -17,7 +17,7 @@ type Units = 'kg' | 'lb';
 function describeSets(sets: LocalSet[], units: Units) {
   return sets
     .map((s) => {
-      if (s.seconds !== null) return `${s.seconds} s`;
+      if (s.seconds !== null) return formatDuration(s.seconds);
       if (s.weightKg !== null && s.weightKg > 0) return `${formatNumber(kgToDisplay(s.weightKg, units))} ${units} × ${s.reps}`;
       return `${s.reps}`;
     })
@@ -25,7 +25,7 @@ function describeSets(sets: LocalSet[], units: Units) {
 }
 
 function describeSuggestion(s: Suggestion, units: Units) {
-  if (s.seconds) return `${s.seconds} s`;
+  if (s.seconds) return formatDuration(s.seconds);
   if (s.weightKg != null) return `${formatNumber(kgToDisplay(s.weightKg, units))} ${units} × ${s.reps}`;
   return `${s.reps} reps`;
 }
@@ -36,6 +36,12 @@ function repRange(min: number | null, max: number | null) {
   if (min && max && min !== max) return `${min}–${max}`;
   if (!min && !max) return '8–12'; // same default range as the progression engine
   return String(min ?? max);
+}
+
+/** «3 series × 8–12 reps · descanso 1:30»; one set and no rest for cardio: «1 serie × 15 min». */
+function goalLine(sets: number, target: string, restSeconds: number) {
+  const line = `${tn('session.setsCount', sets)} × ${target}`;
+  return restSeconds > 0 ? `${line} · ${t('session.restShort', { rest: formatClock(restSeconds) })}` : line;
 }
 
 export const REST_PRESETS = [0, 30, 45, 60, 75, 90, 120, 150, 180, 240, 300];
@@ -111,11 +117,7 @@ export function SessionExerciseCard({
           </Link>
           {exercise && <p className="text-sm text-muted-foreground">{names(exercise.primaryMuscles, muscleName)}</p>}
           <p className="text-sm font-medium">
-            {t('session.goalLine', {
-              sets: goal.targetSets,
-              target: timed ? `${goal.targetSeconds ?? 30} s` : `${repRange(goal.repMin, goal.repMax)} ${t('session.repsShort')}`,
-              rest: formatClock(se.restSeconds),
-            })}
+            {goalLine(goal.targetSets, timed ? formatDuration(goal.targetSeconds ?? 30) : `${repRange(goal.repMin, goal.repMax)} ${t('session.repsShort')}`, se.restSeconds)}
           </p>
           <p className="text-xs text-muted-foreground">
             {previous && previous.length ? t('session.last', { sets: describeSets(previous, units) }) : previous ? t('session.noLast') : ''}
@@ -291,6 +293,9 @@ function NextSetRow({
   const [meters, setMeters] = useState(defaults.meters);
   const [type, setType] = useState<(typeof SET_TYPES)[number]>('normal');
   const [error, setError] = useState<string | null>(null);
+  // Cardio (5 minutes or more) is entered in minutes; short holds stay in seconds.
+  const inMinutes = measure === 'time' && Number(defaults.seconds) >= 300;
+  const minutesValue = seconds === '' ? '' : String(Math.round((Number(seconds) / 60) * 10) / 10);
 
   async function log() {
     const values: SetValues = {
@@ -323,7 +328,12 @@ function NextSetRow({
       <div className="flex flex-col gap-2 min-[400px]:flex-row">
         {measure === 'weight_reps' && <Stepper label={t('session.weight', { unit: units })} value={weight} onChange={setWeight} step={units === 'kg' ? 2.5 : 5} decimal />}
         {(measure === 'weight_reps' || measure === 'reps') && <Stepper label={t('session.reps')} value={reps} onChange={setReps} step={1} />}
-        {measure === 'time' && <Stepper label={t('session.seconds')} value={seconds} onChange={setSeconds} step={5} />}
+        {measure === 'time' &&
+          (inMinutes ? (
+            <Stepper label={t('session.minutesLabel')} value={minutesValue} onChange={(v) => setSeconds(v === '' ? '' : String(Math.round(Number(v) * 60)))} step={1} min={1} decimal />
+          ) : (
+            <Stepper label={t('session.seconds')} value={seconds} onChange={setSeconds} step={5} />
+          ))}
         {measure === 'distance' && <Stepper label={t('session.meters')} value={meters} onChange={setMeters} step={50} decimal />}
       </div>
       <Button size="lg" aria-label={`${t('session.log')}: ${label}`} onClick={() => void log()}>
@@ -382,7 +392,7 @@ function TargetsForm({ timed, initial, onSave, onCancel }: { timed: boolean; ini
       <div className="flex flex-col gap-2">
         <Stepper label={t('routines.sets')} value={sets} onChange={setSets} step={1} min={1} />
         {timed ? (
-          <Stepper label={t('session.seconds')} value={secs} onChange={setSecs} step={5} min={5} />
+          <Stepper label={t('session.seconds')} value={secs} onChange={setSecs} step={Number(secs) >= 300 ? 60 : 5} min={5} />
         ) : (
           <div className="flex gap-2">
             <Stepper label={t('routines.repMin')} value={repMin} onChange={setRepMin} step={1} min={1} />

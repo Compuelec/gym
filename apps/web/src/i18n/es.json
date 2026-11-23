@@ -316,7 +316,6 @@
     "swapShort": "Cambiar",
     "adjust": "Ajustar",
     "adjustTitle": "Meta para hoy",
-    "goalLine": "{sets} series × {target} · descanso {rest}",
     "repsShort": "reps",
     "noSteps": "Este ejercicio no tiene pasos escritos.",
     "fullDetail": "Ver ficha completa",
@@ -329,7 +328,11 @@
     "badSets": "Las series van de 1 a 10.",
     "badSeconds": "El tiempo va de 5 a 3600 segundos.",
     "badReps": "Revisa las repeticiones: el mínimo no puede ser mayor que el máximo.",
-    "sub15": "−15 s"
+    "sub15": "−15 s",
+    "setsCount": "{count} series",
+    "setsCountOne": "1 serie",
+    "restShort": "descanso {rest}",
+    "minutesLabel": "Minutos"
   },
   "smart": {
     "suggestion": "Sugerencia",
@@ -545,5 +548,13 @@
     },
     "failed": "No se pudo completar: {message}",
     "newRequest": "Nueva consulta"
+  },
+  "equipmentGroups": {
+    "free_weights": "Pesas",
+    "support": "Bancos, barras y soportes",
+    "machines": "Máquinas",
+    "cardio": "Cardio",
+    "accessories": "Accesorios",
+    "other": "Poco común"
   }
 }

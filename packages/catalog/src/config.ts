@@ -15,4 +15,4 @@ export const IMAGE_WIDTH = 480;
 export const IMAGE_QUALITY = 62;
 
 /** Bump when the importer's mapping logic changes, so clients download a new catalog. */
-export const IMPORTER_VERSION = 2;
+export const IMPORTER_VERSION = 3;

@@ -16,8 +16,24 @@ export const EQUIPMENT = [
   { slug: 'exercise_ball', nameEs: 'Pelota de ejercicio', category: 'accessories' },
   { slug: 'foam_roll', nameEs: 'Rodillo de espuma', category: 'accessories' },
   { slug: 'mat', nameEs: 'Colchoneta', category: 'accessories' },
-  // Specialized gear not covered above (e.g. tire, sled). Only matches locations that list it.
-  { slug: 'other', nameEs: 'Otro equipo', category: 'other' },
+  { slug: 'plate', nameEs: 'Discos de pesa', category: 'free_weights' },
+  { slug: 'trap_bar', nameEs: 'Barra hexagonal', category: 'free_weights' },
+  { slug: 'dip_bars', nameEs: 'Paralelas para fondos', category: 'support' },
+  { slug: 'suspension', nameEs: 'TRX o anillas', category: 'support' },
+  { slug: 'box', nameEs: 'Cajón o step', category: 'support' },
+  { slug: 'hyper_bench', nameEs: 'Banco de hiperextensiones', category: 'machines' },
+  { slug: 'jump_rope', nameEs: 'Cuerda para saltar', category: 'accessories' },
+  { slug: 'ab_wheel', nameEs: 'Rueda abdominal', category: 'accessories' },
+  { slug: 'battle_rope', nameEs: 'Cuerda de batalla', category: 'accessories' },
+  { slug: 'cones', nameEs: 'Conos o vallas', category: 'accessories' },
+  { slug: 'treadmill', nameEs: 'Trotadora (cinta de correr)', category: 'cardio' },
+  { slug: 'stationary_bike', nameEs: 'Bicicleta estática', category: 'cardio' },
+  { slug: 'elliptical', nameEs: 'Elíptica', category: 'cardio' },
+  { slug: 'rower', nameEs: 'Máquina de remo', category: 'cardio' },
+  { slug: 'stair_climber', nameEs: 'Escaladora', category: 'cardio' },
+  { slug: 'sled', nameEs: 'Trineo de arrastre', category: 'other' },
+  // Strongman and rare implements (tire, atlas stones, log, yoke, heavy bag, bike…).
+  { slug: 'other', nameEs: 'Equipo especial (neumático, piedras, yugo, saco de boxeo, bicicleta…)', category: 'other' },
 ] as const;
 
 export type EquipmentSlug = (typeof EQUIPMENT)[number]['slug'];
@@ -27,7 +43,9 @@ export const EQUIPMENT_SLUGS = EQUIPMENT.map((e) => e.slug) as [EquipmentSlug, .
 /** Everything except exercise/foam accessories: a full commercial gym. */
 export const FULL_GYM_EQUIPMENT: EquipmentSlug[] = [
   'dumbbell', 'barbell', 'ez_bar', 'kettlebell', 'bench', 'pull_up_bar', 'band', 'cable', 'machine',
-  'medicine_ball', 'exercise_ball', 'foam_roll', 'mat',
+  'medicine_ball', 'exercise_ball', 'foam_roll', 'mat', 'plate', 'trap_bar', 'dip_bars', 'suspension', 'box',
+  'hyper_bench', 'jump_rope', 'ab_wheel', 'battle_rope', 'treadmill', 'stationary_bike', 'elliptical', 'rower',
+  'stair_climber',
 ];
 
 /**

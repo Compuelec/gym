@@ -7,6 +7,7 @@ import { useExercises } from '@/features/catalog/exercises';
 import { useRecovery } from '@/features/smart/hooks';
 import { startSession } from '@/features/training/repo';
 import { t } from '@/i18n';
+import { formatDuration } from '@/lib/format';
 import { useUser } from '@/lib/auth-context';
 import { useLocations, useProfile } from '@/lib/repos';
 
@@ -94,7 +95,9 @@ function TodayPage() {
                   {n + 1}. {byId.get(i.exerciseId)?.nameEs}
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  {t('smart.itemTarget', { sets: i.sets, reps: i.repMin === i.repMax ? `${i.repMin}` : `${i.repMin}–${i.repMax}` })}
+                  {i.seconds
+                    ? formatDuration(i.seconds)
+                    : t('smart.itemTarget', { sets: i.sets, reps: i.repMin === i.repMax ? `${i.repMin}` : `${i.repMin}–${i.repMax}` })}
                 </span>
                 <span className="text-xs text-muted-foreground">{i.reason}</span>
               </li>

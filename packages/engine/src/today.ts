@@ -41,6 +41,10 @@ const SCHEME: Record<Goal, { sets: number; repMin: number; repMax: number; rest:
   health: { sets: 3, repMin: 10, repMax: 12, rest: 75 },
   fat_loss: { sets: 3, repMin: 12, repMax: 15, rest: 45 },
 };
+/** Minutes of cardio at the end of the session, by goal. */
+const CARDIO_MINUTES: Record<Goal, number> = { strength: 8, hypertrophy: 10, endurance: 20, health: 12, fat_loss: 15 };
+/** Cardio machines first (what the place has), then outdoor walking/jogging as a fallback. */
+const CARDIO_PREFERENCE = ['treadmill', 'stationary_bike', 'elliptical', 'rower', 'stair_climber', 'jump_rope'];
 const WORK_SECONDS = 45;
 const TRANSITION_SECONDS = 60;
 const LEVEL_ORDER = ['beginner', 'intermediate', 'expert'];
@@ -66,9 +70,12 @@ export function generateToday(opts: {
   catalog: readonly TodayCandidate[];
 }): TodayRoutine {
   const scheme = SCHEME[opts.goal];
-  const perExercise = scheme.sets * (WORK_SECONDS + scheme.rest) + TRANSITION_SECONDS;
-  const slots = Math.max(2, Math.min(8, Math.floor((opts.minutes * 60) / perExercise)));
   const maxLevel = LEVEL_ORDER.indexOf(opts.level);
+  const cardio = pickCardio(opts.catalog, opts.equipment, maxLevel);
+  // Short sessions keep their strength work; cardio gets at most a third of the time.
+  const cardioMinutes = cardio ? Math.min(CARDIO_MINUTES[opts.goal], Math.floor(opts.minutes / 3)) : 0;
+  const perExercise = scheme.sets * (WORK_SECONDS + scheme.rest) + TRANSITION_SECONDS;
+  const slots = Math.max(2, Math.min(8, Math.floor(((opts.minutes - cardioMinutes) * 60) / perExercise)));
 
   // Group recovery: a group is as tired as its most tired muscle.
   const groups = new Map<string, { fatigue: number; weekly: number; muscles: MuscleRecovery[] }>();
@@ -145,9 +152,38 @@ export function generateToday(opts: {
   const mechanic = new Map(usable.map((c) => [c.id, c.mechanic]));
   items.sort((a, b) => Number(mechanic.get(b.exerciseId) === 'compound') - Number(mechanic.get(a.exerciseId) === 'compound'));
 
-  const minutes = Math.round((items.reduce((sum, i) => sum + i.sets * (WORK_SECONDS + i.restSeconds) + TRANSITION_SECONDS, 0)) / 60);
+  // Strength first, cardio to finish.
+  if (cardio && cardioMinutes >= 5) {
+    items.push({
+      exerciseId: cardio.id,
+      sets: 1,
+      repMin: null,
+      repMax: null,
+      seconds: cardioMinutes * 60,
+      restSeconds: 0,
+      reason: `Cardio al final: ${cardioMinutes} minutos a ritmo cómodo, cuando ya terminaste la fuerza.`,
+    });
+  }
+
+  const minutes = Math.round(
+    items.reduce((sum, i) => sum + (i.seconds ? i.seconds : i.sets * (WORK_SECONDS + i.restSeconds) + TRANSITION_SECONDS), 0) / 60,
+  );
   const reason =
     `Foco: ${listEs(focus.map((f) => f.toLowerCase()))}, con el equipo de ${opts.locationName}.` +
+    (cardio && cardioMinutes >= 5 ? ` Primero fuerza y al final ${cardioMinutes} minutos de cardio.` : '') +
     (avoided.length ? ` Evitamos ${listEs(avoided.map((a) => a.toLowerCase()))} porque los trabajaste hace poco.` : '');
   return { focus, avoided, items, reason, estimatedMinutes: minutes };
+}
+
+/** The cardio exercise for the end of the session: a machine the place has, else walking/jogging. */
+function pickCardio(catalog: readonly TodayCandidate[], equipment: readonly string[], maxLevel: number): TodayCandidate | null {
+  const options = catalog.filter(
+    (c) => !c.retiredAt && c.category === 'cardio' && LEVEL_ORDER.indexOf(c.level) <= maxLevel && fitsEquipment(c.equipment, equipment),
+  );
+  const rank = (c: TodayCandidate) => {
+    const i = CARDIO_PREFERENCE.findIndex((e) => c.equipment.includes(e));
+    return i === -1 ? CARDIO_PREFERENCE.length : i;
+  };
+  // Within a machine, the gentlest option first (walking/jogging before running).
+  return options.sort((a, b) => rank(a) - rank(b) || Number(b.level === 'beginner') - Number(a.level === 'beginner') || a.nameEs.localeCompare(b.nameEs, 'es'))[0] ?? null;
 }

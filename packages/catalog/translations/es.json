@@ -2921,7 +2921,7 @@
     "source": "ai"
   },
   "Elliptical_Trainer": {
-    "nameEs": "Entrenador elíptico",
+    "nameEs": "Elíptica",
     "instructionsEs": [
       "Para comenzar, sube a la elíptica y selecciona la opción deseada en el menú. La mayoría de las elípticas tienen un modo manual, o puedes seleccionar un programa para ejecutar. Normalmente puedes ingresar tu edad y peso para estimar la cantidad de calorías quemadas durante el ejercicio. La elevación puede ajustarse para cambiar la intensidad del entrenamiento.",
       "Las manijas pueden usarse para monitorear tu frecuencia cardíaca y ayudarte a mantener una intensidad adecuada."
@@ -4171,7 +4171,7 @@
     "source": "ai"
   },
   "Jogging_Treadmill": {
-    "nameEs": "Trote en cinta caminadora",
+    "nameEs": "Trote en trotadora",
     "instructionsEs": [
       "Para empezar, sube a la cinta caminadora y selecciona la opción deseada en el menú. La mayoría de las cintas tienen un modo manual, o puedes elegir un programa. Normalmente puedes ingresar tu edad y peso para estimar las calorías quemadas durante el ejercicio. La inclinación puede ajustarse para cambiar la intensidad del entrenamiento.",
       "Las cintas caminadoras ofrecen comodidad, beneficios cardiovasculares y normalmente tienen menos impacto que trotar al aire libre. Una persona de 68 kg quemará casi 250 calorías trotando 30 minutos, frente a más de 450 calorías corriendo. Mantén una buena postura al trotar y sujétate de las manijas solo cuando sea necesario, por ejemplo, al bajar o al revisar tu frecuencia cardíaca."
@@ -6927,7 +6927,7 @@
     "source": "ai"
   },
   "Running_Treadmill": {
-    "nameEs": "Correr en cinta",
+    "nameEs": "Correr en trotadora",
     "instructionsEs": [
       "Para comenzar, sube a la cinta y selecciona la opción deseada en el menú. La mayoría de las cintas tienen un modo manual, o puedes elegir un programa para correr. Normalmente puedes ingresar tu edad y tu peso para estimar las calorías quemadas durante el ejercicio. La inclinación puede ajustarse para cambiar la intensidad del entrenamiento.",
       "Las cintas ofrecen comodidad y beneficios cardiovasculares, y por lo general tienen menos impacto que correr al aire libre. Una persona de 70 kg quemará más de 450 calorías corriendo a 13 km/h durante 30 minutos. Mantén una postura adecuada mientras corres y sujétate de los mangos solo cuando sea necesario, por ejemplo al bajarte o al revisar tu frecuencia cardíaca."
@@ -9528,7 +9528,7 @@
     "source": "ai"
   },
   "Walking_Treadmill": {
-    "nameEs": "Caminata en cinta",
+    "nameEs": "Caminata en trotadora",
     "instructionsEs": [
       "Para comenzar, sube a la cinta y selecciona la opción deseada en el menú. La mayoría de las cintas tienen un ajuste manual, o puedes seleccionar un programa. Normalmente puedes ingresar tu edad y peso para estimar las calorías quemadas durante el ejercicio. La inclinación se puede ajustar para cambiar la intensidad del entrenamiento.",
       "Las cintas ofrecen comodidad y beneficios cardiovasculares, y normalmente tienen menos impacto que caminar al aire libre. Al caminar, debes moverte a un ritmo de moderado a rápido, no pausado. Al ser una actividad de menor intensidad, caminar no quema tantas calorías como otras actividades, pero aun así aporta grandes beneficios. Una persona de 68 kg (150 lb) quemará unas 175 calorías caminando a 6,4 km/h (4 millas por hora) durante 30 minutos, en comparación con 450 calorías corriendo al doble de velocidad. Mantén una postura correcta mientras caminas y sujétate de las manijas solo cuando sea necesario, por ejemplo al bajarte o al medir tu frecuencia cardíaca."

@@ -87,7 +87,8 @@ test.describe('US2 · catálogo de ejercicios', () => {
     }).toPass({ timeout: 30_000 });
     await page2.getByLabel('Solo favoritos').uncheck();
     await page2.getByLabel('Buscar ejercicio').fill('mochila');
-    await expect(page2.getByRole('link', { name: /Remo con mochila/ })).toBeVisible();
+    // The own exercise may arrive on the next sync cycle after the favorite (slow mobile runs).
+    await expect(page2.getByRole('link', { name: /Remo con mochila/ })).toBeVisible({ timeout: 20_000 });
     await other.close();
 
     // A different user never sees it.

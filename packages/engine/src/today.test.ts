@@ -75,4 +75,26 @@ describe('generateToday', () => {
     expect(long.items.length).toBeGreaterThan(short.items.length);
     expect(short.items[0]).toMatchObject({ sets: 4, repMin: 4, repMax: 6, restSeconds: 150 });
   });
+
+  it('strength first and cardio to finish, on the machine the place has', () => {
+    const withCardio = [
+      ...catalog,
+      c('trail-walk', [], [], { category: 'cardio', measure: 'time', mechanic: null }),
+      c('treadmill-walk', [], ['treadmill'], { category: 'cardio', measure: 'time', mechanic: null }),
+      c('bike', [], ['stationary_bike'], { category: 'cardio', measure: 'time', mechanic: null }),
+    ];
+    const base = { goal: 'fat_loss' as const, level: 'beginner', minutes: 60, locationName: 'Casa', recovery: muscleRecovery([], NOW), catalog: withCardio };
+    const home = generateToday({ ...base, equipment: ['dumbbell', 'treadmill'] });
+    const last = home.items.at(-1)!;
+    expect(last).toMatchObject({ exerciseId: 'treadmill-walk', sets: 1, seconds: 15 * 60, restSeconds: 0 });
+    expect(home.items.slice(0, -1).every((i) => i.seconds === null)).toBe(true);
+    expect(home.reason).toMatch(/Primero fuerza y al final 15 minutos de cardio/);
+    expect(home.estimatedMinutes).toBeLessThanOrEqual(60);
+
+    // No machine: walking or jogging outside.
+    expect(generateToday({ ...base, equipment: ['dumbbell'] }).items.at(-1)?.exerciseId).toBe('trail-walk');
+    // A short session keeps most of its time for strength.
+    const short = generateToday({ ...base, minutes: 20, equipment: ['dumbbell', 'treadmill'] });
+    expect(short.items.at(-1)?.seconds).toBe(6 * 60);
+  });
 });

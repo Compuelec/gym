@@ -83,3 +83,37 @@ test.describe('US4 · recomendaciones inteligentes sin conexión', () => {
     await expect(page.getByText('1RM estimado').locator('..')).toContainText('16,8 kg'); // Epley: 12·(1+12/30), Spanish decimal comma
   });
 });
+
+test.describe('US4 · rutina de hoy con el equipo real de la casa', () => {
+  test('home with dumbbells and a treadmill: only doable exercises, strength first and the treadmill to finish', async ({ page, context, baseURL }) => {
+    await signUpViaApi(context.request, baseURL!);
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'Cuéntanos de ti' })).toBeVisible();
+    await page.getByRole('button', { name: 'Siguiente' }).click();
+    // Equipment is grouped and specific: the treadmill is under «Cardio».
+    await expect(page.getByText('Cardio', { exact: true })).toBeVisible();
+    await page.getByText('Trotadora (cinta de correr)').first().click();
+    await page.getByRole('button', { name: 'Siguiente' }).click();
+    await page.getByLabel('Entiendo y acepto').check();
+    await page.getByRole('button', { name: 'Comenzar' }).click();
+    await expect(page.getByRole('heading', { name: /Hola/ })).toBeVisible();
+
+    await page.getByRole('link', { name: 'Rutina de hoy' }).click();
+    await page.getByLabel('¿Cuánto tiempo tienes?').selectOption('60');
+    await page.getByRole('button', { name: 'Proponer rutina' }).click();
+    await expect(page.getByText(/Primero fuerza y al final \d+ minutos de cardio\./)).toBeVisible();
+    const items = page.locator('ol > li');
+    await expect(items.last()).toContainText(/trotadora/i);
+    await expect(items.last()).toContainText(/\d+ min/);
+    // Nothing that needs gear this home does not have.
+    await expect(page.locator('ol')).not.toContainText(/trineo|dominadas|barra olímpica|polea/i);
+
+    await page.getByRole('button', { name: 'Empezar esta rutina' }).click();
+    const cardio = page.getByRole('region', { name: /trotadora/i });
+    await expect(cardio.getByText(/^1 serie × \d+ min$/)).toBeVisible();
+    // Cardio is logged in minutes, not seconds.
+    await cardio.getByLabel('Minutos', { exact: true }).fill('20');
+    await cardio.getByRole('button', { name: /^Registrar serie/ }).click();
+    await expect(cardio.locator('li', { hasText: '20 min' })).toBeVisible();
+  });
+});
