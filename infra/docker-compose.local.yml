@@ -1,0 +1,73 @@
+# Local trial stack: the production images with persistent data, to use the app by hand on
+# http://localhost:8090 (emails in Mailpit at http://localhost:58030). AI stays off.
+# Secrets live in ../.env.local (gitignored): BETTER_AUTH_SECRET, APP_ENCRYPTION_KEY, VAPID_*.
+# Run: docker compose -f infra/docker-compose.local.yml up -d --build --wait
+name: gym-local
+services:
+  postgres:
+    image: postgres:17-alpine@sha256:b0f9560a2de083e2cc7382e75f808c7381a32852a7ec49117deedb300e552b24
+    environment:
+      POSTGRES_USER: gym
+      POSTGRES_PASSWORD: gym
+      POSTGRES_DB: gym
+    volumes:
+      - gym-local-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U gym -d gym']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    image: gym-api:local
+    build: { context: .., dockerfile: infra/docker/api.Dockerfile }
+    command: ['node', '--import', 'tsx', 'src/db/migrate.ts']
+    env_file: ../.env.local
+    environment: &api-env
+      DATABASE_URL: postgres://gym:gym@postgres:5432/gym
+      BETTER_AUTH_URL: http://localhost:8090
+      NODE_ENV: production
+      LOG_LEVEL: info
+      SMTP_URL: smtp://mailpit:1025
+      MAIL_FROM: 'Gym <no-reply@localhost>'
+      VAPID_SUBJECT: mailto:admin@localhost
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    image: gym-api:local
+    env_file: ../.env.local
+    environment: *api-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:3000/api/health || exit 1']
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  worker:
+    image: gym-api:local
+    command: ['node', '--import', 'tsx', 'src/worker.ts']
+    env_file: ../.env.local
+    environment: *api-env
+    depends_on:
+      migrate: { condition: service_completed_successfully }
+
+  mailpit:
+    image: axllent/mailpit:v1.27
+    ports:
+      - '58030:8025'
+
+  web:
+    image: gym-web:local
+    build: { context: .., dockerfile: infra/docker/web.Dockerfile }
+    environment:
+      API_UPSTREAM: api:3000
+    ports:
+      - '8090:8080'
+    depends_on:
+      api: { condition: service_healthy }
+
+volumes:
+  gym-local-pg:
