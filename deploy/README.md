@@ -51,6 +51,8 @@ $K "kubectl -n gym create secret generic gym-secrets \
 # 4) Base de datos y volumen de respaldos
 apply deploy/k8s/postgres.yaml
 apply deploy/k8s/backups-pvc.yaml
+apply deploy/k8s/backup-scripts.yaml   # scripts que usa la migración (respaldo previo)
+apply deploy/k8s/backup.yaml           # respaldo diario y verificación mensual
 $K 'kubectl -n gym rollout status statefulset/postgres'
 ```
 
@@ -87,7 +89,14 @@ apply deploy/k8s/app.yaml
 $K 'kubectl -n gym rollout status deploy/gym-api deploy/gym-web deploy/gym-worker'
 ```
 
-## 3. Comprobar después de publicar
+## 3. Invitaciones y administrador
+
+```bash
+$K 'kubectl -n gym exec deploy/gym-api -- node dist/admin.mjs invite --days 14'   # imprime el enlace
+$K 'kubectl -n gym exec deploy/gym-api -- node dist/admin.mjs promote <correo>'   # tras registrarse
+```
+
+## 4. Comprobar después de publicar
 
 ```bash
 curl -s https://$DOMAIN/api/health          # {"status":"ok"}
@@ -98,7 +107,7 @@ $K 'kubectl run -n default prueba-red --rm -i --restart=Never --image=curlimages
 Y en el teléfono: abrir `https://$DOMAIN`, instalar en la pantalla de inicio y abrirla en
 modo avión.
 
-## 4. Respaldos
+## 5. Respaldos
 
 - Antes de cada migración el job `gym-migrate` deja un respaldo `gym-premigrate-AAAAMMDD-HHMMSS.dump`
   en el volumen `gym-backups` y comprueba que se pueda leer.
