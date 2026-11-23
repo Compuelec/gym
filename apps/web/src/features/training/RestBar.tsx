@@ -49,11 +49,15 @@ export function RestBar({ rest, onAdd, onSkip }: { rest: RestState | null; onAdd
   return (
     <div
       role="timer"
-      aria-live="polite"
+      // The countdown changes every second: do not read each tick, only announce the end.
+      aria-live="off"
       className={`fixed inset-x-0 bottom-[calc(3.75rem+env(safe-area-inset-bottom))] z-40 border-t border-border ${done ? 'bg-green-600 text-white' : 'bg-background'}`}
     >
       <div className="mx-auto flex max-w-md items-center gap-3 px-4 py-2">
         <Timer className="size-5" aria-hidden />
+        <span role="status" className="sr-only">
+          {done ? t('session.restDone') : ''}
+        </span>
         <span className="flex-1 font-medium tabular-nums">
           {done ? `${t('session.restDone')} ${t('session.overtime', { time: formatClock(overtimeSeconds(rest, now)) })}` : `${t('session.rest')} ${formatClock(remaining)}`}
         </span>

@@ -1,6 +1,6 @@
 # Tecnologías y arquitectura
 
-> ⚠️ **Documento superado.** La versión vigente y ratificable está en `specs/001-gym-pwa-mvp/` (Spec Kit). Cambios desde aquí: IA con Claude Haiku 5.5 configurable por el administrador, y despliegue en el clúster Kubernetes propio + Cloudflare Tunnel.
+> ⚠️ **Documento superado.** La versión vigente y ratificable está en `specs/001-gym-pwa-mvp/` (Spec Kit). Cambios desde aquí: IA con Claude Haiku 5.5 configurable por el administrador, y despliegue en el clúster Kubernetes propio + Cloudflare Tunnel. Decisiones tomadas al implementar: cola de trabajos en Postgres (`FOR UPDATE SKIP LOCKED`) en lugar de pg-boss, catálogo servido como archivos estáticos por Caddy, y avance del coach por consulta periódica en lugar de SSE. Resumen actual en el `README.md`.
 
 > Fecha: 2026-11-22 · Fase 2 · Propuesta pendiente de aprobación
 

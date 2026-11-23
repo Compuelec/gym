@@ -305,10 +305,10 @@ Monorepo pnpm: `apps/web/`, `apps/api/`, `packages/shared/`, `packages/engine/`,
 
 ## Phase 10: Polish & Cross-Cutting Concerns
 
-- [ ] T141 [P] Accessibility pass (contrast, focus, labels, screen reader on session screen) across `apps/web/src/`
-- [ ] T142 [P] Performance pass: app open < 2 s on mid-range phone, catalog search < 300 ms, bundle splitting, Lighthouse PWA audit; record in `specs/001-gym-pwa-mvp/checklists/performance.md`
+- [X] T141 [P] Accessibility pass (contrast, focus, labels, screen reader on session screen) across `apps/web/src/`
+- [X] T142 [P] Performance pass: app open < 2 s on mid-range phone, catalog search < 300 ms, bundle splitting, Lighthouse PWA audit; record in `specs/001-gym-pwa-mvp/checklists/performance.md`
 - [ ] T143 [P] Security review: owner filter on every query, Origin check, rate limits on auth routes, secrets only in K8s Secret, logs redaction (no health data, no keys) — fix findings
-- [ ] T144 [P] Update `README.md` (setup, scripts, deploy, architecture) and `docs/` with final decisions
+- [X] T144 [P] Update `README.md` (setup, scripts, deploy, architecture) and `docs/` with final decisions
 - [ ] T145 Full regression: `pnpm test`, `pnpm e2e`, and complete `quickstart.md` level 3 on Android and iPhone; record what was and wasn't tested in `specs/001-gym-pwa-mvp/checklists/release.md`
 
 ---
