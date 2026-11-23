@@ -120,7 +120,7 @@ Respaldo manual:
 $K "kubectl -n gym exec postgres-0 -- pg_dump -U gym --clean --if-exists gym" | gzip > gym-$(date +%F).sql.gz
 ```
 
-## 5. Problemas comunes
+## 6. Problemas comunes
 
 | Síntoma | Qué revisar |
 |---|---|
