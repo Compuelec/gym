@@ -183,6 +183,42 @@ describe('coach requests', () => {
     expect(user.match(/Propio\d\d/g)).toHaveLength(50);
   });
 
+  it('texts longer than the schema allows are shortened instead of failing the whole program', async () => {
+    const a = await account();
+    // Seen in production: the model wrote a summary over 600 chars and a progression note over 400.
+    const longSummary = `${'Este programa combina fuerza y cardio para bajar grasa. '.repeat(20)}Fin.`;
+    const longNote = 'Sube el peso cuando completes todas las repeticiones con buena técnica. '.repeat(10);
+    const highlights = Array.from({ length: 7 }, (_, i) => `Punto ${i}`);
+    script = () => message('end_turn', program(a.home, ['fedb:Pushups', 'fedb:Goblet_Squat'], { summaryEs: longSummary, progressionNoteEs: longNote, name: 'N'.repeat(120), highlightsEs: highlights }));
+    await request(a.cookie);
+    await run();
+    expect(calls).toBe(1);
+    const [row] = await db.select().from(coachRequests).where(eq(coachRequests.ownerId, a.id));
+    expect(row?.status).toBe('done');
+    const result = row?.resultJson as { summaryEs: string; progressionNoteEs: string; name: string };
+    expect(result.summaryEs.length).toBeLessThanOrEqual(600);
+    expect(result.summaryEs.length).toBeGreaterThan(300);
+    // Cut at the end of a sentence, not in the middle of a word.
+    expect(result.summaryEs.endsWith('.')).toBe(true);
+    expect(result.progressionNoteEs.length).toBeLessThanOrEqual(400);
+    expect(result.name.length).toBeLessThanOrEqual(80);
+    expect(row?.inputTokens).toBe(5000);
+  });
+
+  it('an answer that is not valid JSON is retried once, then fails clearly and still records what it cost', async () => {
+    const a = await account();
+    script = () => ({ body: { ...message('end_turn', null).body, content: [{ type: 'text', text: '{"name": "corta' }] } });
+    await request(a.cookie);
+    await run();
+    expect(calls).toBe(2);
+    const [row] = await db.select().from(coachRequests).where(eq(coachRequests.ownerId, a.id));
+    expect(row?.status).toBe('failed');
+    expect(row?.errorMessage).not.toBe('El coach no respondió, intenta más tarde.');
+    // Both calls were billed by the provider, so both count against the monthly budget.
+    expect(row?.inputTokens).toBe(10000);
+    expect(row?.costUsd).toBeGreaterThan(0);
+  });
+
   it('parallel requests and parallel accepts never double up', async () => {
     const a = await account();
     script = () => message('end_turn', program(a.home, ['fedb:Pushups', 'fedb:Goblet_Squat']));

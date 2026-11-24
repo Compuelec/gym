@@ -3,6 +3,21 @@
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.1.0/); versiones según
 [SemVer](https://semver.org/lang/es/). `main` siempre es la última versión publicada.
 
+## [0.4.1] — 2026-11-24
+
+### Corregido
+- El coach fallaba («no responde») cuando un texto de su respuesta salía más largo de lo
+  permitido: ahora se acorta en vez de descartar la respuesta, y el gasto se registra siempre.
+- «Terminar» parecía no hacer nada en un entrenamiento largo: ahora abre una ventana desde abajo
+  con la dificultad, las notas, «Guardar entrenamiento», «Descartar» y «Seguir entrenando».
+- El selector de ejercicios se cortaba en 50 sin avisar: ahora tiene «Ver más», y la página de
+  atrás no se desplaza mientras está abierto.
+- La búsqueda de ejercicios exigía todas las palabras en el nombre: ahora ignora palabras como
+  «con», «en» o «para», entiende variantes (banca/banco, pectorales/pecho), busca también por
+  músculo y equipo, y si nada coincide del todo muestra los más parecidos.
+- Los ejercicios que piden equipo que no tienes en tu lugar ya no se esconden en silencio: un
+  botón avisa cuántos son y los muestra.
+
 ## [0.4.0] — 2026-11-23
 
 ### Agregado

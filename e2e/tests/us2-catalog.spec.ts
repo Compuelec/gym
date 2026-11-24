@@ -72,6 +72,25 @@ test.describe('US2 · catálogo de ejercicios', () => {
     expect(loaded).toBe(true);
   });
 
+  test('everyday words find exercises; no dead ends when nothing matches exactly or the place hides them', async ({ page }) => {
+    // As typed in production: «banca» (catalog says «banco»), «pectorales» (muscle «Pecho»), and
+    // a combination no exercise has. The closest ones show up instead of an empty list.
+    await page.getByLabel('Buscar ejercicio').fill('curls con barra en banca para pectorales');
+    await expect(page.getByText('Estos son los más parecidos')).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByRole('link', { name: /^Press de banca con barra, agarre medio/ })).toBeVisible();
+
+    await page.getByLabel('Buscar ejercicio').fill('press banca pecho');
+    await expect(page.getByText('Estos son los más parecidos')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /^Press de banca con barra, agarre medio/ })).toBeVisible();
+
+    // Casa has no barbell: the place filter hides them, but says so and lets you see them.
+    await page.getByRole('button', { name: 'Filtros' }).click();
+    await page.getByLabel('Lugar').selectOption({ label: 'Casa' });
+    await expect(page.getByRole('link', { name: /^Press de banca con barra, agarre medio/ })).toHaveCount(0);
+    await page.getByRole('button', { name: /^Ver también \d+ que piden? equipo que no tienes en Casa/ }).click();
+    await expect(page.getByRole('link', { name: /^Press de banca con barra, agarre medio/ })).toBeVisible();
+  });
+
   test('favorites sync to a second device; own exercises are private', async ({ page, browser, baseURL, context }) => {
     test.setTimeout(90_000); // several browser contexts
     await page.getByLabel('Buscar ejercicio').fill('curl martillo');

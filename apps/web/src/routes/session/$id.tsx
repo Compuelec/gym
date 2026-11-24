@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { PageSpinner } from '@/components/Spinner';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { Bell, Plus } from 'lucide-react';
@@ -43,6 +43,17 @@ function SessionPage() {
   const [picking, setPicking] = useState(false);
   const [swapping, setSwapping] = useState<LocalSessionExercise | null>(null);
   const [finishing, setFinishing] = useState(false);
+  // Focus moves into the finish sheet (screen readers announce it) and the page behind stays put.
+  const finishTitleRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (!finishing) return;
+    finishTitleRef.current?.focus({ preventScroll: true });
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [finishing]);
   const [effort, setEffort] = useState('');
   const [notes, setNotes] = useState('');
   const [alerts, setAlerts] = useState<'unknown' | 'on' | 'off' | 'denied'>('unknown');
@@ -125,39 +136,58 @@ function SessionPage() {
       </Button>
 
       {finishing && (
-        <section aria-label={t('session.finishTitle')} className="flex flex-col gap-3 rounded-lg border border-primary p-4">
-          <h2 className="text-lg font-semibold">{t('session.finishTitle')}</h2>
-          <SelectField label={t('session.effort')} value={effort} onChange={(e) => setEffort(e.target.value)}>
-            <option value="">—</option>
-            {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
-              <option key={n} value={n}>
-                {n}
-              </option>
-            ))}
-          </SelectField>
-          <TextField label={t('session.notes')} value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} />
-          <div className="flex gap-2">
-            <Button
-              className="flex-1"
-              onClick={async () => {
-                rest.clear();
-                await finishSession(user.id, session, { perceivedEffort: effort ? Number(effort) : null, notes: notes.trim() || null });
-              }}
-            >
-              {t('session.confirmFinish')}
+        // Bottom sheet over everything: a tap on «Terminar» always has a visible effect, wherever
+        // the user is on a long workout page.
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="finish-title"
+          className="fixed inset-0 z-50 flex flex-col justify-end bg-black/40"
+          onClick={() => setFinishing(false)}
+          onKeyDown={(e) => e.key === 'Escape' && setFinishing(false)}
+        >
+          <section
+            className="mx-auto flex max-h-[85dvh] w-full max-w-md flex-col gap-3 overflow-y-auto overscroll-contain rounded-t-2xl bg-background p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h2 id="finish-title" ref={finishTitleRef} tabIndex={-1} className="text-lg font-semibold outline-none">
+              {t('session.finishTitle')}
+            </h2>
+            <SelectField label={t('session.effort')} value={effort} onChange={(e) => setEffort(e.target.value)}>
+              <option value="">—</option>
+              {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
+                <option key={n} value={n}>
+                  {n}
+                </option>
+              ))}
+            </SelectField>
+            <TextField label={t('session.notes')} value={notes} maxLength={1000} onChange={(e) => setNotes(e.target.value)} />
+            <div className="flex gap-2">
+              <Button
+                className="flex-1"
+                onClick={async () => {
+                  rest.clear();
+                  await finishSession(user.id, session, { perceivedEffort: effort ? Number(effort) : null, notes: notes.trim() || null });
+                }}
+              >
+                {t('session.confirmFinish')}
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={async () => {
+                  rest.clear();
+                  await discardSession(user.id, session);
+                  await navigate({ to: '/' });
+                }}
+              >
+                {t('session.discard')}
+              </Button>
+            </div>
+            <Button variant="outline" onClick={() => setFinishing(false)}>
+              {t('session.keepTraining')}
             </Button>
-            <Button
-              variant="ghost"
-              onClick={async () => {
-                rest.clear();
-                await discardSession(user.id, session);
-                await navigate({ to: '/' });
-              }}
-            >
-              {t('session.discard')}
-            </Button>
-          </div>
-        </section>
+          </section>
+        </div>
       )}
 
       <RestBar rest={rest.rest} onAdd={() => rest.add(15)} onSubtract={() => rest.add(-15)} onSkip={() => rest.clear()} />

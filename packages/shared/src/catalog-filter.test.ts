@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { filterExercises, fitsEquipment, normalizeText, type FilterableExercise } from './catalog-filter';
+import { filterExercises, fitsEquipment, normalizeText, searchExercises, stemWord, type FilterableExercise } from './catalog-filter';
 
 const ex = (o: Partial<FilterableExercise> & { nameEs: string }): FilterableExercise => ({
   primaryMuscles: ['chest'],
@@ -49,5 +49,54 @@ describe('catalog filters', () => {
     expect(filterExercises(list, {}).map((e) => e.nameEs)).not.toContain('Ejercicio retirado');
     const all = filterExercises(list, {}).map((e) => e.nameEs);
     expect(all).toEqual([...all].sort((a, b) => a.localeCompare(b, 'es')));
+  });
+});
+
+describe('text search', () => {
+  const catalog = [
+    ex({ nameEs: 'Press de banca con barra, agarre medio', primaryMuscles: ['chest'], equipment: ['barbell', 'bench'] }),
+    ex({ nameEs: 'Pullover declinado con barra y agarre ancho', primaryMuscles: ['chest'], equipment: ['barbell', 'bench'] }),
+    ex({ nameEs: 'Curl con barra boca abajo en banco alto', primaryMuscles: ['biceps'], equipment: ['barbell', 'bench'] }),
+    ex({ nameEs: 'Curl martillo', primaryMuscles: ['biceps'], equipment: ['dumbbell'] }),
+    ex({ nameEs: 'Aperturas con mancuernas', primaryMuscles: ['chest'], equipment: ['dumbbell', 'bench'] }),
+    ex({ nameEs: 'Sentadilla goblet', primaryMuscles: ['quadriceps'], equipment: ['dumbbell'] }),
+  ];
+  const names = (r: { results: FilterableExercise[] }) => r.results.map((e) => e.nameEs);
+
+  it('stems plurals and word endings', () => {
+    expect(stemWord('pectorales')).toBe('pectoral');
+    expect(stemWord('curls')).toBe('curl');
+    expect(stemWord('banca')).toBe(stemWord('banco'));
+    expect(stemWord('sentadillas')).toBe(stemWord('sentadilla'));
+  });
+
+  it('ignores filler words and matches muscles and equipment, not only the name', () => {
+    // «banca» finds «banco», «pecho» finds chest exercises whose name does not say it.
+    const r = searchExercises(catalog, { text: 'press en banca para pecho' });
+    expect(r.approximate).toBe(false);
+    expect(names(r)).toEqual(['Press de banca con barra, agarre medio']);
+    expect(names(searchExercises(catalog, { text: 'pectorales con mancuernas' }))).toEqual(['Aperturas con mancuernas']);
+  });
+
+  it('with no exact match shows the closest ones first instead of nothing (seen in production)', () => {
+    const r = searchExercises(catalog, { text: 'curls con barra en banca para pectorales' });
+    expect(r.approximate).toBe(true);
+    // 3 of 4 words: bar + bench + chest, or curl + bar + bench.
+    expect(names(r).slice(0, 3).sort()).toEqual([
+      'Curl con barra boca abajo en banco alto',
+      'Press de banca con barra, agarre medio',
+      'Pullover declinado con barra y agarre ancho',
+    ]);
+    expect(names(r)).not.toContain('Sentadilla goblet');
+  });
+
+  it('the equipment filter still applies to approximate results', () => {
+    const r = searchExercises(catalog, { text: 'curls con barra en banca para pectorales', availableEquipment: ['dumbbell', 'bench'] });
+    expect(names(r)).not.toContain('Press de banca con barra, agarre medio');
+    expect(names(r)).toContain('Aperturas con mancuernas');
+  });
+
+  it('only filler words means no text filter', () => {
+    expect(searchExercises(catalog, { text: 'con para de' }).results).toHaveLength(catalog.length);
   });
 });

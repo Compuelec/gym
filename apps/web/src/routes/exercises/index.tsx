@@ -7,7 +7,7 @@ import {
   EQUIPMENT,
   EXERCISE_LEVELS,
   MUSCLES,
-  filterExercises,
+  searchExercises,
   type EquipmentSlug,
   type MuscleSlug,
 } from '@gym/shared';
@@ -55,16 +55,21 @@ function ExercisesPage() {
     void navigate({ search: (prev: Search) => ({ ...prev, ...patch, n: undefined }), replace: true, resetScroll: false });
 
   const location = locations.find((l) => l.id === search.place);
-  const results = useMemo(() => {
-    const list = filterExercises(all ?? [], {
+  const { results, approximate, hidden } = useMemo(() => {
+    const filter = {
       text: search.q ?? '',
       muscle: (search.muscle || null) as MuscleSlug | null,
       equipment: (search.equip || null) as EquipmentSlug | null,
       availableEquipment: location ? location.equipment : null,
       level: search.level || null,
       category: search.type || null,
-    });
-    return search.fav ? list.filter((e) => favorites.has(e.id)) : list;
+    };
+    const onlyFav = (list: ExerciseView[]) => (search.fav ? list.filter((e) => favorites.has(e.id)) : list);
+    const found = searchExercises(all ?? [], filter);
+    const list = onlyFav(found.results);
+    // How many the place filter hides: offered with one tap instead of looking "missing".
+    const withoutPlace = location ? onlyFav(searchExercises(all ?? [], { ...filter, availableEquipment: null }).results).length : list.length;
+    return { results: list, approximate: found.approximate, hidden: withoutPlace - list.length };
   }, [all, search, location, favorites]);
 
   // Back from an exercise: return to the same spot once the (locally loaded) list is rendered.
@@ -199,6 +204,12 @@ function ExercisesPage() {
             {selected ? t('exercises.selectHint') : tn('exercises.results', results.length)}
           </p>
           {results.length === 0 && <p>{t('exercises.noResults')}</p>}
+          {approximate && results.length > 0 && <p className="text-sm text-muted-foreground">{t('exercises.approximate')}</p>}
+          {hidden > 0 && location && (
+            <Button size="sm" variant="outline" className="self-start" onClick={() => set({ place: undefined })}>
+              {tn('exercises.hiddenByEquipment', hidden, { location: location.name })}
+            </Button>
+          )}
           <ul className="flex flex-col gap-2">
             {results.slice(0, limit).map((ex) => {
               const content = (

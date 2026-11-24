@@ -64,6 +64,13 @@ test.describe('US6 · coach con IA', () => {
     await expect(page.getByText('fedb:Inventado')).toHaveCount(0);
     await page.getByRole('button', { name: 'Nueva consulta' }).click();
 
+    // Texts longer than allowed are shortened, not a failed request (seen in production).
+    await ask(page, 'programa para bajar grasa [[LONG]]');
+    await expect(page.getByRole('heading', { name: 'Programa propuesto' })).toBeVisible({ timeout: 20_000 });
+    await expect(page.getByText('Programa de 4 semanas con mancuernas', { exact: false }).first()).toBeVisible();
+    await expect(page.getByText('El coach no respondió')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Nueva consulta' }).click();
+
     await ask(page, 'algo raro [[REFUSE]]');
     await expect(page.getByRole('alert')).toContainText('El coach no pudo responder a esta solicitud', { timeout: 20_000 });
 
