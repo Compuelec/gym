@@ -65,6 +65,14 @@ test.describe('US3 · entrenar y registrar sin conexión', () => {
     await expect(twist.locator('li')).toHaveCount(1);
 
     await page.getByRole('button', { name: 'Terminar' }).click();
+    // The confirmation must show up where the user tapped, without scrolling (it used to open at
+    // the very bottom of a long page, so on a phone «Terminar» looked like it did nothing).
+    await expect(page.getByRole('button', { name: 'Guardar entrenamiento' })).toBeInViewport();
+    // «Seguir entrenando» closes it without ending anything.
+    await page.getByRole('button', { name: 'Seguir entrenando' }).click();
+    await expect(page.getByRole('button', { name: 'Guardar entrenamiento' })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Terminar' }).click();
+    await expect(page.getByRole('button', { name: 'Guardar entrenamiento' })).toBeInViewport();
     await page.getByLabel('¿Qué tan duro fue? (1 a 10)').selectOption('7');
     await page.getByRole('button', { name: 'Guardar entrenamiento' }).click();
     await expect(page.getByRole('heading', { name: '¡Buen trabajo!' })).toBeVisible();
@@ -89,6 +97,23 @@ test.describe('US3 · entrenar y registrar sin conexión', () => {
     const curl2 = page.getByRole('region', { name: 'Curl martillo' });
     await expect(curl2.getByText('Última vez: 12 kg × 12 · 12 kg × 12')).toBeVisible();
     await expect(curl2.getByLabel('Peso (kg)', { exact: true })).toHaveValue('12');
+  });
+
+  test('exercise picker: nothing hidden silently, and the whole list can be reached', async ({ page }) => {
+    await page.getByRole('button', { name: 'Entrenamiento libre' }).click();
+    await page.getByRole('button', { name: 'Agregar ejercicio' }).click();
+    const picker = page.getByRole('dialog', { name: 'Elegir ejercicio' });
+    // Casa has no barbell: the picker says how many it hides and shows them with one tap.
+    await picker.getByLabel('Buscar ejercicio').fill('press banca pecho');
+    await picker.getByRole('button', { name: /^Ver también \d+ que piden? equipo que no tienes en Casa/ }).click();
+    await expect(picker.getByLabel('Sólo lo que puedo hacer en Casa')).not.toBeChecked();
+    await expect(picker.getByRole('button', { name: /Press de banca con barra, agarre medio/ })).toBeVisible();
+    // It used to stop at 50 results with no way to see the rest.
+    await picker.getByLabel('Buscar ejercicio').fill('');
+    const items = picker.getByRole('listitem');
+    await expect(items).toHaveCount(50);
+    await picker.getByRole('button', { name: 'Ver más' }).click();
+    await expect(items).toHaveCount(100);
   });
 
   test('swap an exercise for an equivalent one doable at the current location, with the reason', async ({ page }) => {
